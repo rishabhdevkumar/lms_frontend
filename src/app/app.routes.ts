@@ -30,4 +30,12 @@ export const routes: Routes = [
     path: 'student-profile',
     loadComponent: () => import('./student/pages/student-profile/student-profile.page').then( m => m.StudentProfilePage)
   },
+  {
+    path: 'login',
+    loadComponent: () => import('./login/login.page').then( m => m.LoginPage)
+  },
+  {
+    path: 'sign-up',
+    loadComponent: () => import('./sign-up/sign-up.page').then( m => m.SignUpPage)
+  },
 ];

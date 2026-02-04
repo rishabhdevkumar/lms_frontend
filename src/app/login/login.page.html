@@ -1,0 +1,35 @@
+<app-student-header></app-student-header>
+
+<ion-content fullscreen="true">
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12" size-md="4" size-lg="4">
+        <ion-card>
+          <ion-card-content>
+            <!-- <ion-segment>
+              <ion-segment-button value="faculty">
+                <ion-label>Faculty</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="admin">
+                <ion-label>Admin</ion-label>
+              </ion-segment-button>
+            </ion-segment> -->
+            <ion-item>
+              <ion-icon name="mail-outline" size="small" slot="start"></ion-icon>
+              <ion-input placeholder="Enter email" required></ion-input>
+              <ion-button slot="end">send</ion-button>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="lock-closed-outline" size="small" slot="start"></ion-icon>
+              <ion-input placeholder="Enter password" type="password" required></ion-input>
+              <ion-icon name="eye-off" slot="end" class="ion-margin-end"></ion-icon>
+            </ion-item>
+            <ion-button expand="block" shape="round" color="tertiary" type="submit" class="ion-margin-top">
+              Login
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
