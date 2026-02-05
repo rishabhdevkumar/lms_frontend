@@ -1,13 +1,79 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>dashboard</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header></app-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">dashboard</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-grid >
+    <ion-row>
+      <ion-col size="12" sizeMd="3">
+        <ion-card class="stat-card">
+          <ion-item lines="none">
+            <ion-icon name="people-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h2>Total Students</h2>
+              <h1>567</h1>
+            </ion-label>
+          </ion-item>
+          <ion-button expand="block" fill="clear" color="primary">
+            View Students
+          </ion-button>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" sizeMd="3">
+        <ion-card class="stat-card">
+          <ion-item lines="none">
+            <ion-icon name="person-outline" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Total Faculty</h2>
+              <h1>45</h1>
+            </ion-label>
+          </ion-item>
+          <ion-button expand="block" fill="clear" color="success">
+            View Faculty
+          </ion-button>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" sizeMd="3">
+        <ion-card class="stat-card">
+          <ion-item lines="none">
+            <ion-icon name="book-outline" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <h2>Total Courses</h2>
+              <h1>32</h1>
+            </ion-label>
+          </ion-item>
+          <ion-button expand="block" fill="clear" color="warning">
+            View Courses
+          </ion-button>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" sizeMd="3">
+        <ion-card class="stat-card">
+          <ion-item lines="none">
+            <ion-icon name="cash-outline" slot="start" color="tertiary"></ion-icon>
+            <ion-label>
+              <h2>Revenue</h2>
+              <h1>₹1.2L</h1>
+            </ion-label>
+          </ion-item>
+          <ion-button expand="block" fill="clear" color="tertiary">
+            View Report
+          </ion-button>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <!-- <ion-row>
+      <ion-col size="12">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Quick Actions</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-button expand="block" color="primary">Add Student</ion-button>
+            <ion-button expand="block" color="success">Add Faculty</ion-button>
+            <ion-button expand="block" color="warning">Add Course</ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row> -->
+
+  </ion-grid>
 </ion-content>

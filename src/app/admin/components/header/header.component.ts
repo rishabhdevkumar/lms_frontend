@@ -17,4 +17,34 @@ export class HeaderComponent  implements OnInit {
 
   ngOnInit() {}
 
+  adminName = 'Admin';
+  notificationsCount = 3;
+
+  showProfileMenu = false; // toggle for dropdown
+
+  // Notifications click
+  openNotifications() {
+    console.log('Open notifications');
+  }
+
+  // Toggle profile menu
+  toggleProfileMenu() {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  goToProfile() {
+    console.log('Go to My Profile');
+    this.showProfileMenu = false; // hide menu after click
+  }
+
+  goToSettings() {
+    console.log('Go to Settings');
+    this.showProfileMenu = false;
+  }
+
+  logout() {
+    console.log('Logout');
+    this.showProfileMenu = false;
+  }
+
 }
