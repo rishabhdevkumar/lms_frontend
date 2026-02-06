@@ -29,6 +29,34 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'add-student',
+        loadComponent: () =>
+          import('./admin/pages/add-student/add-student.page').then(
+            (m) => m.AddStudentPage,
+          ),
+      },
+      {
+        path: 'account-setting',
+        loadComponent: () =>
+          import('./admin/pages/account-setting/account-setting.page').then(
+            (m) => m.AccountSettingPage,
+          ),
+      },
+      {
+        path: 'add-agent',
+        loadComponent: () =>
+          import('./admin/pages/add-agent/add-agent.page').then(
+            (m) => m.AddAgentPage,
+          ),
+      },
+      {
+        path: 'academic',
+        loadComponent: () =>
+          import('./admin/pages/academic/academic.page').then(
+            (m) => m.AcademicPage,
+          ),
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

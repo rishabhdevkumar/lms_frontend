@@ -1,0 +1,30 @@
+ion-segment {
+  margin: 12px;
+}
+
+.tab-content {
+  padding: 12px;
+}
+
+ion-card {
+  border-radius: 12px;
+}
+
+.table-header {
+  font-weight: 600;
+  border-bottom: 1px solid #414040;
+  padding: 4px 0px 4px 5px;
+ background-color: var(--ion-color-light);
+
+}
+
+.table-row {
+  border-bottom: 1px solid #414040;
+  padding: 4px 0px 4px 5px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.academic-segment {
+  --background: var(--ion-color-step-50);
+}

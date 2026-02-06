@@ -1,18 +1,45 @@
 <ion-header>
-  <ion-toolbar color="primary">
-
+  <ion-toolbar>
+    <ion-buttons class="ion-margin-start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
     <ion-buttons slot="end">
-
-      <ion-button>
-        <ion-icon name="notifications-outline"></ion-icon>
+      <ion-button class="notification-btn">
+        <ion-icon name="notifications-outline" size="large"></ion-icon>
         <ion-badge color="danger" class="notify-badge">3</ion-badge>
       </ion-button>
-
-      <ion-button id="profilePopover">
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button id="profile-menu-button">
         <ion-icon name="person-circle-outline" size="large"></ion-icon>
       </ion-button>
-
+      <ion-popover trigger="profile-menu-button" [dismissOnSelect]="true">
+        <ng-template>
+          <ion-content>
+            <ion-list>
+              <ion-item>
+                <ion-icon class="ion-margin-end" name="person-circle-outline" color="tertiary"></ion-icon>
+                <ion-label>
+                  <h3>Rishabh</h3>
+                  <p>rishabh@gmail.com</p>
+                </ion-label>
+              </ion-item>
+              <ion-item routerLink="/admin/account-setting" [button]="true">
+                <ion-icon class="ion-margin-end" name="create-outline" color="tertiary"></ion-icon>
+                Account Setting
+              </ion-item>
+              <ion-item [button]="true">
+                <ion-icon class="ion-margin-end" name="settings-outline" color="tertiary"></ion-icon>
+                Settings
+              </ion-item>
+              <ion-item [button]="true" lines="none">
+                <ion-icon class="ion-margin-end" name="log-out-outline" color="danger"></ion-icon>
+                logout
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
     </ion-buttons>
-
   </ion-toolbar>
 </ion-header>

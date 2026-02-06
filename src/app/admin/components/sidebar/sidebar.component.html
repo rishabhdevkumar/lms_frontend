@@ -1,38 +1,41 @@
 <ion-split-pane contentId="main-content">
-
   <ion-menu contentId="main-content" type="overlay">
     <ion-header>
       <ion-toolbar>
-        <ion-title>Admin Panel</ion-title>
+        <ion-title>Admin</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-list>
-        <ion-item routerLink="/admin/dashboard" routerLinkActive="active-menu" lines="none">
-          <ion-icon name="grid-outline" slot="start"></ion-icon>
+      <ion-list class="sidebar-menu">
+        <ion-item routerLink="/admin/dashboard" routerLinkActive="active-menu">
+          <ion-icon name="grid-outline" class="ion-margin-end"></ion-icon>
           <ion-label>Dashboard</ion-label>
         </ion-item>
-        <ion-item routerLink="/admin/student-details" routerLinkActive="active-menu" lines="none">
-          <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        <ion-item routerLink="/admin/add-student" routerLinkActive="active-menu">
+          <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
           <ion-label>Add Student</ion-label>
         </ion-item>
-        <ion-item routerLink="/admin/agent" routerLinkActive="active-menu" lines="none">
-          <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        <ion-item routerLink="/admin/add-agent" routerLinkActive="active-menu">
+          <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
           <ion-label>Add Agent</ion-label>
         </ion-item>
-        <ion-item routerLink="/admin/attendence" routerLinkActive="active-menu" lines="none">
-          <ion-icon name="finger-print-outline" slot="start"></ion-icon>
+        <ion-item routerLinkActive="active-menu">
+          <ion-icon name="finger-print-outline" class="ion-margin-end"></ion-icon>
           <ion-label>Attendance</ion-label>
         </ion-item>
-        <ion-item routerLink="/admin/projects" routerLinkActive="active-menu" lines="none">
-          <ion-icon name="briefcase-outline" slot="start"></ion-icon>
+        <ion-item routerLinkActive="active-menu">
+          <ion-icon name="briefcase-outline" class="ion-margin-end"></ion-icon>
           <ion-label>Assignment</ion-label>
         </ion-item>
-        <ion-item routerLink="/admin/faculty" routerLinkActive="active-menu" lines="none">
-          <ion-icon name="people-circle-outline" slot="start"></ion-icon>
+        <ion-item routerLinkActive="active-menu">
+          <ion-icon name="people-circle-outline" class="ion-margin-end"></ion-icon>
           <ion-label>Our Faculty</ion-label>
         </ion-item>
-        <ion-item routerLink="/admin/schedule" routerLinkActive="active-menu" lines="none">
+        <ion-item routerLink="/admin/academic" routerLinkActive="active-menu">
+          <ion-icon name="school-outline" class="ion-margin-end"></ion-icon>
+          <ion-label>Academic Setup</ion-label>
+        </ion-item>
+        <!-- <ion-item routerLink="/admin/schedule" routerLinkActive="active-menu" lines="none">
           <ion-icon name="calendar-clear-outline" slot="start"></ion-icon>
           <ion-label>Class Schedule</ion-label>
         </ion-item>
@@ -63,11 +66,14 @@
         <ion-item routerLink="/admin/chapter" routerLinkActive="active-menu" lines="none">
           <ion-icon name="bookmarks-outline" slot="start"></ion-icon>
           <ion-label>Chapter</ion-label>
+        </ion-item> -->
+        <ion-item routerLinkActive="active-menu" lines="none">
+          <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+          <ion-label>Logout</ion-label>
         </ion-item>
       </ion-list>
     </ion-content>
   </ion-menu>
 
   <ion-router-outlet id="main-content"></ion-router-outlet>
-
 </ion-split-pane>

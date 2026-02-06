@@ -1,0 +1,18 @@
+.notification-btn {
+  position: relative;
+}
+
+.notify-badge {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  font-size: 14px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+}
+
+// color="danger" style="margin: 0 0.2rem 0.1rem; color: #fff;"

@@ -1,0 +1,292 @@
+<app-header></app-header>
+
+<ion-content>
+  <ion-segment scrollable value="session" [(ngModel)]="activeTab" class="academic-segment">
+    <ion-segment-button value="session">Session</ion-segment-button>
+    <ion-segment-button value="course">Course</ion-segment-button>
+    <ion-segment-button value="semester">Semester</ion-segment-button>
+    <ion-segment-button value="syllabus">Syllabus</ion-segment-button>
+    <ion-segment-button value="subject">Subject</ion-segment-button>
+    <ion-segment-button value="chapter">Chapter</ion-segment-button>
+  </ion-segment>
+
+  <div class="tab-content">
+    <ng-container *ngIf="activeTab === 'session'">
+      <ion-card>
+        <ion-card-header>
+          <ion-item class="card-header-item">
+            <ion-card-title>Session Management</ion-card-title>
+            <ion-button slot="end" size="small" class="ion-margin-end">
+              Add New
+            </ion-button>
+          </ion-item>
+        </ion-card-header>
+        <ion-card-content class="ion-padding">
+          <ion-item lines="none">
+            <ion-searchbar placeholder="Search by session..." debounce="300">
+            </ion-searchbar>
+          </ion-item>
+          <ion-grid class="table">
+            <ion-row class="table-header ion-hide-md-down">
+              <ion-col size="1">SL.NO</ion-col>
+              <ion-col size="3">SESSION NAME</ion-col>
+              <ion-col size="2">SHORT NAME</ion-col>
+              <ion-col size="3">TIMESTAMP</ion-col>
+              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
+              <ion-col size="2" class="ion-text-center">DELETE</ion-col>
+            </ion-row>
+            <ion-row class="table-row">
+              <ion-col size="12" sizeMd="1">
+                <span class="mobile-label">SL.NO</span> 1
+              </ion-col>
+              <ion-col size="12" sizeMd="3">
+                <span class="mobile-label">2024-2025</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">AY24</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="3">
+                <span class="mobile-label">2024-05-02 15:27:46</span>
+              </ion-col>
+              <ion-col size="6" sizeMd="1">
+                <ion-button size="small" expand="block">
+                  Edit
+                </ion-button>
+              </ion-col>
+              <ion-col size="6" sizeMd="2">
+                <ion-button size="small" expand="block" color="danger">
+                  Delete
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+
+    <ng-container *ngIf="activeTab === 'course'">
+      <ion-card>
+        <ion-card-header>
+          <ion-item class="card-header-item">
+            <ion-card-title>Course Management</ion-card-title>
+            <ion-button slot="end" size="small" class="ion-margin-end">
+              Add New
+            </ion-button>
+          </ion-item>
+        </ion-card-header>
+        <ion-card-content class="ion-padding">
+          <ion-item lines="none">
+            <ion-searchbar placeholder="Search by course..." debounce="300">
+            </ion-searchbar>
+          </ion-item>
+          <ion-grid class="table">
+            <ion-row class="table-header ion-hide-md-down">
+              <ion-col size="1">SL.NO</ion-col>
+              <ion-col size="3">SESSION</ion-col>
+              <ion-col size="2">COURSE NAME</ion-col>
+              <ion-col size="3">SHORT NAME</ion-col>
+              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
+              <ion-col size="2" class="ion-text-center">DELETE</ion-col>
+            </ion-row>
+            <ion-row class="table-row">
+              <ion-col size="12" sizeMd="1">
+                <span class="mobile-label">SL.NO</span> 1
+              </ion-col>
+              <ion-col size="12" sizeMd="3">
+                <span class="mobile-label">2024-2025</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">AY24</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="3">
+                <span class="mobile-label">2024-05-02 15:27:46</span>
+              </ion-col>
+              <ion-col size="6" sizeMd="1">
+                <ion-button size="small" expand="block">
+                  Edit
+                </ion-button>
+              </ion-col>
+              <ion-col size="6" sizeMd="2">
+                <ion-button size="small" expand="block" color="danger">
+                  Delete
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+
+    <ng-container *ngIf="activeTab === 'semester'">
+      <ion-card>
+        <ion-card-header>
+          <ion-item class="card-header-item">
+            <ion-card-title>Semester Management</ion-card-title>
+            <ion-button slot="end" size="small" class="ion-margin-end">
+              Add New
+            </ion-button>
+          </ion-item>
+        </ion-card-header>
+        <ion-card-content class="ion-padding">
+          <ion-item lines="none">
+            <ion-searchbar placeholder="Search by semester..." debounce="300">
+            </ion-searchbar>
+          </ion-item>
+          <ion-grid class="table">
+            <ion-row class="table-header ion-hide-md-down">
+              <ion-col size="1">SL.NO</ion-col>
+              <ion-col size="3">SESSION</ion-col>
+              <ion-col size="2">COURSE</ion-col>
+              <ion-col size="3">SEMESTER</ion-col>
+              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
+              <ion-col size="2" class="ion-text-center">DELETE</ion-col>
+            </ion-row>
+            <ion-row class="table-row">
+              <ion-col size="12" sizeMd="1">
+                <span class="mobile-label">SL.NO</span> 1
+              </ion-col>
+              <ion-col size="12" sizeMd="3">
+                <span class="mobile-label">2024-2025</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">AY24</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="3">
+                <span class="mobile-label">2024-05-02 15:27:46</span>
+              </ion-col>
+              <ion-col size="6" sizeMd="1">
+                <ion-button size="small" expand="block">
+                  Edit
+                </ion-button>
+              </ion-col>
+              <ion-col size="6" sizeMd="2">
+                <ion-button size="small" expand="block" color="danger">
+                  Delete
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+
+    <ng-container *ngIf="activeTab === 'subject'">
+      <ion-card>
+        <ion-card-header>
+          <ion-item class="card-header-item">
+            <ion-card-title>Subject Management</ion-card-title>
+            <ion-button slot="end" size="small" class="ion-margin-end">
+              Add New
+            </ion-button>
+          </ion-item>
+        </ion-card-header>
+        <ion-card-content class="ion-padding">
+          <ion-item lines="none">
+            <ion-searchbar placeholder="Search by subject..." debounce="300">
+            </ion-searchbar>
+          </ion-item>
+          <ion-grid class="table">
+            <ion-row class="table-header ion-hide-md-down">
+              <ion-col size="1">SL.NO</ion-col>
+              <ion-col size="2">SESSION</ion-col>
+              <ion-col size="2">COURSE</ion-col>
+              <ion-col size="2">SEMESTER</ion-col>
+              <ion-col size="2">SUBJECT</ion-col>
+              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
+              <ion-col size="2" class="ion-text-center">DELETE</ion-col>
+            </ion-row>
+            <ion-row class="table-row">
+              <ion-col size="12" sizeMd="1">
+                <span class="mobile-label">SL.NO</span> 1
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">2024-2025</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">AY24</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">AY24</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">Mathematics</span>
+              </ion-col>
+              <ion-col size="6" sizeMd="1">
+                <ion-button size="small" expand="block">
+                  Edit
+                </ion-button>
+              </ion-col>
+              <ion-col size="6" sizeMd="2">
+                <ion-button size="small" expand="block" color="danger">
+                  Delete
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+
+    <ng-container *ngIf="activeTab === 'chapter'">
+      <ion-card>
+        <ion-card-header>
+          <ion-item class="card-header-item">
+            <ion-card-title>Chapter Management</ion-card-title>
+            <ion-button slot="end" size="small" class="ion-margin-end">
+              Add New
+            </ion-button>
+          </ion-item>
+        </ion-card-header>
+        <ion-card-content class="ion-padding">
+          <ion-item lines="none">
+            <ion-searchbar placeholder="Search by chapter..." debounce="300">
+            </ion-searchbar>
+          </ion-item>
+          <ion-grid class="table">
+            <ion-row class="table-header ion-hide-md-down">
+              <ion-col size="1">SL.NO</ion-col>
+              <ion-col size="1">SESSION</ion-col>
+              <ion-col size="2">COURSE</ion-col>
+              <ion-col size="2">SEMESTER</ion-col>
+              <ion-col size="2">SUBJECT</ion-col>
+              <ion-col size="2">SUBJECT</ion-col>
+              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
+              <ion-col size="1" class="ion-text-center">DELETE</ion-col>
+            </ion-row>
+            <ion-row class="table-row">
+              <ion-col size="12" sizeMd="1">
+                <span class="mobile-label">SL.NO</span> 1
+              </ion-col>
+              <ion-col size="12" sizeMd="1">
+                <span class="mobile-label">2024–2025</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">AY24</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">AY24</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">Mathematics</span>
+              </ion-col>
+              <ion-col size="12" sizeMd="2">
+                <span class="mobile-label">chapter1</span>
+              </ion-col>
+              <ion-col size="6" sizeMd="1">
+                <ion-button size="small" expand="block">
+                  Edit
+                </ion-button>
+              </ion-col>
+              <ion-col size="6" sizeMd="1">
+                <ion-button size="small" expand="block" color="danger">
+                  Delete
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+  </div>
+
+</ion-content>

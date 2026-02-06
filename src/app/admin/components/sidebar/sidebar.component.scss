@@ -1,0 +1,16 @@
+.sidebar-menu {
+  padding: 0;
+}
+
+.sidebar-menu ion-item {
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  margin: 0;
+  width: 100%;
+  border-radius: 0;
+}
+
+.active-menu {
+  --background: var(--ion-color-primary);
+  color: #fff;
+}
