@@ -1,5 +1,75 @@
 <app-student-header></app-student-header>
 
 <ion-content [fullscreen]="true">
-  
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <ion-grid>
+      <ion-row class="ion-align-items-center ion-justify-content-center">
+        
+        <!-- TEXT + BUTTONS -->
+        <ion-col size="12" size-md="6" class="hero-text">
+          <h1>Learn Anytime, Anywhere</h1>
+          <p>Online courses for students & faculty. Expand your knowledge with LMS anytime, anywhere.</p>
+          
+          <div class="hero-buttons">
+            <ion-button routerLink="/sign-up" color="primary" shape="round" size="large">Get Started</ion-button>
+            <ion-button routerLink="/courses" color="tertiary" fill="outline" shape="round" size="large">Browse Courses</ion-button>
+          </div>
+        </ion-col>
+
+        <!-- IMAGE / ILLUSTRATION -->
+        <ion-col size="12" size-md="6" class="hero-image">
+          <img src="assets/education-illustration.svg" alt="Education illustration">
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </section>
+  <!-- FEATURES / BENEFITS SECTION -->
+<section class="features-section">
+  <ion-grid>
+    <ion-row class="ion-justify-content-center ion-align-items-stretch">
+      
+      <ion-col size="12">
+        <h2 class="section-title">Why Choose LMS?</h2>
+        <p class="section-subtitle">Explore the key features that make learning easier and flexible.</p>
+      </ion-col>
+
+      <!-- Feature 1 -->
+      <ion-col size="12" size-md="3" class="feature-card">
+        <ion-icon name="book-outline"></ion-icon>
+        <h3>Online Courses</h3>
+        <p>Access a wide variety of courses anytime, anywhere, on any device.</p>
+      </ion-col>
+
+      <!-- Feature 2 -->
+      <ion-col size="12" size-md="3" class="feature-card">
+        <ion-icon name="school-outline"></ion-icon>
+        <h3>Expert Faculty</h3>
+        <p>Learn from experienced teachers and professionals in each field.</p>
+      </ion-col>
+
+      <!-- Feature 3 -->
+      <ion-col size="12" size-md="3" class="feature-card">
+        <ion-icon name="timer-outline"></ion-icon>
+        <h3>Flexible Schedule</h3>
+        <p>Study at your own pace with courses designed to fit your timetable.</p>
+      </ion-col>
+
+      <!-- Feature 4 -->
+      <ion-col size="12" size-md="3" class="feature-card">
+        <ion-icon name="trophy-outline"></ion-icon>
+        <h3>Certification</h3>
+        <p>Get recognized certificates after course completion to boost your career.</p>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+</section>
+
+
 </ion-content>
+
+
+<app-footer></app-footer>

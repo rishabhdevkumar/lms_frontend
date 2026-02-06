@@ -1,0 +1,35 @@
+.logo {
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.desktop-menu {
+  display: none;
+}
+
+/* Mobile menu button */
+.mobile-menu {
+  display: block;
+}
+
+/* Language dropdown */
+.lang-select {
+  min-width: 70px;
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .desktop-menu {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: none;
+  }
+}
+
+.auth-btn {
+  white-space: nowrap;
+  text-transform: none;
+  --border-radius: 999px;
+}

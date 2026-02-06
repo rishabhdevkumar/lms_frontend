@@ -1,3 +1,48 @@
-<p>
-  footer works!
-</p>
+<ion-footer>
+  <ion-toolbar>
+    <ion-grid>
+      <ion-row class="ion-align-items-start">
+
+        <!-- LMS Name & Copyright -->
+        <ion-col size="12" size-md="3" class="footer-section">
+          <h2>LMS</h2>
+          <p>© 2026 LMS. All rights reserved.</p>
+        </ion-col>
+
+        <!-- Quick Links -->
+        <ion-col size="12" size-md="3" class="footer-section">
+          <h3>Quick Links</h3>
+          <ion-list lines="none">
+            <ion-item routerLink="/home">Home</ion-item>
+            <ion-item routerLink="/courses">Courses</ion-item>
+            <ion-item routerLink="/about">About</ion-item>
+            <ion-item routerLink="/contact">Contact</ion-item>
+          </ion-list>
+        </ion-col>
+
+        <!-- Legal Links -->
+        <ion-col size="12" size-md="3" class="footer-section">
+          <h3>Legal</h3>
+          <ion-list lines="none">
+            <ion-item routerLink="/privacy-policy">Privacy Policy</ion-item>
+            <ion-item routerLink="/terms">Terms & Conditions</ion-item>
+          </ion-list>
+        </ion-col>
+
+        <!-- Contact Info & Social -->
+        <ion-col size="12" size-md="3" class="footer-section">
+          <h3>Contact</h3>
+          <p>Email: support@lms.com</p>
+          <p>Phone: +91 12345 67890</p>
+          <div class="social-icons">
+            <ion-icon name="logo-facebook"></ion-icon>
+            <ion-icon name="logo-twitter"></ion-icon>
+            <ion-icon name="logo-instagram"></ion-icon>
+            <ion-icon name="logo-linkedin"></ion-icon>
+          </div>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-footer>

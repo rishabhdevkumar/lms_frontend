@@ -1,5 +1,45 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>lms</ion-title>
+
+    <!-- LEFT : LOGO / TITLE -->
+    <ion-title slot="start" class="logo">
+      LMS
+    </ion-title>
+
+    <!-- CENTER : MENU (WEB VIEW) -->
+    <ion-buttons>
+      <ion-button routerLink="/home">Home</ion-button>
+      <ion-button routerLink="/courses">Courses</ion-button>
+      <ion-button routerLink="/about">About</ion-button>
+      <ion-button routerLink="/contact">Contact</ion-button>
+    </ion-buttons>
+
+    <!-- RIGHT : ACTIONS -->
+    <ion-buttons slot="end">
+
+      <!-- LANGUAGE SWITCH -->
+      <ion-select
+        interface="popover"
+        value="en"
+        class="lang-select">
+        <ion-select-option value="en">EN</ion-select-option>
+        <ion-select-option value="hi">HI</ion-select-option>
+      </ion-select>
+
+      <!-- LOGIN BUTTON -->
+      <ion-button routerLink="/login" class="auth-btn">
+        SIGN-IN
+      </ion-button>
+
+      <!-- REGISTER BUTTON -->
+      <ion-button fill="solid" shape="round" size="small" color="medium" class="auth-btn" routerLink="/sign-up">
+        SIGN-UP
+      </ion-button>
+
+      <!-- MOBILE MENU -->
+      <ion-menu-button class="mobile-menu"></ion-menu-button>
+
+    </ion-buttons>
+
   </ion-toolbar>
 </ion-header>
