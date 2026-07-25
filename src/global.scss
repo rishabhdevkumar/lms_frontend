@@ -1,54 +1,178 @@
 /*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
+ * APP GLOBAL CSS
  */
 
-/* Core CSS required for Ionic components to work properly */
+/* Core CSS imports for Ionic components */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+/* Font utilities */
+.font-serif-display {
+  font-family: 'Instrument Serif', Georgia, serif;
+}
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
+}
 
-.split-pane-visible >.split-pane-side {
-    flex-grow: 28;
+.font-sans-body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.split-pane-visible > .split-pane-side {
+  flex-grow: 28;
+  min-width: 250px;
+  max-width: 280px;
+  border-right: 1px solid #e2e8f0;
+}
+
+.split-pane-visible > .split-pane-main {
+  flex-grow: 72;
+}
+
+ion-modal {
+  --width: 800px !important;
+  --height: 700px !important;
+}
+
+/* ==========================================================================
+   GLOBAL DARK MODE SYSTEM (APPLIES ACROSS HOME, STUDENT, FACULTY & ADMIN)
+   ========================================================================== */
+body.dark {
+  background-color: #0f1c14 !important;
+  color: #f8fafc !important;
+
+  ion-content, ion-page, .ion-page, main, div.min-h-screen, .auth-page-wrapper, .auth-section {
+    background-color: #0f1c14 !important;
+    color: #ffffff !important;
   }
-  .split-pane-visible >.split-pane-main {
-    flex-grow: 72;
+
+  /* HOME PAGE SECTIONS IN DARK MODE */
+  .hero-section, .categories-section, .why-section, .trusted-section, .mentors-section {
+    background-color: #0f1c14 !important;
+    color: #ffffff !important;
+    border-color: #223a2b !important;
   }
 
-  .split-pane-visible >.split-pane-side {
-    min-width: 30px; /* Default: 270px */
-    max-width: 250px; /* Same as when menu opens in mobile mode */
+  .hero-bg-overlay {
+    background: radial-gradient(circle at 35% 50%, rgba(15, 28, 20, 0.82) 0%, rgba(15, 28, 20, 0.95) 100%) !important;
   }
 
-  ion-modal{
-    --width: 800px !important;
-    --height: 700px !important
+  .hero-bg-video {
+    opacity: 0.28 !important;
+  }
+
+  .hero-title, .section-title, .why-title, .cat-name, .mentor-name, .auth-title, .stat-number {
+    color: #ffffff !important;
+  }
+
+  .hero-description, .section-desc, .why-desc, .mentor-role, .auth-subtitle, .stat-label, .trust-text span {
+    color: #cbd5e1 !important;
+  }
+
+  /* CARDS & CONTAINERS IN DARK MODE */
+  .category-card, .why-card, .mentor-card, .stat-card, .auth-card {
+    background-color: #14241a !important;
+    border-color: #223a2b !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* AUTH FORM INPUTS IN DARK MODE */
+  .form-input {
+    background-color: #0f1c14 !important;
+    border-color: #223a2b !important;
+    color: #ffffff !important;
+
+    &::placeholder {
+      color: #64748b !important;
+    }
+
+    &:focus {
+      border-color: #d97706 !important;
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.25) !important;
+    }
+  }
+
+  .form-label, .role-label, .checkbox-label {
+    color: #cbd5e1 !important;
+  }
+
+  .mode-tabs, .role-chips {
+    background-color: #0b130e !important;
+  }
+
+  .role-chip {
+    background-color: #14241a !important;
+    border-color: #223a2b !important;
+    color: #cbd5e1 !important;
+
+    &.selected {
+      background-color: rgba(217, 119, 6, 0.15) !important;
+      border-color: #d97706 !important;
+      color: #d97706 !important;
+    }
+  }
+
+  .mode-tab-btn {
+    color: #94a3b8 !important;
+
+    &.active {
+      background-color: #14241a !important;
+      color: #d97706 !important;
+    }
+  }
+
+  /* FLOATING CARDS IN HERO SECTION */
+  .floating-mobile-card, .floating-rating-badge {
+    background-color: #14241a !important;
+    border-color: #223a2b !important;
+
+    .mobile-title, .rating-num {
+      color: #ffffff !important;
+    }
+
+    .mobile-sub, .rating-text {
+      color: #cbd5e1 !important;
+    }
+  }
+
+  /* BUTTONS IN DARK MODE */
+  .btn-demo-hero {
+    background-color: #14241a !important;
+    border-color: #223a2b !important;
+    color: #ffffff !important;
+
+    &:hover {
+      background-color: #1e3a29 !important;
+      border-color: #d97706 !important;
+    }
+  }
+
+  /* STUDENT, FACULTY & ADMIN PANELS DARK MODE OVERRIDES */
+  .sidebar-container, .admin-header, .student-header, ion-header, ion-toolbar {
+    --background: #0f1c14 !important;
+    background-color: #0f1c14 !important;
+    border-color: #223a2b !important;
+    color: #ffffff !important;
+  }
+
+  ion-card, .dashboard-card, .table-container, table {
+    background-color: #14241a !important;
+    border-color: #223a2b !important;
+    color: #ffffff !important;
+  }
+
+  ion-item, ion-list {
+    --background: #14241a !important;
+    --color: #ffffff !important;
+  }
 }
