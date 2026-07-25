@@ -1,292 +1,355 @@
 <app-header></app-header>
 
-<ion-content>
-  <ion-segment scrollable value="session" [(ngModel)]="activeTab" class="academic-segment">
-    <ion-segment-button value="session">Session</ion-segment-button>
-    <ion-segment-button value="course">Course</ion-segment-button>
-    <ion-segment-button value="semester">Semester</ion-segment-button>
-    <ion-segment-button value="syllabus">Syllabus</ion-segment-button>
-    <ion-segment-button value="subject">Subject</ion-segment-button>
-    <ion-segment-button value="chapter">Chapter</ion-segment-button>
-  </ion-segment>
+<ion-content [fullscreen]="true" class="academic-page-content">
+  
+  <div class="academic-wrapper">
 
-  <div class="tab-content">
-    <ng-container *ngIf="activeTab === 'session'">
-      <ion-card>
-        <ion-card-header>
-          <ion-item class="card-header-item">
-            <ion-card-title>Session Management</ion-card-title>
-            <ion-button slot="end" size="small" class="ion-margin-end">
-              Add New
-            </ion-button>
-          </ion-item>
-        </ion-card-header>
-        <ion-card-content class="ion-padding">
-          <ion-item lines="none">
-            <ion-searchbar placeholder="Search by session..." debounce="300">
-            </ion-searchbar>
-          </ion-item>
-          <ion-grid class="table">
-            <ion-row class="table-header ion-hide-md-down">
-              <ion-col size="1">SL.NO</ion-col>
-              <ion-col size="3">SESSION NAME</ion-col>
-              <ion-col size="2">SHORT NAME</ion-col>
-              <ion-col size="3">TIMESTAMP</ion-col>
-              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
-              <ion-col size="2" class="ion-text-center">DELETE</ion-col>
-            </ion-row>
-            <ion-row class="table-row">
-              <ion-col size="12" sizeMd="1">
-                <span class="mobile-label">SL.NO</span> 1
-              </ion-col>
-              <ion-col size="12" sizeMd="3">
-                <span class="mobile-label">2024-2025</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">AY24</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="3">
-                <span class="mobile-label">2024-05-02 15:27:46</span>
-              </ion-col>
-              <ion-col size="6" sizeMd="1">
-                <ion-button size="small" expand="block">
-                  Edit
-                </ion-button>
-              </ion-col>
-              <ion-col size="6" sizeMd="2">
-                <ion-button size="small" expand="block" color="danger">
-                  Delete
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-card-content>
-      </ion-card>
-    </ng-container>
+    <!-- TOP FLOATING PILL CATEGORY NAVIGATION TABS -->
+    <div class="academic-pills-container">
+      <button class="pill-tab-btn" [class.active]="activeTab === 'session'" (click)="selectTab('session')">
+        <span class="tab-icon">📅</span> SESSION
+      </button>
 
-    <ng-container *ngIf="activeTab === 'course'">
-      <ion-card>
-        <ion-card-header>
-          <ion-item class="card-header-item">
-            <ion-card-title>Course Management</ion-card-title>
-            <ion-button slot="end" size="small" class="ion-margin-end">
-              Add New
-            </ion-button>
-          </ion-item>
-        </ion-card-header>
-        <ion-card-content class="ion-padding">
-          <ion-item lines="none">
-            <ion-searchbar placeholder="Search by course..." debounce="300">
-            </ion-searchbar>
-          </ion-item>
-          <ion-grid class="table">
-            <ion-row class="table-header ion-hide-md-down">
-              <ion-col size="1">SL.NO</ion-col>
-              <ion-col size="3">SESSION</ion-col>
-              <ion-col size="2">COURSE NAME</ion-col>
-              <ion-col size="3">SHORT NAME</ion-col>
-              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
-              <ion-col size="2" class="ion-text-center">DELETE</ion-col>
-            </ion-row>
-            <ion-row class="table-row">
-              <ion-col size="12" sizeMd="1">
-                <span class="mobile-label">SL.NO</span> 1
-              </ion-col>
-              <ion-col size="12" sizeMd="3">
-                <span class="mobile-label">2024-2025</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">AY24</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="3">
-                <span class="mobile-label">2024-05-02 15:27:46</span>
-              </ion-col>
-              <ion-col size="6" sizeMd="1">
-                <ion-button size="small" expand="block">
-                  Edit
-                </ion-button>
-              </ion-col>
-              <ion-col size="6" sizeMd="2">
-                <ion-button size="small" expand="block" color="danger">
-                  Delete
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-card-content>
-      </ion-card>
-    </ng-container>
+      <button class="pill-tab-btn" [class.active]="activeTab === 'course'" (click)="selectTab('course')">
+        <span class="tab-icon">🎓</span> COURSE
+      </button>
 
-    <ng-container *ngIf="activeTab === 'semester'">
-      <ion-card>
-        <ion-card-header>
-          <ion-item class="card-header-item">
-            <ion-card-title>Semester Management</ion-card-title>
-            <ion-button slot="end" size="small" class="ion-margin-end">
-              Add New
-            </ion-button>
-          </ion-item>
-        </ion-card-header>
-        <ion-card-content class="ion-padding">
-          <ion-item lines="none">
-            <ion-searchbar placeholder="Search by semester..." debounce="300">
-            </ion-searchbar>
-          </ion-item>
-          <ion-grid class="table">
-            <ion-row class="table-header ion-hide-md-down">
-              <ion-col size="1">SL.NO</ion-col>
-              <ion-col size="3">SESSION</ion-col>
-              <ion-col size="2">COURSE</ion-col>
-              <ion-col size="3">SEMESTER</ion-col>
-              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
-              <ion-col size="2" class="ion-text-center">DELETE</ion-col>
-            </ion-row>
-            <ion-row class="table-row">
-              <ion-col size="12" sizeMd="1">
-                <span class="mobile-label">SL.NO</span> 1
-              </ion-col>
-              <ion-col size="12" sizeMd="3">
-                <span class="mobile-label">2024-2025</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">AY24</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="3">
-                <span class="mobile-label">2024-05-02 15:27:46</span>
-              </ion-col>
-              <ion-col size="6" sizeMd="1">
-                <ion-button size="small" expand="block">
-                  Edit
-                </ion-button>
-              </ion-col>
-              <ion-col size="6" sizeMd="2">
-                <ion-button size="small" expand="block" color="danger">
-                  Delete
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-card-content>
-      </ion-card>
-    </ng-container>
+      <button class="pill-tab-btn" [class.active]="activeTab === 'semester'" (click)="selectTab('semester')">
+        <span class="tab-icon">📖</span> SEMESTER
+      </button>
 
-    <ng-container *ngIf="activeTab === 'subject'">
-      <ion-card>
-        <ion-card-header>
-          <ion-item class="card-header-item">
-            <ion-card-title>Subject Management</ion-card-title>
-            <ion-button slot="end" size="small" class="ion-margin-end">
-              Add New
-            </ion-button>
-          </ion-item>
-        </ion-card-header>
-        <ion-card-content class="ion-padding">
-          <ion-item lines="none">
-            <ion-searchbar placeholder="Search by subject..." debounce="300">
-            </ion-searchbar>
-          </ion-item>
-          <ion-grid class="table">
-            <ion-row class="table-header ion-hide-md-down">
-              <ion-col size="1">SL.NO</ion-col>
-              <ion-col size="2">SESSION</ion-col>
-              <ion-col size="2">COURSE</ion-col>
-              <ion-col size="2">SEMESTER</ion-col>
-              <ion-col size="2">SUBJECT</ion-col>
-              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
-              <ion-col size="2" class="ion-text-center">DELETE</ion-col>
-            </ion-row>
-            <ion-row class="table-row">
-              <ion-col size="12" sizeMd="1">
-                <span class="mobile-label">SL.NO</span> 1
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">2024-2025</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">AY24</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">AY24</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">Mathematics</span>
-              </ion-col>
-              <ion-col size="6" sizeMd="1">
-                <ion-button size="small" expand="block">
-                  Edit
-                </ion-button>
-              </ion-col>
-              <ion-col size="6" sizeMd="2">
-                <ion-button size="small" expand="block" color="danger">
-                  Delete
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-card-content>
-      </ion-card>
-    </ng-container>
+      <button class="pill-tab-btn" [class.active]="activeTab === 'syllabus'" (click)="selectTab('syllabus')">
+        <span class="tab-icon">📑</span> SYLLABUS
+      </button>
 
-    <ng-container *ngIf="activeTab === 'chapter'">
-      <ion-card>
-        <ion-card-header>
-          <ion-item class="card-header-item">
-            <ion-card-title>Chapter Management</ion-card-title>
-            <ion-button slot="end" size="small" class="ion-margin-end">
-              Add New
-            </ion-button>
-          </ion-item>
-        </ion-card-header>
-        <ion-card-content class="ion-padding">
-          <ion-item lines="none">
-            <ion-searchbar placeholder="Search by chapter..." debounce="300">
-            </ion-searchbar>
-          </ion-item>
-          <ion-grid class="table">
-            <ion-row class="table-header ion-hide-md-down">
-              <ion-col size="1">SL.NO</ion-col>
-              <ion-col size="1">SESSION</ion-col>
-              <ion-col size="2">COURSE</ion-col>
-              <ion-col size="2">SEMESTER</ion-col>
-              <ion-col size="2">SUBJECT</ion-col>
-              <ion-col size="2">SUBJECT</ion-col>
-              <ion-col size="1" class="ion-text-center">UPDATE</ion-col>
-              <ion-col size="1" class="ion-text-center">DELETE</ion-col>
-            </ion-row>
-            <ion-row class="table-row">
-              <ion-col size="12" sizeMd="1">
-                <span class="mobile-label">SL.NO</span> 1
-              </ion-col>
-              <ion-col size="12" sizeMd="1">
-                <span class="mobile-label">2024–2025</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">AY24</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">AY24</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">Mathematics</span>
-              </ion-col>
-              <ion-col size="12" sizeMd="2">
-                <span class="mobile-label">chapter1</span>
-              </ion-col>
-              <ion-col size="6" sizeMd="1">
-                <ion-button size="small" expand="block">
-                  Edit
-                </ion-button>
-              </ion-col>
-              <ion-col size="6" sizeMd="1">
-                <ion-button size="small" expand="block" color="danger">
-                  Delete
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-card-content>
-      </ion-card>
-    </ng-container>
+      <button class="pill-tab-btn" [class.active]="activeTab === 'subject'" (click)="selectTab('subject')">
+        <span class="tab-icon">🧪</span> SUBJECT
+      </button>
+
+      <button class="pill-tab-btn" [class.active]="activeTab === 'chapter'" (click)="selectTab('chapter')">
+        <span class="tab-icon">📌</span> CHAPTER
+      </button>
+    </div>
+
+    <!-- MAIN ACADEMIC CARD CONTAINER -->
+    <div class="academic-main-card">
+      
+      <!-- CARD HEADER WITH ACTION BUTTON -->
+      <div class="academic-card-header">
+        <div class="title-group">
+          <h2 class="management-title">
+            {{ activeTab | titlecase }} Management
+          </h2>
+          <span class="count-badge">{{ getFilteredItems().length }} Total {{ activeTab | titlecase }}s</span>
+        </div>
+        
+        <button class="btn-add-new-amber" (click)="openAddModal()">
+          <span>+</span> Add New {{ activeTab | titlecase }}
+        </button>
+      </div>
+
+      <!-- SEARCH INPUT BAR -->
+      <div class="search-input-wrapper">
+        <span class="search-icon-inside">🔍</span>
+        <input 
+          type="text" 
+          [(ngModel)]="searchText" 
+          placeholder="Search {{ activeTab }}s by name, code, or keyword..." 
+          class="academic-search-input" 
+        />
+      </div>
+
+      <!-- DATA TABLE (SESSION TAB) -->
+      <div class="table-responsive" *ngIf="activeTab === 'session'">
+        <table class="academic-data-table">
+          <thead>
+            <tr>
+              <th>SL.NO</th>
+              <th>SESSION NAME</th>
+              <th>SHORT NAME</th>
+              <th>TIMESTAMP</th>
+              <th class="text-center">UPDATE</th>
+              <th class="text-center">DELETE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getFilteredItems(); let i = index">
+              <td><span class="sl-pill">{{ i + 1 }}</span></td>
+              <td class="font-bold cell-primary">{{ item.sessionName }}</td>
+              <td><span class="short-name-badge">{{ item.shortName }}</span></td>
+              <td class="timestamp-text">{{ item.timestamp }}</td>
+              <td class="text-center">
+                <button class="btn-action-edit" (click)="openEditModal(item)">Edit</button>
+              </td>
+              <td class="text-center">
+                <button class="btn-action-delete" (click)="deleteItem(item.id)">Delete</button>
+              </td>
+            </tr>
+            <tr *ngIf="getFilteredItems().length === 0">
+              <td colspan="6" class="text-center empty-msg">No sessions found matching your search.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DATA TABLE (COURSE TAB) -->
+      <div class="table-responsive" *ngIf="activeTab === 'course'">
+        <table class="academic-data-table">
+          <thead>
+            <tr>
+              <th>SL.NO</th>
+              <th>SESSION</th>
+              <th>COURSE NAME</th>
+              <th>SHORT NAME</th>
+              <th class="text-center">UPDATE</th>
+              <th class="text-center">DELETE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getFilteredItems(); let i = index">
+              <td><span class="sl-pill">{{ i + 1 }}</span></td>
+              <td>{{ item.session }}</td>
+              <td class="font-bold cell-primary">{{ item.courseName }}</td>
+              <td><span class="short-name-badge">{{ item.shortName }}</span></td>
+              <td class="text-center">
+                <button class="btn-action-edit" (click)="openEditModal(item)">Edit</button>
+              </td>
+              <td class="text-center">
+                <button class="btn-action-delete" (click)="deleteItem(item.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DATA TABLE (SEMESTER TAB) -->
+      <div class="table-responsive" *ngIf="activeTab === 'semester'">
+        <table class="academic-data-table">
+          <thead>
+            <tr>
+              <th>SL.NO</th>
+              <th>SESSION</th>
+              <th>COURSE</th>
+              <th>SEMESTER NAME</th>
+              <th class="text-center">UPDATE</th>
+              <th class="text-center">DELETE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getFilteredItems(); let i = index">
+              <td><span class="sl-pill">{{ i + 1 }}</span></td>
+              <td>{{ item.session }}</td>
+              <td>{{ item.course }}</td>
+              <td class="font-bold cell-primary">{{ item.semesterName }}</td>
+              <td class="text-center">
+                <button class="btn-action-edit" (click)="openEditModal(item)">Edit</button>
+              </td>
+              <td class="text-center">
+                <button class="btn-action-delete" (click)="deleteItem(item.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DATA TABLE (SYLLABUS TAB) -->
+      <div class="table-responsive" *ngIf="activeTab === 'syllabus'">
+        <table class="academic-data-table">
+          <thead>
+            <tr>
+              <th>SL.NO</th>
+              <th>SESSION</th>
+              <th>COURSE</th>
+              <th>SEMESTER</th>
+              <th>SYLLABUS TITLE</th>
+              <th class="text-center">UPDATE</th>
+              <th class="text-center">DELETE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getFilteredItems(); let i = index">
+              <td><span class="sl-pill">{{ i + 1 }}</span></td>
+              <td>{{ item.session }}</td>
+              <td>{{ item.course }}</td>
+              <td>{{ item.semester }}</td>
+              <td class="font-bold cell-primary">{{ item.syllabusTitle }}</td>
+              <td class="text-center">
+                <button class="btn-action-edit" (click)="openEditModal(item)">Edit</button>
+              </td>
+              <td class="text-center">
+                <button class="btn-action-delete" (click)="deleteItem(item.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DATA TABLE (SUBJECT TAB) -->
+      <div class="table-responsive" *ngIf="activeTab === 'subject'">
+        <table class="academic-data-table">
+          <thead>
+            <tr>
+              <th>SL.NO</th>
+              <th>SESSION</th>
+              <th>COURSE</th>
+              <th>SEMESTER</th>
+              <th>SUBJECT NAME</th>
+              <th>CODE</th>
+              <th class="text-center">UPDATE</th>
+              <th class="text-center">DELETE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getFilteredItems(); let i = index">
+              <td><span class="sl-pill">{{ i + 1 }}</span></td>
+              <td>{{ item.session }}</td>
+              <td>{{ item.course }}</td>
+              <td>{{ item.semester }}</td>
+              <td class="font-bold cell-primary">{{ item.subjectName }}</td>
+              <td><span class="short-name-badge">{{ item.subjectCode }}</span></td>
+              <td class="text-center">
+                <button class="btn-action-edit" (click)="openEditModal(item)">Edit</button>
+              </td>
+              <td class="text-center">
+                <button class="btn-action-delete" (click)="deleteItem(item.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DATA TABLE (CHAPTER TAB) -->
+      <div class="table-responsive" *ngIf="activeTab === 'chapter'">
+        <table class="academic-data-table">
+          <thead>
+            <tr>
+              <th>SL.NO</th>
+              <th>SESSION</th>
+              <th>COURSE</th>
+              <th>SEMESTER</th>
+              <th>SUBJECT</th>
+              <th>CHAPTER NAME</th>
+              <th class="text-center">UPDATE</th>
+              <th class="text-center">DELETE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getFilteredItems(); let i = index">
+              <td><span class="sl-pill">{{ i + 1 }}</span></td>
+              <td>{{ item.session }}</td>
+              <td>{{ item.course }}</td>
+              <td>{{ item.semester }}</td>
+              <td>{{ item.subject }}</td>
+              <td class="font-bold cell-primary">{{ item.chapterNo }}: {{ item.chapterName }}</td>
+              <td class="text-center">
+                <button class="btn-action-edit" (click)="openEditModal(item)">Edit</button>
+              </td>
+              <td class="text-center">
+                <button class="btn-action-delete" (click)="deleteItem(item.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================== -->
+  <!-- ADD / EDIT ACADEMIC MODAL POPUP -->
+  <!-- ========================================================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isAddEditModalOpen" (click)="closeModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- MODAL HEADER BANNER (DARK GREEN + AMBER ACCENT) -->
+      <div class="modal-header-banner">
+        <div class="modal-title-group">
+          <h3 class="modal-title-white">
+            {{ modalMode === 'add' ? '+ Add New' : '✏️ Edit' }} {{ activeTab | titlecase }}
+          </h3>
+        </div>
+        <button class="modal-close-icon" (click)="closeModal()">✕</button>
+      </div>
+
+      <!-- MODAL FORM INPUTS BASED ON ACTIVE TAB -->
+      <div class="modal-form-body">
+        
+        <!-- SESSION FIELDS -->
+        <ng-container *ngIf="activeTab === 'session'">
+          <div class="form-group">
+            <label class="form-label">Session Name</label>
+            <input type="text" [(ngModel)]="formData.sessionName" placeholder="e.g. 2026-2027" class="modal-form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Short Name</label>
+            <input type="text" [(ngModel)]="formData.shortName" placeholder="e.g. AY26" class="modal-form-input" />
+          </div>
+        </ng-container>
+
+        <!-- COURSE FIELDS -->
+        <ng-container *ngIf="activeTab === 'course'">
+          <div class="form-group">
+            <label class="form-label">Course Name</label>
+            <input type="text" [(ngModel)]="formData.courseName" placeholder="e.g. Software Engineering" class="modal-form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Course Short Name</label>
+            <input type="text" [(ngModel)]="formData.shortName" placeholder="e.g. SE" class="modal-form-input" />
+          </div>
+        </ng-container>
+
+        <!-- SEMESTER FIELDS -->
+        <ng-container *ngIf="activeTab === 'semester'">
+          <div class="form-group">
+            <label class="form-label">Semester Name</label>
+            <input type="text" [(ngModel)]="formData.semesterName" placeholder="e.g. Semester 5" class="modal-form-input" />
+          </div>
+        </ng-container>
+
+        <!-- SYLLABUS FIELDS -->
+        <ng-container *ngIf="activeTab === 'syllabus'">
+          <div class="form-group">
+            <label class="form-label">Syllabus Title</label>
+            <input type="text" [(ngModel)]="formData.syllabusTitle" placeholder="e.g. AICTE 2026 Curriculum" class="modal-form-input" />
+          </div>
+        </ng-container>
+
+        <!-- SUBJECT FIELDS -->
+        <ng-container *ngIf="activeTab === 'subject'">
+          <div class="form-group">
+            <label class="form-label">Subject Name</label>
+            <input type="text" [(ngModel)]="formData.subjectName" placeholder="e.g. Machine Learning" class="modal-form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject Code</label>
+            <input type="text" [(ngModel)]="formData.subjectCode" placeholder="e.g. CS401" class="modal-form-input" />
+          </div>
+        </ng-container>
+
+        <!-- CHAPTER FIELDS -->
+        <ng-container *ngIf="activeTab === 'chapter'">
+          <div class="form-group">
+            <label class="form-label">Chapter No</label>
+            <input type="text" [(ngModel)]="formData.chapterNo" placeholder="e.g. Chapter 3" class="modal-form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Chapter Title</label>
+            <input type="text" [(ngModel)]="formData.chapterName" placeholder="e.g. Neural Networks & Deep Learning" class="modal-form-input" />
+          </div>
+        </ng-container>
+
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <div class="modal-footer-actions">
+        <button class="btn-modal-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn-modal-primary btn-amber" (click)="saveItem()">
+          {{ modalMode === 'add' ? 'Save Record' : 'Update Record' }}
+        </button>
+      </div>
+
+    </div>
   </div>
 
 </ion-content>

@@ -1,13 +1,340 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>account_setting</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">account_setting</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="settings-page-content">
+  
+  <div class="settings-wrapper">
+
+    <!-- TOP ADMIN HERO CARD -->
+    <div class="admin-hero-card">
+      <div class="hero-left-profile">
+        <div class="admin-avatar-badge">
+          AD
+        </div>
+        <div class="admin-meta">
+          <h2 class="admin-name">{{ adminProfile.name }}</h2>
+          <p class="admin-role">{{ adminProfile.role }} • {{ adminProfile.department }}</p>
+          <span class="admin-email">{{ adminProfile.email }} | Code: {{ adminProfile.employeeId }}</span>
+        </div>
+      </div>
+
+      <div class="hero-right-badge">
+        <span class="system-status-pill" [class.maint-mode]="maintenanceData.maintenanceMode">
+          <span class="pulse-dot"></span> 
+          {{ maintenanceData.maintenanceMode ? 'Maintenance Mode ACTIVE' : 'System Status: Online' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- NAVIGATION PILLS -->
+    <div class="settings-pills-container">
+      <button class="pill-tab-btn" [class.active]="activeTab === 'profile'" (click)="selectTab('profile')">
+        <span class="tab-icon">👤</span> Profile Details
+      </button>
+
+      <button class="pill-tab-btn" [class.active]="activeTab === 'email'" (click)="selectTab('email')">
+        <span class="tab-icon">📧</span> Change Email
+      </button>
+
+      <button class="pill-tab-btn" [class.active]="activeTab === 'password'" (click)="selectTab('password')">
+        <span class="tab-icon">🔒</span> Change Password
+      </button>
+
+      <button class="pill-tab-btn" [class.active]="activeTab === 'maintenance'" (click)="selectTab('maintenance')">
+        <span class="tab-icon">🛠️</span> Software Maintenance
+      </button>
+
+      <button class="pill-tab-btn" [class.active]="activeTab === 'other'" (click)="selectTab('other')">
+        <span class="tab-icon">⚙️</span> Other Settings
+      </button>
+    </div>
+
+    <!-- MAIN SETTINGS CARD CONTAINER -->
+    <div class="settings-main-card">
+      
+      <!-- TOAST NOTIFICATION -->
+      <div class="toast-alert-success" *ngIf="showSavedToast">
+        {{ toastMessage }}
+      </div>
+
+      <!-- ==================================================================== -->
+      <!-- 1. ADMIN PROFILE DETAILS SECTION -->
+      <!-- ==================================================================== -->
+      <div class="setting-section" *ngIf="activeTab === 'profile'">
+        <div class="section-header">
+          <h3 class="section-title">Admin Personal & Account Profile</h3>
+          <p class="section-sub">Manage your official administrative information and credentials</p>
+        </div>
+
+        <div class="settings-form-grid">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" [(ngModel)]="adminProfile.name" class="modal-form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Employee / Admin Code</label>
+              <input type="text" [(ngModel)]="adminProfile.employeeId" class="modal-form-input" readonly />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Primary Email Address</label>
+              <input type="email" [(ngModel)]="adminProfile.email" class="modal-form-input" readonly />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Secondary Recovery Email</label>
+              <input type="email" [(ngModel)]="adminProfile.recoveryEmail" class="modal-form-input" />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" [(ngModel)]="adminProfile.phone" class="modal-form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Administrative Department</label>
+              <input type="text" [(ngModel)]="adminProfile.department" class="modal-form-input" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Designation Bio / Scope</label>
+            <textarea rows="3" [(ngModel)]="adminProfile.bio" class="modal-form-input"></textarea>
+          </div>
+        </div>
+
+        <div class="settings-card-footer">
+          <button class="btn-save-settings" (click)="saveProfile()">
+            Update Profile Info
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================================================================== -->
+      <!-- 2. CHANGE EMAIL SECTION -->
+      <!-- ==================================================================== -->
+      <div class="setting-section" *ngIf="activeTab === 'email'">
+        <div class="section-header">
+          <h3 class="section-title">Change Primary Admin Email Address</h3>
+          <p class="section-sub">Update your official system login email with OTP verification</p>
+        </div>
+
+        <div class="settings-form-grid">
+          <div class="form-group">
+            <label class="form-label">Current Email Address</label>
+            <input type="email" [(ngModel)]="emailData.currentEmail" class="modal-form-input" readonly />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">New Email Address</label>
+              <input type="email" [(ngModel)]="emailData.newEmail" placeholder="e.g. newadmin@lms-edu.com" class="modal-form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Email Address</label>
+              <input type="email" [(ngModel)]="emailData.confirmNewEmail" placeholder="Re-type new email address" class="modal-form-input" />
+            </div>
+          </div>
+
+          <div class="otp-verification-box" *ngIf="emailData.otpSent">
+            <div class="form-group">
+              <label class="form-label">Enter 6-Digit OTP Verification Code</label>
+              <input type="text" [(ngModel)]="emailData.otpCode" placeholder="Enter code sent to new email" class="modal-form-input" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card-footer">
+          <button *ngIf="!emailData.otpSent" class="btn-save-settings btn-amber" (click)="sendOtp()">
+            Send OTP Verification
+          </button>
+
+          <button *ngIf="emailData.otpSent" class="btn-save-settings" (click)="updateEmail()">
+            Verify OTP & Change Email
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================================================================== -->
+      <!-- 3. CHANGE PASSWORD SECTION -->
+      <!-- ==================================================================== -->
+      <div class="setting-section" *ngIf="activeTab === 'password'">
+        <div class="section-header">
+          <h3 class="section-title">Change Admin Security Password</h3>
+          <p class="section-sub">Strengthen your account credentials with strong encryption standards</p>
+        </div>
+
+        <div class="settings-form-grid">
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <input type="password" [(ngModel)]="passwordData.currentPassword" placeholder="Enter your current password" class="modal-form-input" />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" [(ngModel)]="passwordData.newPassword" placeholder="Minimum 8 characters with numbers & symbols" class="modal-form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" [(ngModel)]="passwordData.confirmPassword" placeholder="Re-enter new password" class="modal-form-input" />
+            </div>
+          </div>
+
+          <div class="checkbox-row-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="passwordData.enable2FA" />
+              <span>Require Two-Factor Authentication (2FA) for next login</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="passwordData.logoutOtherDevices" />
+              <span>Log out from all other active sessions & devices</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-card-footer">
+          <button class="btn-save-settings" (click)="updatePassword()">
+            Update Password
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================================================================== -->
+      <!-- 4. SOFTWARE MAINTENANCE SECTION -->
+      <!-- ==================================================================== -->
+      <div class="setting-section" *ngIf="activeTab === 'maintenance'">
+        <div class="section-header">
+          <h3 class="section-title">Software Maintenance & Operations</h3>
+          <p class="section-sub">System maintenance mode, database backups, cache purge, and version control</p>
+        </div>
+
+        <div class="settings-form-grid">
+          
+          <!-- MAINTENANCE TOGGLE BOX -->
+          <div class="maint-card-box">
+            <div class="maint-info">
+              <h4 class="maint-title">System Maintenance Mode</h4>
+              <p class="maint-sub">Enabling this puts the LMS app under scheduled maintenance. Only Admins can access.</p>
+            </div>
+
+            <label class="switch-toggle">
+              <input type="checkbox" [(ngModel)]="maintenanceData.maintenanceMode" (change)="toggleMaintenanceMode()" />
+              <span class="slider-round"></span>
+            </label>
+          </div>
+
+          <div class="form-group" *ngIf="maintenanceData.maintenanceMode">
+            <label class="form-label">Maintenance Banner Notice Message</label>
+            <input type="text" [(ngModel)]="maintenanceData.maintenanceMessage" class="modal-form-input" />
+          </div>
+
+          <!-- DATABASE BACKUP & CACHE OPERATIONS -->
+          <div class="ops-grid-2">
+            <div class="op-mini-card">
+              <div class="op-header">
+                <span class="op-icon">💾</span>
+                <div>
+                  <h5 class="op-name">Database Snapshot Backup</h5>
+                  <span class="op-meta">Size: {{ maintenanceData.dbSize }} • Last Backup: {{ maintenanceData.lastBackupTime }}</span>
+                </div>
+              </div>
+              <button class="btn-op-action" (click)="triggerBackup()">Create Instant Backup</button>
+            </div>
+
+            <div class="op-mini-card">
+              <div class="op-header">
+                <span class="op-icon">⚡</span>
+                <div>
+                  <h5 class="op-name">System Cache & Temp Storage</h5>
+                  <span class="op-meta">Active Cache: {{ maintenanceData.cacheSize }}</span>
+                </div>
+              </div>
+              <button class="btn-op-action btn-red" (click)="clearCache()">Clear System Cache</button>
+            </div>
+          </div>
+
+          <!-- SOFTWARE VERSION & AUTO BACKUP PREFS -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Installed LMS Software Version</label>
+              <input type="text" [(ngModel)]="maintenanceData.softwareVersion" class="modal-form-input" readonly />
+            </div>
+            <div class="form-group">
+              <label class="form-label">System Audit Log Retention</label>
+              <select [(ngModel)]="maintenanceData.logRetentionDays" class="modal-form-select">
+                <option value="15 Days">15 Days</option>
+                <option value="30 Days">30 Days</option>
+                <option value="90 Days">90 Days</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==================================================================== -->
+      <!-- 5. OTHER ADVANCED SETTINGS SECTION -->
+      <!-- ==================================================================== -->
+      <div class="setting-section" *ngIf="activeTab === 'other'">
+        <div class="section-header">
+          <h3 class="section-title">Other Advanced & System Preferences</h3>
+          <p class="section-sub">Configure platform global defaults, API security keys, and session timeouts</p>
+        </div>
+
+        <div class="settings-form-grid">
+          <div class="form-group">
+            <label class="form-label">Institution Full Name</label>
+            <input type="text" [(ngModel)]="otherSettings.institutionName" class="modal-form-input" />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Default Academic Session</label>
+              <select [(ngModel)]="otherSettings.academicSession" class="modal-form-select">
+                <option value="2024-2025">2024-2025</option>
+                <option value="2025-2026">2025-2026</option>
+                <option value="2026-2027">2026-2027</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Idle Session Timeout</label>
+              <select [(ngModel)]="otherSettings.sessionTimeout" class="modal-form-select">
+                <option value="15 Minutes">15 Minutes</option>
+                <option value="30 Minutes">30 Minutes</option>
+                <option value="1 Hour">1 Hour</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">System API Live Secret Key</label>
+            <input type="text" [(ngModel)]="otherSettings.apiKey" class="modal-form-input" readonly />
+          </div>
+
+          <div class="checkbox-row-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="otherSettings.emailBroadcasts" />
+              <span>Enable system-wide email notifications & emergency broadcasts</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="otherSettings.activityLogging" />
+              <span>Record detailed audit logs for all faculty & student actions</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-card-footer">
+          <button class="btn-save-settings" (click)="saveOtherSettings()">
+            Save Advanced Preferences
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
 </ion-content>

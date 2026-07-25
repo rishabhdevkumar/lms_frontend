@@ -1,45 +1,203 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons class="ion-margin-start">
-      <ion-menu-button></ion-menu-button>
+<ion-header class="admin-top-header">
+  <ion-toolbar class="admin-toolbar">
+    
+    <!-- MOBILE HAMBURGER MENU BUTTON -->
+    <ion-buttons slot="start">
+      <ion-menu-button color="dark"></ion-menu-button>
     </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button class="notification-btn">
-        <ion-icon name="notifications-outline" size="large"></ion-icon>
-        <ion-badge color="danger" class="notify-badge">3</ion-badge>
-      </ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button id="profile-menu-button">
-        <ion-icon name="person-circle-outline" size="large"></ion-icon>
-      </ion-button>
-      <ion-popover trigger="profile-menu-button" [dismissOnSelect]="true">
+
+    <!-- RIGHT SIDE ACTIONS (NOTIFICATION, PROFILE) -->
+    <ion-buttons slot="end" class="header-actions-group">
+
+      <!-- NOTIFICATION BELL WITH AMBER BADGE -->
+      <button class="header-action-btn notification-wrapper" id="notify-popover-trigger" title="Notifications">
+        <span class="bell-icon">🔔</span>
+        <span class="notify-badge">3</span>
+      </button>
+
+      <!-- PROFILE USER BUTTON WITH POPOVER MENU -->
+      <button class="profile-avatar-btn" id="admin-profile-trigger" title="Admin Profile">
+        <div class="avatar-box">AD</div>
+        <span class="admin-name hidden sm:inline">Admin</span>
+        <span class="dropdown-icon">▼</span>
+      </button>
+
+      <ion-popover trigger="admin-profile-trigger" [dismissOnSelect]="true">
         <ng-template>
-          <ion-content>
-            <ion-list>
-              <ion-item>
-                <ion-icon class="ion-margin-end" name="person-circle-outline" color="tertiary"></ion-icon>
-                <ion-label>
-                  <h3>Rishabh</h3>
-                  <p>rishabh@gmail.com</p>
-                </ion-label>
-              </ion-item>
+          <ion-content class="profile-popover-content">
+            <div class="popover-user-header">
+              <div class="user-avatar-large">AD</div>
+              <div>
+                <div class="user-name">Rishabh Admin</div>
+                <div class="user-email">admin@lms-hub.com</div>
+              </div>
+            </div>
+            <ion-list lines="none" class="popover-menu-list">
               <ion-item routerLink="/admin/account-setting" [button]="true">
-                <ion-icon class="ion-margin-end" name="create-outline" color="tertiary"></ion-icon>
-                Account Setting
+                <ion-icon class="ion-margin-end" name="person-circle-outline"></ion-icon>
+                Account Settings
               </ion-item>
-              <ion-item [button]="true">
-                <ion-icon class="ion-margin-end" name="settings-outline" color="tertiary"></ion-icon>
-                Settings
+              <ion-item routerLink="/admin/academic" [button]="true">
+                <ion-icon class="ion-margin-end" name="settings-outline"></ion-icon>
+                System Setup
               </ion-item>
-              <ion-item [button]="true" lines="none">
-                <ion-icon class="ion-margin-end" name="log-out-outline" color="danger"></ion-icon>
-                logout
+              <ion-item (click)="openLanguageModal()" [button]="true" class="lang-pop-item">
+                <ion-icon class="ion-margin-end" name="globe-outline"></ion-icon>
+                Change Language
+                <ion-badge slot="end" color="warning" class="active-lang-badge">{{ selectedLanguage?.code | uppercase }}</ion-badge>
+              </ion-item>
+              <ion-item routerLink="/home" [button]="true" lines="none" class="logout-pop-item">
+                <ion-icon class="ion-margin-end" name="log-out-outline"></ion-icon>
+                Logout
               </ion-item>
             </ion-list>
           </ion-content>
         </ng-template>
       </ion-popover>
+
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
+<!-- SUCCESS TOAST NOTIFICATION -->
+<div class="toast-alert-float" *ngIf="showToast">
+  <span class="toast-icon">🌐</span>
+  <span class="toast-text">{{ toastMessage }}</span>
+</div>
+
+<!-- ==================================================================== -->
+<!-- CHANGE LANGUAGE MODAL -->
+<!-- ==================================================================== -->
+<ion-modal [isOpen]="isLanguageModalOpen" (didDismiss)="closeLanguageModal()" class="custom-language-modal">
+  <ng-template>
+    <div class="lang-modal-container">
+      
+      <!-- MODAL HEADER -->
+      <div class="lang-modal-header">
+        <div class="modal-title-group">
+          <div class="header-icon-box">
+            🌐
+          </div>
+          <div>
+            <h3 class="modal-title">Select System Language</h3>
+            <p class="modal-subtitle">Choose your preferred language for the LMS administration workspace</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closeLanguageModal()" title="Close Modal">✕</button>
+      </div>
+
+      <!-- ACTIVE LANGUAGE STATUS BANNER -->
+      <div class="active-lang-banner">
+        <span class="banner-label">Active Language:</span>
+        <span class="banner-value">
+          <span class="flag-icon">{{ selectedLanguage?.flag }}</span> 
+          <strong>{{ selectedLanguage?.name }}</strong> 
+          <span class="native-name">({{ selectedLanguage?.nativeName }})</span>
+        </span>
+      </div>
+
+      <!-- SEARCH BAR & ADD ACTION ROW -->
+      <div class="lang-search-row">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            (input)="filterLanguages()" 
+            placeholder="Search language by name or code (e.g. English, Hindi, es)..." 
+            class="search-input"
+          />
+          <button *ngIf="searchQuery" class="clear-search-btn" (click)="searchQuery=''; filterLanguages()">✕</button>
+        </div>
+
+        <button class="btn-toggle-add" (click)="toggleAddLanguageForm()" [class.active]="showAddLanguageForm">
+          <span class="plus-icon">{{ showAddLanguageForm ? '✕' : '➕' }}</span>
+          <span>{{ showAddLanguageForm ? 'Cancel' : 'Add Language' }}</span>
+        </button>
+      </div>
+
+      <!-- INLINE ADD CUSTOM LANGUAGE FORM -->
+      <div class="add-language-card" *ngIf="showAddLanguageForm">
+        <div class="add-card-header">
+          <h4>➕ Add New Custom Language</h4>
+          <p>Register a new language option in the system list</p>
+        </div>
+
+        <div class="add-form-grid">
+          <div class="form-group">
+            <label>Language Name (English)</label>
+            <input type="text" [(ngModel)]="newLangName" placeholder="e.g. Spanish" class="modal-input" />
+          </div>
+          <div class="form-group">
+            <label>Native Name</label>
+            <input type="text" [(ngModel)]="newLangNative" placeholder="e.g. Español" class="modal-input" />
+          </div>
+          <div class="form-group">
+            <label>ISO Code</label>
+            <input type="text" [(ngModel)]="newLangCode" placeholder="e.g. es" class="modal-input" />
+          </div>
+          <div class="form-group">
+            <label>Flag Emoji / Icon</label>
+            <input type="text" [(ngModel)]="newLangFlag" placeholder="e.g. 🇪🇸" class="modal-input" />
+          </div>
+        </div>
+
+        <div class="form-error-msg" *ngIf="addLanguageError">
+          ⚠️ {{ addLanguageError }}
+        </div>
+
+        <div class="add-card-actions">
+          <button class="btn-submit-lang" (click)="submitAddLanguage()">Save Language</button>
+        </div>
+      </div>
+
+      <!-- LANGUAGES LIST GRID -->
+      <div class="lang-modal-body">
+        
+        <div class="languages-grid" *ngIf="filteredLanguages.length > 0">
+          <div 
+            *ngFor="let lang of filteredLanguages" 
+            class="language-card" 
+            [class.selected]="lang.code === selectedLanguage?.code"
+            (click)="selectLanguage(lang)"
+          >
+            <div class="lang-card-left">
+              <span class="lang-flag-large">{{ lang.flag }}</span>
+              <div class="lang-info">
+                <div class="lang-primary-name">
+                  {{ lang.nativeName }}
+                  <span class="lang-code-pill">{{ lang.code | uppercase }}</span>
+                </div>
+                <div class="lang-secondary-name">{{ lang.name }}</div>
+              </div>
+            </div>
+
+            <div class="lang-card-right">
+              <span class="selected-check-badge" *ngIf="lang.code === selectedLanguage?.code">
+                ✓ Active
+              </span>
+              <span class="select-hover-hint" *ngIf="lang.code !== selectedLanguage?.code">
+                Select
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- NO RESULTS FOUND -->
+        <div class="empty-search-state" *ngIf="filteredLanguages.length === 0">
+          <div class="empty-icon">🌐</div>
+          <h5>No languages match "{{ searchQuery }}"</h5>
+          <p>Try searching with another term or click "Add Language" to register a new one.</p>
+        </div>
+
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <div class="lang-modal-footer">
+        <span class="footer-count">Total Added Languages: <strong>{{ languages.length }}</strong></span>
+        <button class="btn-close-modal" (click)="closeLanguageModal()">Done</button>
+      </div>
+
+    </div>
+  </ng-template>
+</ion-modal>

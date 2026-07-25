@@ -57,6 +57,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'attendance',
+        loadComponent: () =>
+          import('./admin/pages/attendance/attendance.page').then(
+            (m) => m.AttendancePage,
+          ),
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

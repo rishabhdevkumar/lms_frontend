@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { LanguageService, Language } from 'src/app/services/language.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -9,7 +11,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule]
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   isMobileMenuOpen = false;
   isDarkMode = false;
   isSearchOpen = false;
@@ -19,8 +21,12 @@ export class NavbarComponent implements OnInit {
 
   // Language Dropdown options
   isLangDropdownOpen = false;
-  selectedLang = 'English';
-  languages = ['English', 'Hindi', 'Spanish', 'French'];
+  selectedLang: Language | null = null;
+  languages: Language[] = [];
+
+  private subs = new Subscription();
+
+  constructor(private languageService: LanguageService) {}
 
   ngOnInit() {
     // PERSIST GLOBAL DARK MODE ACROSS ALL PAGES
@@ -29,6 +35,22 @@ export class NavbarComponent implements OnInit {
       this.isDarkMode = true;
       document.body.classList.add('dark');
     }
+
+    this.subs.add(
+      this.languageService.currentLanguage$.subscribe(lang => {
+        this.selectedLang = lang;
+      })
+    );
+
+    this.subs.add(
+      this.languageService.languages$.subscribe(langs => {
+        this.languages = langs;
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subs.unsubscribe();
   }
 
   setActiveTab(tabName: string) {
@@ -60,8 +82,8 @@ export class NavbarComponent implements OnInit {
     this.isLangDropdownOpen = !this.isLangDropdownOpen;
   }
 
-  selectLanguage(lang: string) {
-    this.selectedLang = lang;
+  selectLanguage(lang: Language) {
+    this.languageService.setLanguage(lang);
     this.isLangDropdownOpen = false;
   }
 
