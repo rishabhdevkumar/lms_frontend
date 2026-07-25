@@ -1,77 +1,67 @@
 <ion-split-pane contentId="main-admin-content" when="md">
-  <!-- ADMIN SIDEBAR MENU -->
+  <!-- ADMIN DARK GREEN SIDEBAR MENU -->
   <ion-menu contentId="main-admin-content" type="overlay" menuId="admin-menu">
     
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-item lines="none" color="primary">
-          <ion-icon name="shield-checkmark" slot="start" size="large"></ion-icon>
-          <ion-label>
-            <h2><b>LMS Admin</b></h2>
-            <p>Control Center</p>
-          </ion-label>
-        </ion-item>
-      </ion-toolbar>
-    </ion-header>
+    <!-- BRAND LOGO HEADER (DARK GREEN + AMBER ACCENT) -->
+    <div class="sidebar-brand-header">
+      <a class="brand-logo" routerLink="/admin/dashboard">
+        <div class="logo-badge">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+        <div class="brand-text-group">
+          <span class="brand-name">LMS</span>
+        </div>
+      </a>
+    </div>
 
     <ion-content class="sidebar-content">
       
-      <!-- MENU GROUPS -->
-      <ion-list-header>
-        <ion-label>MAIN NAVIGATION</ion-label>
-      </ion-list-header>
-
       <ion-list class="sidebar-menu" lines="none">
         
         <ion-item routerLink="/admin/dashboard" routerLinkActive="active-menu">
-          <ion-icon name="grid-outline" slot="start" color="primary"></ion-icon>
+          <ion-icon name="grid-outline" slot="start"></ion-icon>
           <ion-label>Dashboard</ion-label>
         </ion-item>
 
         <ion-item routerLink="/admin/add-student" routerLinkActive="active-menu">
-          <ion-icon name="people-outline" slot="start" color="secondary"></ion-icon>
-          <ion-label>Manage Students</ion-label>
-          <ion-badge slot="end" color="primary">2,850</ion-badge>
+          <ion-icon name="people-outline" slot="start"></ion-icon>
+          <ion-label>Students</ion-label>
+          <span class="badge-count amber">2,850</span>
         </ion-item>
 
         <ion-item routerLink="/admin/add-agent" routerLinkActive="active-menu">
-          <ion-icon name="person-add-outline" slot="start" color="tertiary"></ion-icon>
-          <ion-label>Faculty & Staff</ion-label>
-          <ion-badge slot="end" color="success">142</ion-badge>
+          <ion-icon name="person-add-outline" slot="start"></ion-icon>
+          <ion-label>Faculty</ion-label>
+          <span class="badge-count green">142</span>
         </ion-item>
 
         <ion-item routerLink="/admin/academic" routerLinkActive="active-menu">
-          <ion-icon name="school-outline" slot="start" color="warning"></ion-icon>
-          <ion-label>Academic Setup</ion-label>
+          <ion-icon name="school-outline" slot="start"></ion-icon>
+          <ion-label>Academics</ion-label>
         </ion-item>
 
-        <ion-list-header class="ion-margin-top">
-          <ion-label>MANAGEMENT</ion-label>
-        </ion-list-header>
-
-        <ion-item routerLinkActive="active-menu">
-          <ion-icon name="book-outline" slot="start" color="medium"></ion-icon>
-          <ion-label>Course Catalog</ion-label>
+        <ion-item routerLink="/admin/attendance" routerLinkActive="active-menu">
+          <ion-icon name="finger-print-outline" slot="start"></ion-icon>
+          <ion-label>Attendance</ion-label>
         </ion-item>
 
         <ion-item routerLinkActive="active-menu">
-          <ion-icon name="finger-print-outline" slot="start" color="medium"></ion-icon>
-          <ion-label>Attendance Records</ion-label>
-        </ion-item>
-
-        <ion-item routerLinkActive="active-menu">
-          <ion-icon name="stats-chart-outline" slot="start" color="medium"></ion-icon>
-          <ion-label>Reports & Analytics</ion-label>
+          <ion-icon name="stats-chart-outline" slot="start"></ion-icon>
+          <ion-label>Reports</ion-label>
         </ion-item>
 
         <ion-item routerLink="/admin/account-setting" routerLinkActive="active-menu">
-          <ion-icon name="settings-outline" slot="start" color="medium"></ion-icon>
-          <ion-label>Admin Settings</ion-label>
+          <ion-icon name="settings-outline" slot="start"></ion-icon>
+          <ion-label>Settings</ion-label>
         </ion-item>
 
+        <!-- LOGOUT LINK -->
         <ion-item routerLink="/home" lines="none" class="logout-item">
-          <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
-          <ion-label color="danger">Logout</ion-label>
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          <ion-label>Logout</ion-label>
         </ion-item>
 
       </ion-list>

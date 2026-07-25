@@ -1,9 +1,339 @@
 <app-header></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">add_agent</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="staff-page-content">
+  
+  <div class="staff-wrapper">
+
+    <!-- TOP FLOATING PILL CATEGORY TABS -->
+    <div class="pills-tab-container">
+      <button class="pill-tab-btn" [class.active]="activeTab === 'faculty'" (click)="selectTab('faculty')">
+        <span class="tab-icon">👨‍🏫</span> FACULTY MEMBERS ({{ facultyList.length }})
+      </button>
+
+      <button class="pill-tab-btn" [class.active]="activeTab === 'agent'" (click)="selectTab('agent')">
+        <span class="tab-icon">💼</span> ACADEMIC AGENTS / STAFF ({{ agentsList.length }})
+      </button>
+    </div>
+
+    <!-- TOP STATS OVERVIEW CARDS -->
+    <div class="stats-overview-grid">
+      <div class="stat-mini-card brand-darkgreen">
+        <div class="stat-info">
+          <span class="stat-label">TOTAL {{ activeTab === 'faculty' ? 'FACULTY' : 'AGENTS' }}</span>
+          <h3 class="stat-value">{{ getCurrentList().length }}</h3>
+        </div>
+        <div class="stat-icon-badge">{{ activeTab === 'faculty' ? '🎓' : '💼' }}</div>
+      </div>
+
+      <div class="stat-mini-card brand-emerald">
+        <div class="stat-info">
+          <span class="stat-label">ACTIVE STATUS</span>
+          <h3 class="stat-value">{{ getActiveCount() }}</h3>
+        </div>
+        <div class="stat-icon-badge">✅</div>
+      </div>
+
+      <div class="stat-mini-card brand-coral">
+        <div class="stat-info">
+          <span class="stat-label">SUSPENDED STATUS</span>
+          <h3 class="stat-value">{{ getSuspendedCount() }}</h3>
+        </div>
+        <div class="stat-icon-badge">🚫</div>
+      </div>
+    </div>
+
+    <!-- MAIN STAFF CONTROL CARD -->
+    <div class="staff-main-card">
+      
+      <!-- CARD HEADER & ACTION BUTTON -->
+      <div class="card-top-header">
+        <div class="title-group">
+          <h2 class="section-title">
+            {{ activeTab === 'faculty' ? 'Faculty Members Directory' : 'Academic Agents & Staff Directory' }}
+          </h2>
+          <span class="count-pill">{{ getFilteredItems().length }} Active Records</span>
+        </div>
+
+        <button class="btn-register-staff" (click)="openAddModal()">
+          <span>+</span> Add New {{ activeTab === 'faculty' ? 'Faculty Member' : 'Academic Agent' }}
+        </button>
+      </div>
+
+      <!-- SEARCH & FILTER TOOLBAR -->
+      <div class="toolbar-row">
+        <div class="search-box-container">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            [(ngModel)]="searchText" 
+            placeholder="Search {{ activeTab }} by name, email, department, role..." 
+            class="staff-search-input" 
+          />
+        </div>
+
+        <div class="filter-pills-group">
+          <button 
+            class="filter-pill-btn" 
+            [class.active]="statusFilter === 'All'" 
+            (click)="statusFilter = 'All'">
+            All ({{ getCurrentList().length }})
+          </button>
+          <button 
+            class="filter-pill-btn green" 
+            [class.active]="statusFilter === 'Active'" 
+            (click)="statusFilter = 'Active'">
+            Active ({{ getActiveCount() }})
+          </button>
+          <button 
+            class="filter-pill-btn red" 
+            [class.active]="statusFilter === 'Suspended'" 
+            (click)="statusFilter = 'Suspended'">
+            Suspended ({{ getSuspendedCount() }})
+          </button>
+        </div>
+      </div>
+
+      <!-- GETALL STAFF DATA TABLE -->
+      <div class="table-responsive">
+        <table class="staff-data-table">
+          <thead>
+            <tr>
+              <th>{{ activeTab === 'faculty' ? 'FACULTY CODE' : 'AGENT CODE' }}</th>
+              <th>NAME & CONTACT</th>
+              <th>DEPARTMENT & ROLE</th>
+              <th>ASSIGNED COURSES / SCOPE</th>
+              <th>STATUS</th>
+              <th class="text-center">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getFilteredItems()">
+              
+              <!-- FACULTY / AGENT CODE -->
+              <td>
+                <span class="code-badge">{{ item.staffId }}</span>
+              </td>
+
+              <!-- NAME & CONTACT -->
+              <td>
+                <div class="staff-profile-cell">
+                  <div class="staff-avatar" [style.background-color]="item.avatarBg">
+                    {{ getInitials(item.name) }}
+                  </div>
+                  <div class="staff-meta">
+                    <span class="staff-name">{{ item.name }}</span>
+                    <span class="staff-email">{{ item.email }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- DEPARTMENT & ROLE -->
+              <td>
+                <div class="dept-role-cell">
+                  <span class="dept-text">{{ item.department }}</span>
+                  <span class="role-text">{{ item.designation }}</span>
+                </div>
+              </td>
+
+              <!-- ASSIGNED COURSES -->
+              <td>
+                <span class="courses-badge">{{ item.assignedCourses }}</span>
+              </td>
+
+              <!-- STATUS BADGE -->
+              <td>
+                <span class="status-pill-badge" [class.status-active]="item.status === 'Active'" [class.status-suspended]="item.status === 'Suspended'">
+                  {{ item.status }}
+                </span>
+              </td>
+
+              <!-- ACTION BUTTONS: VIEW, EDIT, ACTIVATE/SUSPEND -->
+              <td class="text-center">
+                <div class="actions-flex-group">
+                  
+                  <!-- VIEW BUTTON -->
+                  <button class="btn-action-view" (click)="openViewModal(item)" title="View Details">
+                    View
+                  </button>
+
+                  <!-- EDIT BUTTON -->
+                  <button class="btn-action-edit" (click)="openEditModal(item)" title="Edit Record">
+                    Edit
+                  </button>
+
+                  <!-- TOGGLE ACTIVATE / SUSPEND BUTTON -->
+                  <button 
+                    *ngIf="item.status === 'Active'" 
+                    class="btn-action-suspend" 
+                    (click)="toggleStatus(item)" 
+                    title="Suspend User">
+                    Suspend
+                  </button>
+
+                  <button 
+                    *ngIf="item.status === 'Suspended'" 
+                    class="btn-action-activate" 
+                    (click)="toggleStatus(item)" 
+                    title="Activate User">
+                    Activate
+                  </button>
+
+                </div>
+              </td>
+
+            </tr>
+
+            <!-- EMPTY MESSAGE -->
+            <tr *ngIf="getFilteredItems().length === 0">
+              <td colspan="6" class="empty-msg">No {{ activeTab }} records found matching your search.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================== -->
+  <!-- 1. VIEW PROFILE DETAILS MODAL -->
+  <!-- ========================================================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isViewModalOpen" (click)="closeViewModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- CENTERED HEADER WITH AVATAR, NAME, EMAIL & PHONE -->
+      <div class="modal-header-banner modal-centered-header" *ngIf="selectedItem">
+        <div class="large-centered-avatar" [style.background-color]="selectedItem.avatarBg">
+          {{ getInitials(selectedItem.name) }}
+        </div>
+        <div class="text-center">
+          <h3>{{ selectedItem.name }}</h3>
+          <p class="contact-subinfo">{{ selectedItem.email }} • {{ selectedItem.phone }}</p>
+        </div>
+        <button class="modal-close-icon corner-close" (click)="closeViewModal()">✕</button>
+      </div>
+
+      <!-- BODY GRID -->
+      <div class="modal-body-grid" *ngIf="selectedItem">
+        <div class="info-row">
+          <div class="info-cell">
+            <span class="cell-label">STAFF ID</span>
+            <span class="cell-value font-bold">{{ selectedItem.staffId }}</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">CATEGORY TYPE</span>
+            <span class="cell-value">{{ selectedItem.type }}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-cell">
+            <span class="cell-label">DEPARTMENT</span>
+            <span class="cell-value">{{ selectedItem.department }}</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">DESIGNATION / ROLE</span>
+            <span class="cell-value">{{ selectedItem.designation }}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-cell">
+            <span class="cell-label">ASSIGNED COURSES / SCOPE</span>
+            <span class="cell-value text-amber">{{ selectedItem.assignedCourses }}</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">JOINING DATE</span>
+            <span class="cell-value">{{ selectedItem.joiningDate }}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-cell">
+            <span class="cell-label">ACCOUNT STATUS</span>
+            <span class="cell-value font-bold" [class.text-green]="selectedItem.status === 'Active'" [class.text-coral]="selectedItem.status === 'Suspended'">
+              {{ selectedItem.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-modal-secondary" (click)="closeViewModal()">Close</button>
+        <button class="btn-modal-primary" (click)="closeViewModal(); openEditModal(selectedItem!)">Edit Profile</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================== -->
+  <!-- 2. ADD / EDIT FACULTY / AGENT MODAL -->
+  <!-- ========================================================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isAddEditModalOpen" (click)="closeAddEditModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- HEADER BANNER -->
+      <div class="modal-header-banner modal-brand-amber">
+        <div class="modal-student-title">
+          <h3 class="modal-title-white">
+            {{ modalMode === 'add' ? ('Add New ' + (activeTab === 'faculty' ? 'Faculty Member' : 'Academic Agent')) : 'Edit Staff Record' }}
+          </h3>
+        </div>
+        <button class="modal-close-icon" (click)="closeAddEditModal()">✕</button>
+      </div>
+
+      <!-- FORM BODY -->
+      <div class="modal-form-body">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" [(ngModel)]="formData.name" placeholder="e.g. Dr. Rajesh Kumar" class="modal-form-input" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" [(ngModel)]="formData.email" placeholder="staff@lms-edu.com" class="modal-form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="text" [(ngModel)]="formData.phone" placeholder="+91 98000 00000" class="modal-form-input" />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input type="text" [(ngModel)]="formData.department" placeholder="e.g. Computer Science" class="modal-form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Designation / Role</label>
+            <input type="text" [(ngModel)]="formData.designation" placeholder="e.g. Senior Professor / Counselor" class="modal-form-input" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Assigned Courses / Scope</label>
+          <input type="text" [(ngModel)]="formData.assignedCourses" placeholder="e.g. Data Structures, Machine Learning" class="modal-form-input" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Account Status</label>
+          <select [(ngModel)]="formData.status" class="modal-form-select">
+            <option value="Active">Active</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="modal-footer-actions">
+        <button class="btn-modal-secondary" (click)="closeAddEditModal()">Cancel</button>
+        <button class="btn-modal-primary" (click)="saveItem()">
+          {{ modalMode === 'add' ? 'Save Record' : 'Update Record' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
 </ion-content>

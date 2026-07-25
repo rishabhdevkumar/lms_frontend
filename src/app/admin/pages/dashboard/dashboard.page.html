@@ -1,201 +1,403 @@
 <app-header></app-header>
 
-<ion-content [fullscreen]="true" class="admin-dashboard-content ion-padding">
+<ion-content [fullscreen]="true" class="admin-dashboard-content">
   
-  <!-- WELCOME HEADER BANNER -->
-  <ion-grid>
-    <ion-row class="ion-align-items-center ion-margin-bottom">
-      <ion-col size="12" size-md="8">
-        <h1 class="page-header-title">Welcome back, Admin 👋</h1>
-        <p class="page-header-subtitle">Here is the real-time summary of your institute's learning ecosystem today.</p>
-      </ion-col>
-      <ion-col size="12" size-md="4" class="ion-text-md-end">
-        <ion-chip color="primary">
-          <ion-icon name="calendar-outline"></ion-icon>
-          <ion-label>Academic Session 2026</ion-label>
-        </ion-chip>
-      </ion-col>
-    </ion-row>
+  <div class="dashboard-wrapper">
 
-    <!-- KEY STATS METRICS CARDS GRID -->
-    <ion-row>
+    <!-- WELCOME HEADER BANNER -->
+    <div class="welcome-header-banner">
+      <div class="welcome-text">
+        <h1 class="page-title">Welcome back, Admin 👋</h1>
+        <p class="page-subtitle">Here is the real-time summary of your institute's learning ecosystem today.</p>
+      </div>
+
+      <div class="session-badge">
+        <span class="badge-icon">📅</span>
+        <span>Academic Session 2026</span>
+      </div>
+    </div>
+
+    <!-- KEY STATS METRICS CARDS GRID (4 COLUMNS) -->
+    <div class="metrics-grid">
+      
       <!-- Stat 1: Students -->
-      <ion-col size="12" size-sm="6" size-md="3">
-        <ion-card class="stat-metric-card border-primary">
-          <ion-card-content>
-            <div class="stat-card-header">
-              <div class="icon-avatar primary-bg">
-                <ion-icon name="people" color="primary"></ion-icon>
-              </div>
-              <ion-chip color="success" class="growth-chip">
-                <ion-icon name="trending-up-outline"></ion-icon> +12%
-              </ion-chip>
-            </div>
-            <h2 class="stat-number">2,850</h2>
-            <p class="stat-label">Total Students Enrolled</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
+      <div class="stat-card amber-border">
+        <div class="stat-card-top">
+          <div class="stat-icon-box amber-bg">👥</div>
+          <div class="trend-badge green-trend">+12% 📈</div>
+        </div>
+        <div class="stat-number">2,850</div>
+        <div class="stat-label">Total Students Enrolled</div>
+      </div>
 
       <!-- Stat 2: Faculty -->
-      <ion-col size="12" size-sm="6" size-md="3">
-        <ion-card class="stat-metric-card border-secondary">
-          <ion-card-content>
-            <div class="stat-card-header">
-              <div class="icon-avatar secondary-bg">
-                <ion-icon name="school" color="secondary"></ion-icon>
-              </div>
-              <ion-badge color="success">Active</ion-badge>
-            </div>
-            <h2 class="stat-number">142</h2>
-            <p class="stat-label">Total Faculty Members</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
+      <div class="stat-card green-border">
+        <div class="stat-card-top">
+          <div class="stat-icon-box green-bg">🎓</div>
+          <div class="status-chip active-chip">Active</div>
+        </div>
+        <div class="stat-number">142</div>
+        <div class="stat-label">Total Faculty Members</div>
+      </div>
 
-      <!-- Stat 3: Active Courses -->
-      <ion-col size="12" size-sm="6" size-md="3">
-        <ion-card class="stat-metric-card border-warning">
-          <ion-card-content>
-            <div class="stat-card-header">
-              <div class="icon-avatar warning-bg">
-                <ion-icon name="book" color="warning"></ion-icon>
-              </div>
-              <ion-badge color="warning">84 Active</ion-badge>
-            </div>
-            <h2 class="stat-number">120</h2>
-            <p class="stat-label">Published Courses</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
+      <!-- Stat 3: Published Courses -->
+      <div class="stat-card purple-border">
+        <div class="stat-card-top">
+          <div class="stat-icon-box purple-bg">📚</div>
+          <div class="status-chip count-chip">84 Active</div>
+        </div>
+        <div class="stat-number">120</div>
+        <div class="stat-label">Published Courses</div>
+      </div>
 
-      <!-- Stat 4: Revenue / Collections -->
-      <ion-col size="12" size-sm="6" size-md="3">
-        <ion-card class="stat-metric-card border-tertiary">
-          <ion-card-content>
-            <div class="stat-card-header">
-              <div class="icon-avatar tertiary-bg">
-                <ion-icon name="cash" color="tertiary"></ion-icon>
-              </div>
-              <ion-chip color="success" class="growth-chip">
-                <ion-icon name="trending-up-outline"></ion-icon> +18%
-              </ion-chip>
-            </div>
-            <h2 class="stat-number">$145.2k</h2>
-            <p class="stat-label">Tuition Revenue</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
+      <!-- Stat 4: Revenue -->
+      <div class="stat-card teal-border">
+        <div class="stat-card-top">
+          <div class="stat-icon-box teal-bg">💰</div>
+          <div class="trend-badge green-trend">+18% 📈</div>
+        </div>
+        <div class="stat-number">$145.2k</div>
+        <div class="stat-label">Tuition Revenue</div>
+      </div>
 
-    <!-- MIDDLE SECTION: RECENT ENROLLMENTS & QUICK ACTIONS -->
-    <ion-row class="ion-margin-top">
+    </div>
+
+    <!-- MIDDLE SECTION: RECENT ENROLLMENTS & QUICK ACTIONS GRID -->
+    <div class="main-sections-grid">
       
-      <!-- RECENT STUDENT ENROLLMENTS -->
-      <ion-col size="12" size-lg="8">
-        <ion-card class="dashboard-panel-card">
-          <ion-card-header>
-            <ion-item lines="none">
-              <ion-card-title slot="start">Recent Student Enrollments</ion-card-title>
-              <ion-button fill="clear" color="primary" slot="end" routerLink="/admin/add-student">
-                View All
-              </ion-button>
-            </ion-item>
-          </ion-card-header>
+      <!-- RECENT STUDENT ENROLLMENTS PANEL -->
+      <div class="panel-card enrollments-panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Recent Student Enrollments</h2>
+            <p class="panel-subtitle">Real-time registration summary across departments</p>
+          </div>
+          <button (click)="openAddStudentModal()" class="view-all-link">+ Add New Student</button>
+        </div>
 
-          <ion-card-content>
-            <ion-list lines="full">
-              <ion-item>
-                <ion-avatar slot="start">
-                  <ion-icon name="person-circle" size="large" color="primary"></ion-icon>
-                </ion-avatar>
-                <ion-label>
-                  <h3>Aarav Sharma</h3>
-                  <p>Computer Science & Engineering • ID: CS-2026-041</p>
-                </ion-label>
-                <ion-chip color="success" slot="end">Active</ion-chip>
-              </ion-item>
+        <!-- ENROLLMENTS DATA TABLE WITH COLUMN HEADERS -->
+        <div class="table-responsive">
+          <table class="enrollment-table">
+            <thead>
+              <tr>
+                <th>PROFILE</th>
+                <th>NAME / EMAIL</th>
+                <th>COURSE</th>
+                <th>STATUS</th>
+                <th class="text-right">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let student of studentsList">
+                <td>
+                  <div class="student-avatar" [ngClass]="student.avatarBg">{{ student.avatar }}</div>
+                </td>
+                <td>
+                  <div class="student-name">{{ student.name }}</div>
+                  <div class="student-email">{{ student.email }}</div>
+                </td>
+                <td>
+                  <div class="course-title">{{ student.course }}</div>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="student.status === 'Active' ? 'green' : 'amber'">{{ student.status }}</span>
+                </td>
+                <td class="text-right">
+                  <button class="table-action-btn" (click)="openStudentModal(student)">View</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-              <ion-item>
-                <ion-avatar slot="start">
-                  <ion-icon name="person-circle" size="large" color="secondary"></ion-icon>
-                </ion-avatar>
-                <ion-label>
-                  <h3>Priya Patel</h3>
-                  <p>Data Science & AI • ID: DS-2026-089</p>
-                </ion-label>
-                <ion-chip color="success" slot="end">Active</ion-chip>
-              </ion-item>
+      <!-- QUICK ADMIN ACTIONS PANEL -->
+      <div class="panel-card actions-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Quick Admin Actions</h2>
+        </div>
 
-              <ion-item>
-                <ion-avatar slot="start">
-                  <ion-icon name="person-circle" size="large" color="tertiary"></ion-icon>
-                </ion-avatar>
-                <ion-label>
-                  <h3>Rohan Verma</h3>
-                  <p>Information Technology • ID: IT-2026-112</p>
-                </ion-label>
-                <ion-chip color="warning" slot="end">Pending Fee</ion-chip>
-              </ion-item>
+        <div class="action-buttons-stack">
+          <button (click)="openAddStudentModal()" class="btn-action primary-amber">
+            <span>👤</span> Register New Student
+          </button>
 
-              <ion-item lines="none">
-                <ion-avatar slot="start">
-                  <ion-icon name="person-circle" size="large" color="warning"></ion-icon>
-                </ion-avatar>
-                <ion-label>
-                  <h3>Ananya Gupta</h3>
-                  <p>Software Engineering • ID: SE-2026-015</p>
-                </ion-label>
-                <ion-chip color="success" slot="end">Active</ion-chip>
-              </ion-item>
-            </ion-list>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
+          <button (click)="openAddFacultyModal()" class="btn-action secondary-green">
+            <span>💼</span> Add Faculty Member
+          </button>
 
-      <!-- QUICK ACTIONS & SYSTEM ALERTS PANEL -->
-      <ion-col size="12" size-lg="4">
-        <ion-card class="dashboard-panel-card">
-          <ion-card-header>
-            <ion-card-title>Quick Admin Actions</ion-card-title>
-          </ion-card-header>
+          <button (click)="openAddCourseModal()" class="btn-action dark-brand">
+            <span>📖</span> Create New Course
+          </button>
 
-          <ion-card-content>
-            <div class="quick-action-buttons">
-              <ion-button expand="block" color="primary" routerLink="/admin/add-student">
-                <ion-icon name="person-add-outline" slot="start"></ion-icon>
-                Register New Student
-              </ion-button>
+          <button class="btn-action outline-btn">
+            <span>📥</span> Export Reports (PDF/CSV)
+          </button>
+        </div>
 
-              <ion-button expand="block" color="secondary" routerLink="/admin/add-agent">
-                <ion-icon name="briefcase-outline" slot="start"></ion-icon>
-                Add Faculty Member
-              </ion-button>
+        <!-- SYSTEM ALERT CALLOUT -->
+        <div class="system-alert-card">
+          <div class="alert-icon">⚠️</div>
+          <div>
+            <h4 class="alert-title">System Maintenance</h4>
+            <p class="alert-desc">Scheduled server backup on Sunday, 2:00 AM UTC.</p>
+          </div>
+        </div>
 
-              <ion-button expand="block" color="tertiary" routerLink="/admin/academic">
-                <ion-icon name="book-outline" slot="start"></ion-icon>
-                Create New Course
-              </ion-button>
+      </div>
 
-              <ion-button expand="block" fill="outline" color="dark">
-                <ion-icon name="download-outline" slot="start"></ion-icon>
-                Export Reports (PDF/CSV)
-              </ion-button>
-            </div>
+    </div>
 
-            <!-- SYSTEM NOTIFICATION CALLOUT -->
-            <ion-item class="system-alert-item ion-margin-top" lines="none">
-              <ion-icon name="alert-circle" color="warning" slot="start" size="large"></ion-icon>
-              <ion-label class="ion-text-wrap">
-                <h4><b>System Maintenance</b></h4>
-                <p>Scheduled server backup on Sunday, 2:00 AM UTC.</p>
-              </ion-label>
-            </ion-item>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
+  </div>
 
-    </ion-row>
-  </ion-grid>
+  <!-- ========================================== -->
+  <!-- 1. VIEW STUDENT DETAILS MODAL -->
+  <!-- ========================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isStudentModalOpen" (click)="closeStudentModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- CENTERED TOP HEADER BANNER (NAME, EMAIL & PHONE) -->
+      <div class="modal-header-banner modal-centered-header">
+        <button class="modal-close-icon corner-close" (click)="closeStudentModal()">✕</button>
+        
+        <div class="modal-student-avatar large-centered-avatar" [ngClass]="selectedStudent?.avatarBg">
+          {{ selectedStudent?.avatar }}
+        </div>
+        <div class="modal-student-title text-center">
+          <h3>{{ selectedStudent?.name }}</h3>
+          <p class="contact-subinfo">{{ selectedStudent?.email }} • {{ selectedStudent?.phone }}</p>
+        </div>
+      </div>
+
+      <!-- MODAL BODY GRID (EMAIL & PHONE REMOVED, DETAILS ORGANIZED) -->
+      <div class="modal-body-grid">
+        <div class="info-row">
+          <div class="info-cell">
+            <span class="cell-label">STUDENT ID</span>
+            <span class="cell-value font-bold">{{ selectedStudent?.id }}</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">DEPARTMENT</span>
+            <span class="cell-value">{{ selectedStudent?.department }}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-cell">
+            <span class="cell-label">ENROLLED COURSE</span>
+            <span class="cell-value font-bold">{{ selectedStudent?.course }}</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">CURRENT SEMESTER</span>
+            <span class="cell-value">{{ selectedStudent?.semester }}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-cell">
+            <span class="cell-label">ATTENDANCE RATE</span>
+            <span class="cell-value text-green">{{ selectedStudent?.attendance }}</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">ACADEMIC GPA</span>
+            <span class="cell-value text-amber">{{ selectedStudent?.gpa }}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-cell">
+            <span class="cell-label">ENROLLMENT DATE</span>
+            <span class="cell-value">{{ selectedStudent?.enrollDate }}</span>
+          </div>
+          <div class="info-cell">
+            <span class="cell-label">FEE PAYMENT STATUS</span>
+            <span class="status-badge" [ngClass]="selectedStudent?.status === 'Active' ? 'green' : 'amber'">{{ selectedStudent?.feeStatus }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-modal-secondary" (click)="closeStudentModal()">Close</button>
+        <button class="btn-modal-primary" (click)="closeStudentModal()">Edit Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. REGISTER NEW STUDENT MODAL -->
+  <!-- ========================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isAddStudentModalOpen" (click)="closeAddStudentModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header-banner modal-brand-amber">
+        <div class="modal-student-title">
+          <h3 class="modal-title-white">Add New Student</h3>
+        </div>
+        <button class="modal-close-icon" (click)="closeAddStudentModal()">✕</button>
+      </div>
+
+      <div class="modal-form-body">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" [(ngModel)]="newStudent.name" placeholder="e.g. Vikramaditya Roy" class="modal-form-input" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" [(ngModel)]="newStudent.email" placeholder="student@lms-edu.com" class="modal-form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="text" [(ngModel)]="newStudent.phone" placeholder="+91 98000 00000" class="modal-form-input" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Course Program</label>
+          <select [(ngModel)]="newStudent.course" class="modal-form-select">
+            <option value="B.Tech Computer Science">B.Tech Computer Science</option>
+            <option value="B.Sc Data Science & AI">B.Sc Data Science & AI</option>
+            <option value="B.Tech Information Tech">B.Tech Information Tech</option>
+            <option value="M.Tech Software Engg">M.Tech Software Engg</option>
+          </select>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input type="text" [(ngModel)]="newStudent.department" class="modal-form-input" readonly />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Semester</label>
+            <select [(ngModel)]="newStudent.semester" class="modal-form-select">
+              <option value="Semester 1">Semester 1</option>
+              <option value="Semester 2">Semester 2</option>
+              <option value="Semester 3">Semester 3</option>
+              <option value="Semester 4">Semester 4</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-modal-secondary" (click)="closeAddStudentModal()">Cancel</button>
+        <button class="btn-modal-primary btn-amber" (click)="submitAddStudent()">Register Student</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3. ADD FACULTY MEMBER MODAL -->
+  <!-- ========================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isAddFacultyModalOpen" (click)="closeAddFacultyModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header-banner modal-brand-green">
+        <div class="modal-student-title">
+          <h3 class="modal-title-white">Add Faculty Member</h3>
+        </div>
+        <button class="modal-close-icon" (click)="closeAddFacultyModal()">✕</button>
+      </div>
+
+      <div class="modal-form-body">
+        <div class="form-group">
+          <label class="form-label">Faculty Full Name</label>
+          <input type="text" [(ngModel)]="newFaculty.name" placeholder="e.g. Dr. Rajesh Kumar" class="modal-form-input" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Academic Email</label>
+            <input type="email" [(ngModel)]="newFaculty.email" placeholder="faculty@lms-edu.com" class="modal-form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="text" [(ngModel)]="newFaculty.phone" placeholder="+91 98111 22334" class="modal-form-input" />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select [(ngModel)]="newFaculty.department" class="modal-form-select">
+              <option value="Computer Science & Engineering">Computer Science & Engg</option>
+              <option value="Data Science & AI">Data Science & AI</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Software Engineering">Software Engineering</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Designation</label>
+            <select [(ngModel)]="newFaculty.designation" class="modal-form-select">
+              <option value="Assistant Professor">Assistant Professor</option>
+              <option value="Associate Professor">Associate Professor</option>
+              <option value="Senior Professor">Senior Professor</option>
+              <option value="Head of Department">Head of Department</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-modal-secondary" (click)="closeAddFacultyModal()">Cancel</button>
+        <button class="btn-modal-primary btn-green" (click)="submitAddFaculty()">Add Faculty</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 4. CREATE NEW COURSE MODAL -->
+  <!-- ========================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isAddCourseModalOpen" (click)="closeAddCourseModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header-banner modal-brand-dark">
+        <div class="modal-student-title">
+          <h3 class="modal-title-white">Create New Course</h3>
+        </div>
+        <button class="modal-close-icon" (click)="closeAddCourseModal()">✕</button>
+      </div>
+
+      <div class="modal-form-body">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Course Title</label>
+            <input type="text" [(ngModel)]="newCourse.title" placeholder="e.g. Advanced Machine Learning" class="modal-form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Course Code</label>
+            <input type="text" [(ngModel)]="newCourse.code" placeholder="e.g. CS-402" class="modal-form-input" />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select [(ngModel)]="newCourse.department" class="modal-form-select">
+              <option value="Computer Science & Engineering">Computer Science & Engg</option>
+              <option value="Data Science & AI">Data Science & AI</option>
+              <option value="Information Technology">Information Technology</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Academic Credits</label>
+            <select [(ngModel)]="newCourse.credits" class="modal-form-select">
+              <option [value]="2">2 Credits</option>
+              <option [value]="3">3 Credits</option>
+              <option [value]="4">4 Credits</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Assigned Lead Instructor</label>
+          <input type="text" [(ngModel)]="newCourse.instructor" class="modal-form-input" placeholder="e.g. Dr. Sarah Jenkins" />
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-modal-secondary" (click)="closeAddCourseModal()">Cancel</button>
+        <button class="btn-modal-primary btn-dark" (click)="submitAddCourse()">Create Course</button>
+      </div>
+    </div>
+  </div>
 
 </ion-content>

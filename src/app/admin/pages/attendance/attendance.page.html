@@ -1,0 +1,281 @@
+<app-header></app-header>
+
+<ion-content [fullscreen]="true" class="attendance-page-content">
+  
+  <div class="attendance-wrapper">
+
+    <!-- TOP FLOATING PILL CATEGORY TABS -->
+    <div class="pills-tab-container">
+      <button class="pill-tab-btn" [class.active]="activeTab === 'student'" (click)="selectTab('student')">
+        <span class="tab-icon">🎓</span> STUDENTS ATTENDANCE ({{ studentAttendance.length }})
+      </button>
+
+      <button class="pill-tab-btn" [class.active]="activeTab === 'faculty'" (click)="selectTab('faculty')">
+        <span class="tab-icon">👨‍🏫</span> FACULTY ATTENDANCE ({{ facultyAttendance.length }})
+      </button>
+    </div>
+
+    <!-- DATE FILTER & HEADER TOOLBAR -->
+    <div class="date-header-card">
+      <div class="date-selector-group">
+        <label class="date-label">📅 SELECT DAY / DATE:</label>
+        <input type="date" [(ngModel)]="selectedDate" (change)="appliedFilters.date = selectedDate" class="date-input-picker" />
+        <span class="selected-date-badge">Showing Attendance for: <strong>{{ selectedDate }}</strong></span>
+      </div>
+
+      <div class="quick-date-buttons">
+        <button class="btn-quick-date" (click)="selectedDate = '2026-07-25'; appliedFilters.date = '2026-07-25'">Today</button>
+        <button class="btn-quick-date" (click)="selectedDate = '2026-07-24'; appliedFilters.date = '2026-07-24'">Yesterday</button>
+      </div>
+    </div>
+
+    <!-- STATS OVERVIEW CARDS -->
+    <div class="stats-overview-grid">
+      <div class="stat-mini-card brand-darkgreen">
+        <div class="stat-info">
+          <span class="stat-label">TOTAL {{ activeTab === 'student' ? 'STUDENTS' : 'FACULTY' }}</span>
+          <h3 class="stat-value">{{ getCurrentList().length }}</h3>
+        </div>
+        <div class="stat-icon-badge">📋</div>
+      </div>
+
+      <div class="stat-mini-card brand-emerald">
+        <div class="stat-info">
+          <span class="stat-label">PRESENT TODAY</span>
+          <h3 class="stat-value">{{ getPresentCount() }}</h3>
+        </div>
+        <div class="stat-icon-badge">✅</div>
+      </div>
+
+      <div class="stat-mini-card brand-coral">
+        <div class="stat-info">
+          <span class="stat-label">ABSENT TODAY</span>
+          <h3 class="stat-value">{{ getAbsentCount() }}</h3>
+        </div>
+        <div class="stat-icon-badge">❌</div>
+      </div>
+
+      <div class="stat-mini-card brand-amber">
+        <div class="stat-info">
+          <span class="stat-label">LATE / ON LEAVE</span>
+          <h3 class="stat-value">{{ getLateCount() + getLeaveCount() }}</h3>
+        </div>
+        <div class="stat-icon-badge">⏰</div>
+      </div>
+    </div>
+
+    <!-- MAIN ATTENDANCE CARD -->
+    <div class="attendance-main-card">
+      
+      <!-- CARD TOP TITLE & FILTER MODAL BUTTON -->
+      <div class="card-top-header">
+        <div class="title-group">
+          <h2 class="section-title">
+            {{ activeTab === 'student' ? 'Student Attendance Registry' : 'Faculty Attendance Registry' }}
+          </h2>
+          <span class="count-pill">{{ getFilteredRecords().length }} Records Found</span>
+        </div>
+
+        <button class="btn-open-filter-modal" (click)="openFilterModal()">
+          <span>⚙️</span> Filter Records
+        </button>
+      </div>
+
+      <!-- SEARCH & FILTER TOOLBAR -->
+      <div class="toolbar-row">
+        <div class="search-box-container">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            [(ngModel)]="searchText" 
+            placeholder="Search {{ activeTab }} by name, roll no, department..." 
+            class="attendance-search-input" 
+          />
+        </div>
+
+        <div class="filter-pills-group">
+          <button class="filter-pill-btn" [class.active]="statusFilter === 'All'" (click)="statusFilter = 'All'">
+            All ({{ getCurrentList().length }})
+          </button>
+          <button class="filter-pill-btn green" [class.active]="statusFilter === 'Present'" (click)="statusFilter = 'Present'">
+            Present ({{ getPresentCount() }})
+          </button>
+          <button class="filter-pill-btn red" [class.active]="statusFilter === 'Absent'" (click)="statusFilter = 'Absent'">
+            Absent ({{ getAbsentCount() }})
+          </button>
+          <button class="filter-pill-btn amber" [class.active]="statusFilter === 'Late'" (click)="statusFilter = 'Late'">
+            Late ({{ getLateCount() }})
+          </button>
+          <button class="filter-pill-btn blue" [class.active]="statusFilter === 'Leave'" (click)="statusFilter = 'Leave'">
+            On Leave ({{ getLeaveCount() }})
+          </button>
+        </div>
+      </div>
+
+      <!-- GETALL ATTENDANCE DATA TABLE -->
+      <div class="table-responsive">
+        <table class="attendance-data-table">
+          <thead>
+            <tr>
+              <th>{{ activeTab === 'student' ? 'ROLL NO' : 'FACULTY CODE' }}</th>
+              <th>NAME & EMAIL</th>
+              <th>{{ activeTab === 'student' ? 'COURSE & SEMESTER' : 'DEPARTMENT & ROLE' }}</th>
+              <th>CHECK-IN / OUT TIME</th>
+              <th>STATUS</th>
+              <th class="text-center">MARK ATTENDANCE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getFilteredRecords()">
+              
+              <!-- CODE / ROLL NO -->
+              <td>
+                <span class="code-roll-text">{{ item.codeOrRoll }}</span>
+              </td>
+
+              <!-- NAME & EMAIL -->
+              <td>
+                <div class="user-profile-cell">
+                  <div class="user-avatar" [style.background-color]="item.avatarBg">
+                    {{ getInitials(item.name) }}
+                  </div>
+                  <div class="user-meta">
+                    <span class="user-name">{{ item.name }}</span>
+                    <span class="user-email">{{ item.email }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- DEPT / COURSE -->
+              <td>
+                <div class="dept-course-cell">
+                  <span class="main-text">{{ item.departmentOrCourse }}</span>
+                  <span class="sub-text">{{ item.subMeta }}</span>
+                </div>
+              </td>
+
+              <!-- TIMINGS -->
+              <td>
+                <div class="time-cell">
+                  <span class="time-val">{{ item.timeIn }} - {{ item.timeOut }}</span>
+                </div>
+              </td>
+
+              <!-- STATUS BADGE -->
+              <td>
+                <span class="status-pill-badge" 
+                      [class.status-present]="item.status === 'Present'" 
+                      [class.status-absent]="item.status === 'Absent'"
+                      [class.status-late]="item.status === 'Late'"
+                      [class.status-leave]="item.status === 'Leave'">
+                  {{ item.status }}
+                </span>
+              </td>
+
+              <!-- QUICK ACTION MARK BUTTONS -->
+              <td class="text-center">
+                <div class="actions-flex-group">
+                  <button class="btn-mark btn-present" (click)="markStatus(item, 'Present')" title="Mark Present">
+                    Present
+                  </button>
+                  <button class="btn-mark btn-absent" (click)="markStatus(item, 'Absent')" title="Mark Absent">
+                    Absent
+                  </button>
+                  <button class="btn-mark btn-late" (click)="markStatus(item, 'Late')" title="Mark Late">
+                    Late
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+
+            <!-- EMPTY MESSAGE -->
+            <tr *ngIf="getFilteredRecords().length === 0">
+              <td colspan="6" class="empty-msg">No attendance records found matching your selected filters and date.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================== -->
+  <!-- ATTENDANCE ADVANCED FILTER POPUP MODAL -->
+  <!-- ========================================================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isFilterModalOpen" (click)="closeFilterModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- HEADER BANNER WITH CORNER CLOSE -->
+      <div class="modal-header-banner modal-brand-amber">
+        <div class="modal-student-title">
+          <h3 class="modal-title-white">Filter Attendance Records</h3>
+        </div>
+        <button class="modal-close-icon" (click)="closeFilterModal()">✕</button>
+      </div>
+
+      <!-- FORM BODY FOR FILTER PARAMETERS -->
+      <div class="modal-form-body">
+        
+        <!-- SELECT DATE -->
+        <div class="form-group">
+          <label class="form-label">Select Target Date</label>
+          <input type="date" [(ngModel)]="filterOptions.date" class="modal-form-input" />
+        </div>
+
+        <!-- SELECT DEPARTMENT / COURSE -->
+        <div class="form-group">
+          <label class="form-label">Department / Course Program</label>
+          <select [(ngModel)]="filterOptions.dept" class="modal-form-select">
+            <option value="All">All Departments & Programs</option>
+            <option value="Computer Science">Computer Science & Engineering</option>
+            <option value="Data Science">Data Science & AI</option>
+            <option value="Information Tech">Information Technology</option>
+            <option value="Software Engg">Software Engineering</option>
+          </select>
+        </div>
+
+        <!-- SELECT SEMESTER / DESIGNATION -->
+        <div class="form-group">
+          <label class="form-label">{{ activeTab === 'student' ? 'Semester Level' : 'Faculty Role / Designation' }}</label>
+          <select [(ngModel)]="filterOptions.subMeta" class="modal-form-select" *ngIf="activeTab === 'student'">
+            <option value="All">All Semesters</option>
+            <option value="Semester 2">Semester 2</option>
+            <option value="Semester 4">Semester 4</option>
+            <option value="Semester 6">Semester 6</option>
+          </select>
+
+          <select [(ngModel)]="filterOptions.subMeta" class="modal-form-select" *ngIf="activeTab === 'faculty'">
+            <option value="All">All Roles</option>
+            <option value="Senior Professor">Senior Professor</option>
+            <option value="Associate Professor">Associate Professor</option>
+            <option value="Assistant Professor">Assistant Professor</option>
+            <option value="Head of Department">Head of Department</option>
+          </select>
+        </div>
+
+        <!-- SELECT ATTENDANCE STATUS -->
+        <div class="form-group">
+          <label class="form-label">Attendance Status</label>
+          <select [(ngModel)]="filterOptions.status" class="modal-form-select">
+            <option value="All">All Statuses (Present, Absent, Late, Leave)</option>
+            <option value="Present">Present Only</option>
+            <option value="Absent">Absent Only</option>
+            <option value="Late">Late Arrival Only</option>
+            <option value="Leave">On Leave Only</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- MODAL FOOTER ACTIONS -->
+      <div class="modal-footer-actions">
+        <button class="btn-modal-secondary" (click)="resetModalFilters()">Reset Filters</button>
+        <button class="btn-modal-primary" (click)="applyModalFilters()">Apply Filters</button>
+      </div>
+
+    </div>
+  </div>
+
+</ion-content>
