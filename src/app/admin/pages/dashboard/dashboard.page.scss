@@ -1,0 +1,111 @@
+/* ADMIN DASHBOARD 2-COLOR DESIGN: WHITE (#ffffff) + ROYAL BLUE (#2563eb) */
+
+.admin-dashboard-content {
+  --background: #ffffff;
+}
+
+.page-header-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.25rem;
+}
+
+.page-header-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* STAT METRIC CARDS */
+.stat-metric-card {
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-top: 4px solid #2563eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+  .stat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .icon-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: rgba(37, 99, 235, 0.08);
+    color: #2563eb;
+  }
+
+  .growth-chip {
+    font-weight: 700;
+    font-size: 0.75rem;
+    height: 24px;
+    --background: rgba(37, 99, 235, 0.1);
+    --color: #2563eb;
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0 0 0.25rem 0;
+    color: #0f172a;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+/* PANEL CARDS */
+.dashboard-panel-card {
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+
+  ion-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+}
+
+.quick-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  ion-button {
+    --border-radius: 10px;
+    font-weight: 600;
+  }
+}
+
+.system-alert-item {
+  background: rgba(37, 99, 235, 0.05);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  border-radius: 12px;
+  padding: 0.5rem;
+
+  h4 {
+    font-size: 0.9rem;
+    color: #0f172a;
+    margin: 0 0 0.2rem 0;
+  }
+  p {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0;
+  }
+}

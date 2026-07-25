@@ -1,0 +1,102 @@
+/* FACULTY DASHBOARD 2-COLOR DESIGN: WHITE (#ffffff) + ROYAL BLUE (#2563eb) */
+
+.faculty-dashboard-content {
+  --background: #ffffff;
+}
+
+.faculty-welcome-card {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 20px;
+  border: 2px solid #2563eb;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08);
+
+  .welcome-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0.5rem 0;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+.fac-stat-card {
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-top: 4px solid #2563eb;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+
+  .stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.2rem 0;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+.fac-panel-card {
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+
+  ion-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+}
+
+.class-avatar {
+  width: 48px;
+  height: 48px;
+  background: rgba(37, 99, 235, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+}
+
+.status-chip {
+  font-weight: 700;
+  font-size: 0.75rem;
+  --background: rgba(37, 99, 235, 0.1);
+  --color: #2563eb;
+}
+
+.sub-date {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.input-item {
+  --background: #f8fafc;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  border: 1px solid #e2e8f0;
+}
