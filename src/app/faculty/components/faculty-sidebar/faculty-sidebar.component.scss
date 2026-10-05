@@ -1,0 +1,253 @@
+:host {
+  display: block;
+}
+
+ion-menu {
+  --width: 260px !important;
+  --min-width: 240px !important;
+  --max-width: 280px !important;
+  width: 260px !important;
+  --background: #0d1b14 !important;
+  border-right: 1px solid #1a3325 !important;
+}
+
+.sidebar-content {
+  --background: #0d1b14 !important;
+  background-color: #0d1b14 !important;
+}
+
+/* BRAND HEADER IN SIDEBAR */
+.sidebar-brand-header {
+  background-color: #0d1b14;
+  padding: 1.25rem 1.25rem 1rem 1.25rem;
+  border-bottom: 1px solid #1a3325;
+
+  .brand-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .close-menu-btn {
+    --color: #94a3b8;
+    margin: 0;
+    height: 2rem;
+    width: 2rem;
+
+    ion-icon {
+      font-size: 1.4rem;
+    }
+
+    &:hover {
+      --color: #ffffff;
+    }
+  }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    text-decoration: none;
+
+    .logo-badge {
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 0.75rem;
+      background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(4, 120, 87, 0.3);
+
+      .logo-icon {
+        width: 1.3rem;
+        height: 1.3rem;
+      }
+    }
+
+    .brand-text-group {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+
+      .brand-name {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: #ffffff;
+      }
+
+      .brand-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.58rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        color: #34d399;
+        margin-top: 4px;
+      }
+    }
+  }
+
+  .faculty-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    margin-top: 1rem;
+
+    .profile-avatar {
+      width: 2.3rem;
+      height: 2.3rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .profile-info {
+      overflow: hidden;
+
+      .profile-name {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .profile-role {
+        margin: 2px 0 0 0;
+        font-size: 0.7rem;
+        color: #94a3b8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+/* SIDEBAR GROUP LABELS */
+.sidebar-group-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #64748b;
+  padding: 1.25rem 1.25rem 0.4rem 1.25rem;
+
+  &.margin-top-group {
+    margin-top: 1rem;
+  }
+}
+
+/* SIDEBAR MENU LIST & ITEMS */
+.sidebar-menu {
+  background: transparent !important;
+  padding: 0.5rem 0.5rem 1rem 0.5rem;
+
+  ion-item {
+    --background: transparent;
+    --color: #94a3b8;
+    --padding-start: 0.9rem;
+    --inner-padding-end: 0.9rem;
+    margin: 0.2rem 0;
+    border-radius: 0.65rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    ion-label {
+      white-space: nowrap !important;
+    }
+
+    ion-icon {
+      color: #64748b;
+      font-size: 1.2rem;
+      transition: color 0.2s ease;
+    }
+
+    &:hover {
+      --background: rgba(16, 185, 129, 0.1);
+      --color: #ffffff;
+
+      ion-icon {
+        color: #34d399;
+      }
+    }
+  }
+}
+
+/* ACTIVE MENU ITEM HIGHLIGHT */
+.active-menu {
+  --background: linear-gradient(135deg, rgba(5, 150, 105, 0.25) 0%, rgba(16, 185, 129, 0.1) 100%) !important;
+  --color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2) !important;
+
+  ion-icon {
+    color: #34d399 !important;
+  }
+}
+
+/* BADGES IN SIDEBAR */
+.badge-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+
+  &.amber {
+    background-color: rgba(217, 119, 6, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(217, 119, 6, 0.4);
+  }
+
+  &.green {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+  }
+
+  &.danger {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+  }
+}
+
+/* LOGOUT ITEM STYLING */
+.logout-item {
+  margin-top: 1.5rem !important;
+
+  ion-icon {
+    color: #f87171 !important;
+  }
+
+  ion-label {
+    color: #f87171 !important;
+    font-weight: 700;
+  }
+
+  &:hover {
+    --background: rgba(239, 68, 68, 0.15) !important;
+  }
+}

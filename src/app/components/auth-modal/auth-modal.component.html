@@ -1,0 +1,153 @@
+<!-- AUTH MODAL OVERLAY BACKDROP -->
+<div class="auth-modal-backdrop" *ngIf="isOpen" (click)="closeModal()">
+  <div class="auth-modal-dialog" (click)="$event.stopPropagation()">
+    <button class="modal-close-icon" (click)="closeModal()" title="Close Modal">✕</button>
+
+    <div class="auth-card-header">
+      <div class="brand-badge-small">
+        <span class="badge-icon">🎓</span>
+        <span>LearnSphere</span>
+      </div>
+
+      <h2 class="auth-title">
+        {{ authMode === 'signin' ? 'Welcome Back!' : 'Create Your Account' }}
+      </h2>
+      <p class="auth-subtitle">
+        {{ authMode === 'signin' ? 'Sign in to access your courses and live classes.' : 'Join thousands of students and mentors today.' }}
+      </p>
+
+      <!-- MODE SWITCHER PILL TABS -->
+      <div class="mode-tabs">
+        <button type="button" 
+                class="mode-tab-btn" 
+                [class.active]="authMode === 'signin'" 
+                (click)="setAuthMode('signin')">
+          Sign In
+        </button>
+
+        <button type="button" 
+                class="mode-tab-btn" 
+                [class.active]="authMode === 'signup'" 
+                (click)="setAuthMode('signup')">
+          Sign Up
+        </button>
+      </div>
+    </div>
+
+    <!-- ROLE SELECTOR (ONLY FOR SIGN UP MODE) -->
+    <div class="role-selector-wrapper" *ngIf="authMode === 'signup'">
+      <span class="role-label">Select Account Type:</span>
+      <div class="role-chips">
+        <button type="button" 
+                class="role-chip" 
+                [class.selected]="userRole === 'student'" 
+                (click)="setUserRole('student')">
+          <span class="chip-icon">🎓</span> Student
+        </button>
+
+        <button type="button" 
+                class="role-chip" 
+                [class.selected]="userRole === 'faculty'" 
+                (click)="setUserRole('faculty')">
+          <span class="chip-icon">👨‍🏫</span> Faculty
+        </button>
+      </div>
+    </div>
+
+    <!-- DYNAMIC AUTH FORM -->
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+
+      <!-- FULL NAME (ONLY FOR SIGN UP) -->
+      <div class="form-group" *ngIf="authMode === 'signup'">
+        <label class="form-label">Full Name</label>
+        <div class="input-wrapper">
+          <span class="input-icon">👤</span>
+          <input type="text" 
+                 [(ngModel)]="fullName" 
+                 name="fullName" 
+                 placeholder="Enter your full name" 
+                 required 
+                 class="form-input" />
+        </div>
+      </div>
+
+      <!-- EMAIL ADDRESS -->
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input type="email" 
+                 [(ngModel)]="email" 
+                 name="email" 
+                 placeholder="name@example.com" 
+                 required 
+                 class="form-input" />
+        </div>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input type="password" 
+                 [(ngModel)]="password" 
+                 name="password" 
+                 placeholder="••••••••" 
+                 required 
+                 class="form-input" />
+        </div>
+      </div>
+
+      <!-- CONFIRM PASSWORD (ONLY FOR SIGN UP) -->
+      <div class="form-group" *ngIf="authMode === 'signup'">
+        <label class="form-label">Confirm Password</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🛡️</span>
+          <input type="password" 
+                 [(ngModel)]="confirmPassword" 
+                 name="confirmPassword" 
+                 placeholder="••••••••" 
+                 required 
+                 class="form-input" />
+        </div>
+      </div>
+
+      <!-- CHECKBOXES -->
+      <div class="form-options-row" *ngIf="authMode === 'signin'">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" />
+          <span>Remember me</span>
+        </label>
+        <a href="javascript:void(0)" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <div class="form-options-row" *ngIf="authMode === 'signup'">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="agreeTerms" name="agreeTerms" required />
+          <span>I agree to the Terms of Service & Privacy Policy</span>
+        </label>
+      </div>
+
+      <!-- SUBMIT ACTION BUTTON -->
+      <button type="submit" class="submit-btn">
+        <span *ngIf="authMode === 'signin'">Sign In to Account ➔</span>
+        <span *ngIf="authMode === 'signup'">Create Free Account 🚀</span>
+      </button>
+
+    </form>
+
+    <!-- BOTTOM TOGGLE FOOTER -->
+    <div class="auth-card-footer">
+      <span *ngIf="authMode === 'signup'">
+        Already have an account? 
+        <a href="javascript:void(0)" class="toggle-link" (click)="setAuthMode('signin')">Sign In</a>
+      </span>
+      <span *ngIf="authMode === 'signin'">
+        Don't have an account yet? 
+        <a href="javascript:void(0)" class="toggle-link" (click)="setAuthMode('signup')">Create Account</a>
+      </span>
+    </div>
+
+  </div>
+</div>

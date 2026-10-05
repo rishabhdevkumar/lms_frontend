@@ -1,5 +1,5 @@
 <!-- LMS REUSABLE NAVBAR WITH FULL MOBILE & TABLET RESPONSIVENESS -->
-<header class="navbar-header" [class.dark-nav]="isDarkMode">
+<header class="navbar-header">
   <div class="navbar-container">
 
     <!-- BRAND LOGO BADGE -->
@@ -11,12 +11,11 @@
         </svg>
       </div>
       <div class="brand-text-group">
-        <span class="brand-name">LMS</span>
-        <span class="brand-tag">LEARNING HUB</span>
+        <span class="brand-name">LearnSphere</span>
       </div>
     </a>
 
-    <!-- DESKTOP NAV LINKS (ACTIVE DEFAULT ON HOME, BOLD TEXT WHEN ACTIVE) -->
+    <!-- DESKTOP NAV LINKS -->
     <nav class="desktop-nav-links">
       <a routerLink="/home" class="nav-item" [class.active]="activeTab === 'Home'" (click)="setActiveTab('Home')">
         Home
@@ -38,7 +37,7 @@
       </a>
     </nav>
 
-    <!-- RIGHT SIDE ACTIONS (SEARCH, DARK MODE, LANGUAGE DROPDOWN, GET STARTED) -->
+    <!-- RIGHT SIDE ACTIONS (SEARCH, GET STARTED) -->
     <div class="desktop-actions">
 
       <!-- 🔍 SEARCH COURSE TOGGLE -->
@@ -54,33 +53,10 @@
         </div>
       </div>
 
-      <!-- 🌙 / ☀️ DARK MODE TOGGLE -->
-      <button class="action-icon-btn" (click)="toggleDarkMode()" title="Toggle Dark Mode">
-        <span *ngIf="!isDarkMode">🌙</span>
-        <span *ngIf="isDarkMode">☀️</span>
-      </button>
-
-      <!-- 🌐 LANGUAGE DROPDOWN SELECTOR -->
-      <div class="lang-dropdown-wrapper">
-        <button class="lang-btn" (click)="toggleLangDropdown()" title="Select Language">
-          <span class="lang-text">{{ selectedLang }}</span>
-          <span class="dropdown-arrow">▼</span>
-        </button>
-
-        <div class="lang-menu" *ngIf="isLangDropdownOpen">
-          <div *ngFor="let lang of languages" 
-               class="lang-option" 
-               [class.selected]="lang === selectedLang"
-               (click)="selectLanguage(lang)">
-            {{ lang }}
-          </div>
-        </div>
-      </div>
-
-      <!-- 🚀 GET STARTED BUTTON (REPLACED REGISTER/SIGN UP) -->
-      <a routerLink="/sign-up" class="register-btn">
+      <!-- 🚀 GET STARTED BUTTON (OPENS AUTH MODAL) -->
+      <button class="register-btn" (click)="openAuthModal('signup')">
         Get Started
-      </a>
+      </button>
 
       <!-- ☰ HAMBURGER MENU BUTTON -->
       <button class="hamburger-btn" (click)="toggleMobileMenu()" aria-label="Toggle Navigation Menu">
@@ -102,7 +78,7 @@
         <input type="text" placeholder="Search courses, mentors..." class="mobile-search-input" />
       </div>
 
-      <!-- NAVIGATION LINKS LIST (ACTIVE BOLD) -->
+      <!-- NAVIGATION LINKS LIST -->
       <div class="mobile-nav-links">
         <a routerLink="/home" class="mobile-nav-item" [class.active]="activeTab === 'Home'" (click)="setActiveTab('Home')">Home</a>
         <a routerLink="/home" class="mobile-nav-item" [class.active]="activeTab === 'Courses'" (click)="setActiveTab('Courses')">Courses</a>
@@ -114,37 +90,16 @@
 
       <!-- CONTROL BUTTONS GRID -->
       <div class="mobile-controls-section">
-        
-        <div class="mobile-toggles-row">
-          <!-- DARK MODE TOGGLE -->
-          <button class="mobile-control-btn" (click)="toggleDarkMode()">
-            <span>{{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}</span>
-          </button>
-
-          <!-- LANGUAGE SWITCHER -->
-          <button class="mobile-control-btn" (click)="toggleLangDropdown()">
-            <span>{{ selectedLang }} ▼</span>
-          </button>
-        </div>
-
-        <!-- MOBILE LANGUAGE OPTIONS LIST -->
-        <div class="mobile-lang-list" *ngIf="isLangDropdownOpen">
-          <div *ngFor="let lang of languages" 
-               class="mobile-lang-chip"
-               [class.active]="lang === selectedLang"
-               (click)="selectLanguage(lang)">
-            {{ lang }}
-          </div>
-        </div>
-
-        <!-- GET STARTED BUTTON -->
-        <a routerLink="/sign-up" class="mobile-register-btn" (click)="closeMobileMenu()">
+        <!-- GET STARTED BUTTON (OPENS AUTH MODAL) -->
+        <button class="mobile-register-btn" (click)="openAuthModal('signup')">
           Get Started
-        </a>
-
+        </button>
       </div>
 
     </div>
   </div>
 
 </header>
+
+<!-- REUSABLE AUTH MODAL COMPONENT (LOGIN & SIGN UP) -->
+<app-auth-modal [isOpen]="isAuthModalOpen" [authMode]="authMode" (closed)="closeAuthModal()"></app-auth-modal>

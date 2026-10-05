@@ -1,4 +1,4 @@
-/* FACULTY DASHBOARD 2-COLOR DESIGN: WHITE (#ffffff) + ROYAL BLUE (#2563eb) */
+/* FACULTY DASHBOARD DESIGN */
 
 .faculty-dashboard-content {
   --background: #ffffff;
@@ -15,6 +15,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 
   h2 {
@@ -72,26 +74,147 @@
   }
 }
 
-.class-avatar {
-  width: 48px;
-  height: 48px;
-  background: rgba(37, 99, 235, 0.08);
+/* RESPONSIVE SCHEDULE LIST */
+.responsive-schedule-list {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2563eb;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  .schedule-flex-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    @media (max-width: 576px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .schedule-item-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      min-width: 0;
+      flex: 1;
+
+      .class-avatar-icon {
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 0.6rem;
+        background: rgba(37, 99, 235, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .class-details {
+        min-width: 0;
+        flex: 1;
+
+        .course-heading {
+          margin: 0;
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #0f172a;
+          line-height: 1.3;
+          word-break: break-word;
+        }
+
+        .meta-line {
+          margin: 4px 0;
+          font-size: 0.8rem;
+          color: #475569;
+          word-break: break-word;
+        }
+
+        .students-line {
+          margin: 0;
+          font-size: 0.78rem;
+          color: #64748b;
+        }
+      }
+    }
+
+    .schedule-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+
+      @media (max-width: 576px) {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 0.25rem;
+        padding-top: 0.5rem;
+        border-top: 1px dashed #e2e8f0;
+      }
+    }
+  }
 }
 
-.status-chip {
-  font-weight: 700;
-  font-size: 0.75rem;
-  --background: rgba(37, 99, 235, 0.1);
-  --color: #2563eb;
-}
+/* RESPONSIVE SUBMISSIONS QUEUE LIST */
+.responsive-sub-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 
-.sub-date {
-  font-size: 0.75rem;
-  color: #64748b;
+  .sub-flex-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0.9rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+
+    .sub-item-main {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-width: 0;
+      flex: 1;
+
+      .sub-avatar {
+        width: 2.2rem;
+        height: 2.2rem;
+        flex-shrink: 0;
+      }
+
+      .sub-details {
+        min-width: 0;
+        flex: 1;
+
+        h3 {
+          margin: 0;
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: #0f172a;
+        }
+
+        .sub-title-text {
+          margin: 2px 0;
+          font-size: 0.8rem;
+          color: #334155;
+          word-break: break-word;
+        }
+
+        .sub-date {
+          margin: 0;
+          font-size: 0.73rem;
+          color: #64748b;
+        }
+      }
+    }
+  }
 }
 
 .input-item {

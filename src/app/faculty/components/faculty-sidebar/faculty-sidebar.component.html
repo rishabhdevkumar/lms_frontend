@@ -1,0 +1,113 @@
+<ion-split-pane contentId="main-faculty-content" when="md">
+  <!-- FACULTY SIDEBAR MENU -->
+  <ion-menu contentId="main-faculty-content" type="overlay" menuId="faculty-menu">
+    
+    <!-- BRAND & PROFILE HEADER -->
+    <div class="sidebar-brand-header">
+      <div class="brand-top-row">
+        <a class="brand-logo" routerLink="/faculty/dashboard">
+          <div class="logo-badge">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <div class="brand-text-group">
+            <span class="brand-name">LearnSphere</span>
+            <span class="brand-tag">FACULTY PORTAL</span>
+          </div>
+        </a>
+
+        <!-- CLOSE SIDEBAR ICON / BUTTON -->
+        <ion-menu-toggle menu="faculty-menu">
+          <ion-button fill="clear" class="close-menu-btn">
+            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-menu-toggle>
+      </div>
+
+      <!-- FACULTY USER BRIEF -->
+      <div class="faculty-profile-card">
+        <div class="profile-avatar">
+          <span>SJ</span>
+        </div>
+        <div class="profile-info">
+          <h4 class="profile-name">{{ facultyName }}</h4>
+          <p class="profile-role">{{ facultyRole }}</p>
+        </div>
+      </div>
+    </div>
+
+    <ion-content class="sidebar-content">
+      <div class="sidebar-group-label">NAVIGATION</div>
+
+      <ion-list class="sidebar-menu" lines="none">
+        <ion-menu-toggle menu="faculty-menu" auto-hide="false">
+          <ion-item routerLink="/faculty/dashboard" routerLinkActive="active-menu">
+            <ion-icon name="grid-outline" slot="start"></ion-icon>
+            <ion-label>Dashboard</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-menu-toggle menu="faculty-menu" auto-hide="false">
+          <ion-item routerLink="/faculty/classes" routerLinkActive="active-menu">
+            <ion-icon name="easel-outline" slot="start"></ion-icon>
+            <ion-label>My Classes</ion-label>
+            <span class="badge-count amber">3 Today</span>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-menu-toggle menu="faculty-menu" auto-hide="false">
+          <ion-item routerLink="/faculty/assignments" routerLinkActive="active-menu">
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            <ion-label>Assignments & Grading</ion-label>
+            <span class="badge-count danger">18</span>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-menu-toggle menu="faculty-menu" auto-hide="false">
+          <ion-item routerLink="/faculty/attendance" routerLinkActive="active-menu">
+            <ion-icon name="checkmark-done-circle-outline" slot="start"></ion-icon>
+            <ion-label>Student Attendance</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-menu-toggle menu="faculty-menu" auto-hide="false">
+          <ion-item routerLink="/faculty/course-material" routerLinkActive="active-menu">
+            <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+            <ion-label>Course Material</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-menu-toggle menu="faculty-menu" auto-hide="false">
+          <ion-item routerLink="/faculty/doubts" routerLinkActive="active-menu">
+            <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
+            <ion-label>Student Doubts</ion-label>
+            <span class="badge-count green">5 New</span>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <div class="sidebar-group-label margin-top-group">ACCOUNT</div>
+
+        <ion-menu-toggle menu="faculty-menu" auto-hide="false">
+          <ion-item routerLink="/faculty/profile" routerLinkActive="active-menu">
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+            <ion-label>Profile & Settings</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <!-- LOGOUT LINK -->
+        <ion-menu-toggle menu="faculty-menu" auto-hide="false">
+          <ion-item routerLink="/home" lines="none" class="logout-item">
+            <ion-icon name="log-out-outline" slot="start"></ion-icon>
+            <ion-label>Logout</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+
+  <!-- ROUTER OUTLET FOR FACULTY PAGES -->
+  <ion-router-outlet id="main-faculty-content"></ion-router-outlet>
+</ion-split-pane>

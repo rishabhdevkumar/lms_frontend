@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+
+.doubt-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+
+  .doubt-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  ion-card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .doubt-body {
+    font-size: 0.92rem;
+    color: #334155;
+    line-height: 1.5;
+  }
+
+  .reply-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 0.6rem;
+    padding: 0.75rem 1rem;
+
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #166534;
+    }
+
+    .reply-text {
+      margin-top: 4px;
+      color: #15803d;
+      font-style: italic;
+    }
+  }
+}

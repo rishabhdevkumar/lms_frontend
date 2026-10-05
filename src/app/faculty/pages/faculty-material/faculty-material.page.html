@@ -1,0 +1,108 @@
+<app-faculty-header pageTitle="Upload & Course Material"></app-faculty-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <!-- TOP TOOLBAR & UPLOAD BUTTON -->
+    <ion-row class="ion-align-items-center ion-margin-bottom">
+      <ion-col size="12" size-md="6">
+        <ion-item class="filter-item">
+          <ion-label position="stacked">Filter Course Materials</ion-label>
+          <ion-select [(ngModel)]="selectedCourseFilter">
+            <ion-select-option value="all">All Courses</ion-select-option>
+            <ion-select-option value="CS-402">CS-402: Web Engineering</ion-select-option>
+            <ion-select-option value="CS-501">CS-501: Microservices</ion-select-option>
+            <ion-select-option value="DS-302">DS-302: Data Analytics</ion-select-option>
+            <ion-select-option value="SE-601">SE-601: Software Patterns</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+
+      <ion-col size="12" size-md="6" class="ion-text-end">
+        <ion-button color="tertiary" (click)="openUploadModal()">
+          <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+          Upload New Document / PDF
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <!-- MATERIAL GRID -->
+    <ion-row>
+      <ion-col size="12" size-md="6" *ngFor="let mat of filteredMaterials">
+        <ion-card class="material-card">
+          <ion-card-header>
+            <div class="mat-top">
+              <ion-badge color="tertiary">{{ mat.courseCode }}</ion-badge>
+              <ion-chip color="dark" class="type-chip">{{ mat.fileType }}</ion-chip>
+            </div>
+            <ion-card-title class="ion-margin-top">{{ mat.title }}</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <p><ion-icon name="document-outline"></ion-icon> <b>Size:</b> {{ mat.fileSize }} &nbsp;•&nbsp; <ion-icon name="time-outline"></ion-icon> {{ mat.uploadDate }}</p>
+            <p><ion-icon name="download-outline"></ion-icon> <b>{{ mat.downloads }}</b> Student Downloads</p>
+
+            <div class="mat-footer ion-margin-top">
+              <ion-button size="small" fill="outline" color="tertiary">
+                <ion-icon name="download-outline" slot="start"></ion-icon> Download
+              </ion-button>
+              <ion-button size="small" fill="clear" color="danger" (click)="deleteMaterial(mat)">
+                <ion-icon name="trash-outline" slot="start"></ion-icon> Delete
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+<!-- UPLOAD MATERIAL MODAL -->
+<ion-modal [isOpen]="isUploadModalOpen" (didDismiss)="closeUploadModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="tertiary">
+        <ion-title>Upload Course Resource</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeUploadModal()">Cancel</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-list lines="full">
+        <ion-item>
+          <ion-label position="stacked">Course</ion-label>
+          <ion-select [(ngModel)]="newMaterial.course">
+            <ion-select-option value="CS-402">CS-402: Web Engineering</ion-select-option>
+            <ion-select-option value="CS-501">CS-501: Microservices</ion-select-option>
+            <ion-select-option value="DS-302">DS-302: Data Analytics</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Resource Title</ion-label>
+          <ion-input [(ngModel)]="newMaterial.title" placeholder="e.g. Chapter 5 Reference Manual"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Document Format</ion-label>
+          <ion-select [(ngModel)]="newMaterial.type">
+            <ion-select-option value="PDF">PDF Document</ion-select-option>
+            <ion-select-option value="PPTX">PowerPoint Presentation</ion-select-option>
+            <ion-select-option value="ZIP">ZIP Source Code / Project</ion-select-option>
+            <ion-select-option value="IPYNB">Jupyter Notebook</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Description / Notes</ion-label>
+          <ion-textarea [(ngModel)]="newMaterial.description" rows="3" placeholder="Brief notes for students..."></ion-textarea>
+        </ion-item>
+      </ion-list>
+
+      <ion-button expand="block" color="tertiary" class="ion-margin-top" (click)="submitUpload()">
+        <ion-icon name="cloud-upload-outline" slot="start"></ion-icon> Publish Resource File
+      </ion-button>
+    </ion-content>
+  </ng-template>
+</ion-modal>

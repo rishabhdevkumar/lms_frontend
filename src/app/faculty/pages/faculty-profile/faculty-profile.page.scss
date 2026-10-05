@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+.profile-summary-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+
+  .avatar-large {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem auto 0.75rem auto;
+    box-shadow: 0 6px 16px rgba(5, 150, 105, 0.3);
+  }
+
+  h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+  }
+
+  .dept-text {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  .emp-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: #475569;
+  }
+}
+
+.settings-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+
+  ion-card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+}
