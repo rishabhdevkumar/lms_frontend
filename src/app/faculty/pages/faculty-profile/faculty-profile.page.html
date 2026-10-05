@@ -1,13 +1,135 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>faculty_profile</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-faculty-header pageTitle="Faculty Profile & Settings"></app-faculty-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">faculty_profile</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <!-- LEFT COLUMN: PROFILE CARD -->
+      <ion-col size="12" size-lg="4">
+        <ion-card class="profile-summary-card">
+          <ion-card-content class="ion-text-center">
+            <div class="avatar-large">
+              <span>SJ</span>
+            </div>
+            <h2>{{ facultyData.name }}</h2>
+            <ion-chip color="tertiary">{{ facultyData.designation }}</ion-chip>
+            <p class="dept-text">{{ facultyData.department }}</p>
+            <p class="emp-id"><ion-icon name="id-card-outline"></ion-icon> ID: {{ facultyData.employeeId }}</p>
+
+            <ion-list lines="none" class="ion-margin-top ion-text-start">
+              <ion-item>
+                <ion-icon name="mail-outline" slot="start" color="tertiary"></ion-icon>
+                <ion-label>
+                  <p>Email Address</p>
+                  <h4>{{ facultyData.email }}</h4>
+                </ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="call-outline" slot="start" color="tertiary"></ion-icon>
+                <ion-label>
+                  <p>Phone Number</p>
+                  <h4>{{ facultyData.phone }}</h4>
+                </ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="business-outline" slot="start" color="tertiary"></ion-icon>
+                <ion-label>
+                  <p>Office Location</p>
+                  <h4>{{ facultyData.officeRoom }}</h4>
+                </ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="time-outline" slot="start" color="tertiary"></ion-icon>
+                <ion-label>
+                  <p>Office Consultation Hours</p>
+                  <h4>{{ facultyData.officeHours }}</h4>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- RIGHT COLUMN: EDIT PROFILE & PREFERENCES FORMS -->
+      <ion-col size="12" size-lg="8">
+        <ion-card class="settings-card">
+          <ion-card-header>
+            <ion-card-title>Edit Faculty Information</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-list lines="full">
+              <ion-row>
+                <ion-col size="12" size-md="6">
+                  <ion-item>
+                    <ion-label position="stacked">Full Name</ion-label>
+                    <ion-input [(ngModel)]="facultyData.name"></ion-input>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="12" size-md="6">
+                  <ion-item>
+                    <ion-label position="stacked">Designation</ion-label>
+                    <ion-input [(ngModel)]="facultyData.designation"></ion-input>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="12" size-md="6">
+                  <ion-item>
+                    <ion-label position="stacked">Phone Number</ion-label>
+                    <ion-input [(ngModel)]="facultyData.phone"></ion-input>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="12" size-md="6">
+                  <ion-item>
+                    <ion-label position="stacked">Office Room</ion-label>
+                    <ion-input [(ngModel)]="facultyData.officeRoom"></ion-input>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="12">
+                  <ion-item>
+                    <ion-label position="stacked">Office Consultation Hours</ion-label>
+                    <ion-input [(ngModel)]="facultyData.officeHours"></ion-input>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="12">
+                  <ion-item>
+                    <ion-label position="stacked">Academic Biography</ion-label>
+                    <ion-textarea [(ngModel)]="facultyData.bio" rows="3"></ion-textarea>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- NOTIFICATION PREFERENCES CARD -->
+        <ion-card class="settings-card ion-margin-top">
+          <ion-card-header>
+            <ion-card-title>Notification Preferences</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-list lines="full">
+              <ion-item>
+                <ion-label>Email Digest & Daily Schedule</ion-label>
+                <ion-toggle slot="end" [(ngModel)]="notificationPrefs.emailAlerts" color="tertiary"></ion-toggle>
+              </ion-item>
+              <ion-item>
+                <ion-label>Student Doubt Q&A Notifications</ion-label>
+                <ion-toggle slot="end" [(ngModel)]="notificationPrefs.doubtNotifications" color="tertiary"></ion-toggle>
+              </ion-item>
+              <ion-item>
+                <ion-label>Assignment Submission Alerts</ion-label>
+                <ion-toggle slot="end" [(ngModel)]="notificationPrefs.submissionAlerts" color="tertiary"></ion-toggle>
+              </ion-item>
+            </ion-list>
+
+            <div class="ion-margin-top ion-text-end">
+              <ion-button color="tertiary" size="large" (click)="saveProfile()">
+                <ion-icon name="save-outline" slot="start"></ion-icon> Save Changes
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

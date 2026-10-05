@@ -1,0 +1,134 @@
+<app-faculty-header pageTitle="My Classes & Timetable"></app-faculty-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <!-- HEADER BAR & SEGMENT CONTROLS -->
+    <ion-row class="ion-align-items-center ion-margin-bottom">
+      <ion-col size="12" size-md="7">
+        <ion-segment [(ngModel)]="selectedSegment" color="tertiary">
+          <ion-segment-button value="schedule">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <ion-label>Weekly Timetable</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="courses">
+            <ion-icon name="book-outline"></ion-icon>
+            <ion-label>Assigned Courses</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </ion-col>
+      <ion-col size="12" size-md="5" class="ion-text-end ion-hide-sm-down">
+        <ion-chip color="tertiary">
+          <ion-icon name="easel-outline"></ion-icon>
+          <ion-label>Total 4 Modules • 240 Students</ion-label>
+        </ion-chip>
+      </ion-col>
+    </ion-row>
+
+    <!-- TAB 1: WEEKLY TIMETABLE SCHEDULE -->
+    <div *ngIf="selectedSegment === 'schedule'">
+      <ion-row>
+        <ion-col size="12" *ngFor="let item of weeklyTimetable" size-md="6" size-lg="4">
+          <ion-card class="schedule-card">
+            <ion-card-header>
+              <div class="schedule-top">
+                <ion-badge color="tertiary">{{ item.day }}</ion-badge>
+                <span class="schedule-time"><ion-icon name="time-outline"></ion-icon> {{ item.time }}</span>
+              </div>
+              <ion-card-title class="ion-margin-top">{{ item.course }}</ion-card-title>
+              <ion-card-subtitle>{{ item.title }}</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <p><ion-icon name="location-outline" color="primary"></ion-icon> <b>Venue:</b> {{ item.room }}</p>
+              <div class="schedule-actions ion-margin-top">
+                <ion-button size="small" color="tertiary" fill="solid" shape="round">
+                  <ion-icon name="videocam-outline" slot="start"></ion-icon> Start Virtual Class
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <!-- TAB 2: ASSIGNED COURSES GRID -->
+    <div *ngIf="selectedSegment === 'courses'">
+      <ion-row>
+        <ion-col size="12" size-md="6" *ngFor="let course of assignedCourses">
+          <ion-card class="course-card">
+            <ion-card-header>
+              <div class="course-header-row">
+                <div>
+                  <span class="course-code">{{ course.code }}</span>
+                  <ion-card-title>{{ course.name }}</ion-card-title>
+                  <p class="course-dept">{{ course.department }}</p>
+                </div>
+                <ion-chip color="success">{{ course.status }}</ion-chip>
+              </div>
+            </ion-card-header>
+
+            <ion-card-content>
+              <ion-grid class="ion-no-padding">
+                <ion-row class="course-info-row">
+                  <ion-col size="6">
+                    <p><ion-icon name="people-outline"></ion-icon> <b>{{ course.students }}</b> Students</p>
+                  </ion-col>
+                  <ion-col size="6">
+                    <p><ion-icon name="ribbon-outline"></ion-icon> <b>{{ course.credits }}</b> Credits</p>
+                  </ion-col>
+                  <ion-col size="6">
+                    <p><ion-icon name="time-outline"></ion-icon> {{ course.days }}</p>
+                  </ion-col>
+                  <ion-col size="6">
+                    <p><ion-icon name="location-outline"></ion-icon> {{ course.room }}</p>
+                  </ion-col>
+                </ion-row>
+
+                <!-- SYLLABUS PROGRESS -->
+                <div class="progress-box ion-margin-top">
+                  <div class="progress-label">
+                    <span>Syllabus Covered</span>
+                    <b>{{ course.syllabusProgress }}%</b>
+                  </div>
+                  <ion-progress-bar [value]="course.syllabusProgress / 100" color="tertiary"></ion-progress-bar>
+                </div>
+
+                <div class="course-actions-footer ion-margin-top">
+                  <ion-button size="small" fill="outline" color="tertiary" (click)="openAddNoteModal(course)">
+                    <ion-icon name="megaphone-outline" slot="start"></ion-icon> Post Announcement
+                  </ion-button>
+                  <ion-button size="small" color="tertiary" routerLink="/faculty/attendance">
+                    <ion-icon name="checkmark-done-circle-outline" slot="start"></ion-icon> Take Attendance
+                  </ion-button>
+                </div>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </div>
+
+  </ion-grid>
+</ion-content>
+
+<!-- POST ANNOUNCEMENT MODAL -->
+<ion-modal [isOpen]="isAddNoteModalOpen" (didDismiss)="closeAddNoteModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="tertiary">
+        <ion-title>Post Announcement - {{ selectedCourseForNote?.code }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeAddNoteModal()">Cancel</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <ion-item lines="full">
+        <ion-label position="stacked">Announcement / Class Note</ion-label>
+        <ion-textarea [(ngModel)]="classNoteText" rows="5" placeholder="e.g. Please review Chapter 4 slides before tomorrow's lecture..."></ion-textarea>
+      </ion-item>
+      <ion-button expand="block" color="tertiary" class="ion-margin-top" (click)="submitClassNote()">
+        Broadcast to Enrolled Students
+      </ion-button>
+    </ion-content>
+  </ng-template>
+</ion-modal>

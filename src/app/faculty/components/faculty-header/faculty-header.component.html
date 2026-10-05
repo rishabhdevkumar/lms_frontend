@@ -1,0 +1,139 @@
+<ion-header class="faculty-main-header">
+  <ion-toolbar color="light">
+    <!-- LEFT SIDE: MENU TOGGLE & PAGE TITLE -->
+    <ion-buttons slot="start">
+      <ion-menu-button menu="faculty-menu" color="primary"></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title class="header-page-title">
+      <span class="title-text">{{ pageTitle }}</span>
+    </ion-title>
+
+    <!-- RIGHT SIDE: TERM BADGE, LANGUAGE, NOTIFICATIONS, PROFILE -->
+    <ion-buttons slot="end" class="header-actions">
+      <!-- CURRENT TERM CHIP -->
+      <ion-chip color="tertiary" outline class="ion-hide-md-down term-chip">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <ion-label>Term 1 - Fall 2026</ion-label>
+      </ion-chip>
+
+      <!-- LANGUAGE SELECTOR BUTTON -->
+      <ion-button (click)="openLanguageModal()" class="lang-btn">
+        <span class="lang-flag">{{ selectedLanguage.flag || '🌐' }}</span>
+        <span class="lang-code ion-hide-sm-down">{{ selectedLanguage.code.toUpperCase() || 'EN' }}</span>
+      </ion-button>
+
+      <!-- NOTIFICATION BELL BUTTON -->
+      <ion-button (click)="openNotificationsModal()" class="notif-btn">
+        <ion-icon name="notifications-outline" size="medium"></ion-icon>
+        <ion-badge color="danger" *ngIf="notificationsCount > 0">{{ notificationsCount }}</ion-badge>
+      </ion-button>
+
+      <!-- PROFILE AVATAR DROPDOWN TRIGGER -->
+      <div class="header-profile-wrapper">
+        <button class="profile-trigger-btn" (click)="toggleProfileMenu()">
+          <div class="avatar-badge">
+            <span>SJ</span>
+          </div>
+          <span class="profile-name ion-hide-sm-down">Dr. Sarah</span>
+          <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
+        </button>
+
+        <!-- PROFILE DROPDOWN MENU -->
+        <div class="profile-dropdown-card" *ngIf="showProfileMenu">
+          <div class="dropdown-header">
+            <h4>Dr. Sarah Jenkins</h4>
+            <p>Senior Faculty • CS Dept</p>
+          </div>
+          <ion-list lines="none" class="dropdown-list">
+            <ion-item routerLink="/faculty/profile" (click)="showProfileMenu = false">
+              <ion-icon name="person-outline" slot="start"></ion-icon>
+              <ion-label>My Profile & Settings</ion-label>
+            </ion-item>
+            <ion-item routerLink="/faculty/classes" (click)="showProfileMenu = false">
+              <ion-icon name="easel-outline" slot="start"></ion-icon>
+              <ion-label>Assigned Classes</ion-label>
+            </ion-item>
+            <ion-item (click)="openLanguageModal()">
+              <ion-icon name="language-outline" slot="start"></ion-icon>
+              <ion-label>Language Settings</ion-label>
+            </ion-item>
+            <ion-item routerLink="/home" (click)="showProfileMenu = false" class="logout-link">
+              <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+              <ion-label color="danger">Logout</ion-label>
+            </ion-item>
+          </ion-list>
+        </div>
+      </div>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<!-- NOTIFICATIONS MODAL -->
+<ion-modal [isOpen]="isNotificationsModalOpen" (didDismiss)="closeNotificationsModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="tertiary">
+        <ion-title>Faculty Notifications</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeNotificationsModal()">Close</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <div class="modal-notif-header">
+        <h3>Recent Updates</h3>
+        <ion-button size="small" fill="clear" color="tertiary" (click)="markAllAsRead()">Mark All Read</ion-button>
+      </div>
+
+      <ion-list lines="full">
+        <ion-item *ngFor="let notif of notifications" [class.unread-item]="!notif.read">
+          <ion-avatar slot="start" class="notif-avatar">
+            <ion-icon name="notifications" color="tertiary" size="large" *ngIf="notif.type === 'alert'"></ion-icon>
+            <ion-icon name="chatbubbles" color="primary" size="large" *ngIf="notif.type === 'doubt'"></ion-icon>
+            <ion-icon name="document-text" color="warning" size="large" *ngIf="notif.type === 'assignment'"></ion-icon>
+            <ion-icon name="calendar" color="success" size="large" *ngIf="notif.type === 'meeting'"></ion-icon>
+          </ion-avatar>
+          <ion-label class="ion-text-wrap">
+            <h4><b>{{ notif.title }}</b></h4>
+            <p>{{ notif.desc }}</p>
+            <span class="notif-time">{{ notif.time }}</span>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- LANGUAGE SELECTION MODAL -->
+<ion-modal [isOpen]="isLanguageModalOpen" (didDismiss)="closeLanguageModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="tertiary">
+        <ion-title>Select Interface Language</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeLanguageModal()">Close</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-searchbar [(ngModel)]="searchQuery" (ionInput)="filterLanguages()" placeholder="Search language..."></ion-searchbar>
+
+      <ion-list lines="full">
+        <ion-item *ngFor="let lang of filteredLanguages" (click)="selectLanguage(lang)" button>
+          <span slot="start" class="modal-lang-flag">{{ lang.flag }}</span>
+          <ion-label>
+            <h2>{{ lang.name }}</h2>
+            <p>{{ lang.nativeName }} ({{ lang.code.toUpperCase() }})</p>
+          </ion-label>
+          <ion-icon name="checkmark-circle" color="tertiary" slot="end" *ngIf="selectedLanguage?.code === lang.code"></ion-icon>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- TOAST NOTIFICATION -->
+<ion-toast [isOpen]="showToast" [message]="toastMessage" [duration]="3000" position="bottom" color="dark"></ion-toast>

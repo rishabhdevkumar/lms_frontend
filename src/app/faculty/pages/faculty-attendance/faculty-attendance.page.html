@@ -1,0 +1,113 @@
+<app-faculty-header pageTitle="Student Attendance"></app-faculty-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <!-- SELECTION HEADER BAR -->
+    <ion-row class="ion-align-items-center ion-margin-bottom">
+      <ion-col size="12" size-md="4">
+        <ion-item class="filter-item">
+          <ion-label position="stacked">Select Course</ion-label>
+          <ion-select [(ngModel)]="selectedCourse">
+            <ion-select-option value="CS-402">CS-402: Web Engineering</ion-select-option>
+            <ion-select-option value="CS-501">CS-501: Microservices</ion-select-option>
+            <ion-select-option value="DS-302">DS-302: Data Analytics</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+
+      <ion-col size="12" size-md="4">
+        <ion-item class="filter-item">
+          <ion-label position="stacked">Lecture Date</ion-label>
+          <ion-input type="date" [(ngModel)]="selectedDate"></ion-input>
+        </ion-item>
+      </ion-col>
+
+      <ion-col size="12" size-md="4" class="ion-text-end">
+        <ion-button fill="outline" color="tertiary" (click)="markAllPresent()">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          Mark All Present
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <!-- SUMMARY METRICS -->
+    <ion-row class="ion-margin-bottom">
+      <ion-col size="6" size-md="3">
+        <ion-card class="mini-stat-card border-tertiary">
+          <ion-card-content>
+            <p>Total Class</p>
+            <h3>{{ students.length }}</h3>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="3">
+        <ion-card class="mini-stat-card border-success">
+          <ion-card-content>
+            <p>Present</p>
+            <h3 class="text-success">{{ presentCount }}</h3>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="3">
+        <ion-card class="mini-stat-card border-danger">
+          <ion-card-content>
+            <p>Absent</p>
+            <h3 class="text-danger">{{ absentCount }}</h3>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="3">
+        <ion-card class="mini-stat-card border-warning">
+          <ion-card-content>
+            <p>Attendance %</p>
+            <h3 class="text-warning">{{ percentage }}%</h3>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <!-- ATTENDANCE ROSTER TABLE -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-card class="roster-card">
+          <ion-card-header>
+            <ion-card-title>Class Roster - {{ selectedCourse }} ({{ selectedDate }})</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-list lines="full">
+              <ion-item *ngFor="let s of students" class="roster-item">
+                <ion-avatar slot="start" class="roster-avatar">
+                  <span>{{ s.rollNo.slice(-3) }}</span>
+                </ion-avatar>
+
+                <ion-label>
+                  <h3><b>{{ s.name }}</b></h3>
+                  <p>Roll No: {{ s.rollNo }}</p>
+                </ion-label>
+
+                <div slot="end" class="status-toggle-group">
+                  <ion-chip [color]="s.status === 'Present' ? 'success' : 'light'" (click)="setStatus(s, 'Present')" button>
+                    Present
+                  </ion-chip>
+                  <ion-chip [color]="s.status === 'Absent' ? 'danger' : 'light'" (click)="setStatus(s, 'Absent')" button>
+                    Absent
+                  </ion-chip>
+                  <ion-chip [color]="s.status === 'Late' ? 'warning' : 'light'" (click)="setStatus(s, 'Late')" button>
+                    Late
+                  </ion-chip>
+                </div>
+              </ion-item>
+            </ion-list>
+
+            <div class="ion-margin-top ion-text-end">
+              <ion-button color="tertiary" size="large" (click)="submitAttendance()">
+                <ion-icon name="save-outline" slot="start"></ion-icon> Submit Attendance Record
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

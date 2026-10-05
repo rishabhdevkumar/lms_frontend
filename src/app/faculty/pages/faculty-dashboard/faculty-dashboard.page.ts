@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { FacultyHeaderComponent } from '../../components/faculty-header/faculty-header.component';
 
 @Component({
   selector: 'app-faculty-dashboard',
   templateUrl: './faculty-dashboard.page.html',
   styleUrls: ['./faculty-dashboard.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule, FacultyHeaderComponent]
 })
 export class FacultyDashboardPage implements OnInit {
 
@@ -48,8 +50,31 @@ export class FacultyDashboardPage implements OnInit {
     { student: 'Vikram Singh', assignment: 'Assignment 3: Data Cleaning Script', course: 'DS-302', submittedDate: '24 Jul, 04:00 PM' }
   ];
 
+  isScheduleModalOpen = false;
+  newLecture = {
+    course: 'CS-402',
+    topic: '',
+    date: '',
+    time: '',
+    room: 'Lab 304'
+  };
+
   constructor() { }
 
   ngOnInit() { }
 
+  openScheduleModal() {
+    this.isScheduleModalOpen = true;
+  }
+
+  closeScheduleModal() {
+    this.isScheduleModalOpen = false;
+  }
+
+  submitScheduleLecture() {
+    if (!this.newLecture.topic) return;
+    alert(`Lecture "${this.newLecture.topic}" scheduled successfully for ${this.newLecture.course}!`);
+    this.newLecture = { course: 'CS-402', topic: '', date: '', time: '', room: 'Lab 304' };
+    this.closeScheduleModal();
+  }
 }

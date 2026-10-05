@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.filter-item {
+  --background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.6rem;
+}
+
+.material-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+
+  .mat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .type-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+  }
+
+  ion-card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .mat-footer {
+    display: flex;
+    justify-content: space-between;
+  }
+}

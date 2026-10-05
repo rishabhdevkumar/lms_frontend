@@ -1,0 +1,78 @@
+:host {
+  display: block;
+}
+
+.filter-item {
+  --background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.6rem;
+}
+
+.submissions-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+
+  ion-card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+}
+
+.sub-item {
+  .sub-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .roll-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 400;
+    }
+  }
+
+  .course-code-line {
+    font-size: 0.9rem;
+    color: #334155;
+    margin: 4px 0;
+  }
+
+  .attachment-line {
+    font-size: 0.82rem;
+    color: #475569;
+
+    .file-link {
+      color: #059669;
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+  .submitted-time {
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .graded-score-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+
+    span {
+      font-size: 0.85rem;
+      color: #166534;
+    }
+
+    .feedback-text {
+      margin: 4px 0 0 0;
+      font-size: 0.8rem;
+      color: #15803d;
+      font-style: italic;
+    }
+  }
+}

@@ -44,7 +44,7 @@
               <ion-item (click)="openLanguageModal()" [button]="true" class="lang-pop-item">
                 <ion-icon class="ion-margin-end" name="globe-outline"></ion-icon>
                 Change Language
-                <ion-badge slot="end" color="warning" class="active-lang-badge">{{ selectedLanguage?.code | uppercase }}</ion-badge>
+                <ion-badge slot="end" color="warning" class="active-lang-badge">{{ selectedLanguage.code | uppercase }}</ion-badge>
               </ion-item>
               <ion-item routerLink="/home" [button]="true" lines="none" class="logout-pop-item">
                 <ion-icon class="ion-margin-end" name="log-out-outline"></ion-icon>
@@ -90,9 +90,9 @@
       <div class="active-lang-banner">
         <span class="banner-label">Active Language:</span>
         <span class="banner-value">
-          <span class="flag-icon">{{ selectedLanguage?.flag }}</span> 
-          <strong>{{ selectedLanguage?.name }}</strong> 
-          <span class="native-name">({{ selectedLanguage?.nativeName }})</span>
+          <span class="flag-icon">{{ selectedLanguage.flag }}</span> 
+          <strong>{{ selectedLanguage.name }}</strong> 
+          <span class="native-name">({{ selectedLanguage.nativeName }})</span>
         </span>
       </div>
 
@@ -158,7 +158,7 @@
           <div 
             *ngFor="let lang of filteredLanguages" 
             class="language-card" 
-            [class.selected]="lang.code === selectedLanguage?.code"
+            [class.selected]="lang.code === selectedLanguage.code"
             (click)="selectLanguage(lang)"
           >
             <div class="lang-card-left">

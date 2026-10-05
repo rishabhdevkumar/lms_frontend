@@ -1,303 +1,247 @@
-<ion-split-pane contentId="faculty-main-content" when="md">
-  
-  <!-- FACULTY SIDEBAR NAVIGATION MENU -->
-  <ion-menu contentId="faculty-main-content" type="overlay" menuId="faculty-menu">
+<app-faculty-header pageTitle="Faculty Dashboard"></app-faculty-header>
+
+<ion-content class="faculty-dashboard-content ion-padding">
+  <ion-grid>
+
+    <!-- WELCOME HEADER BANNER CARD -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-card class="faculty-welcome-card">
+          <ion-card-content class="welcome-content">
+            <div class="welcome-text">
+              <ion-chip color="tertiary">
+                <ion-icon name="sparkles-outline"></ion-icon>
+                <ion-label>Faculty Dashboard</ion-label>
+              </ion-chip>
+              <h2>Hello, Dr. Sarah Jenkins! 👋</h2>
+              <p>You have <b>3 live lectures</b> scheduled today and <b>18 pending assignments</b> awaiting your review.</p>
+            </div>
+            <div class="welcome-action ion-hide-sm-down">
+              <ion-button color="light" shape="round" (click)="openScheduleModal()">
+                <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+                Schedule Live Class
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <!-- STATS CARDS GRID -->
+    <ion-row>
+      <!-- Stat 1: Assigned Courses -->
+      <ion-col size="12" size-sm="6" size-md="3">
+        <ion-card class="fac-stat-card border-tertiary">
+          <ion-card-content>
+            <div class="stat-header">
+              <ion-icon name="book" color="tertiary" size="large"></ion-icon>
+              <ion-badge color="tertiary">Current Term</ion-badge>
+            </div>
+            <h2>4 Courses</h2>
+            <p>Assigned Modules</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Stat 2: Total Enrolled Students -->
+      <ion-col size="12" size-sm="6" size-md="3">
+        <ion-card class="fac-stat-card border-primary">
+          <ion-card-content>
+            <div class="stat-header">
+              <ion-icon name="people" color="primary" size="large"></ion-icon>
+              <ion-badge color="primary">Active</ion-badge>
+            </div>
+            <h2>240 Students</h2>
+            <p>Enrolled Across Classes</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Stat 3: Pending Submissions -->
+      <ion-col size="12" size-sm="6" size-md="3">
+        <ion-card class="fac-stat-card border-warning">
+          <ion-card-content>
+            <div class="stat-header">
+              <ion-icon name="document-text" color="warning" size="large"></ion-icon>
+              <ion-badge color="danger">Action Required</ion-badge>
+            </div>
+            <h2>18 Submissions</h2>
+            <p>Pending Grading</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Stat 4: Average Attendance -->
+      <ion-col size="12" size-sm="6" size-md="3">
+        <ion-card class="fac-stat-card border-success">
+          <ion-card-content>
+            <div class="stat-header">
+              <ion-icon name="stats-chart" color="success" size="large"></ion-icon>
+              <ion-badge color="success">High Rate</ion-badge>
+            </div>
+            <h2>94.2%</h2>
+            <p>Avg. Attendance Rate</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <!-- MAIN WORKSPACE ROW -->
+    <ion-row class="ion-margin-top">
+
+      <!-- LEFT COLUMN: TODAY'S TIMETABLE SCHEDULE -->
+      <ion-col size="12" size-lg="7">
+        <ion-card class="fac-panel-card">
+          <ion-card-header>
+            <ion-item lines="none">
+              <ion-card-title slot="start">Today's Teaching Schedule</ion-card-title>
+              <ion-chip color="tertiary" slot="end" routerLink="/faculty/classes">
+                <ion-icon name="calendar-outline"></ion-icon>
+                View Full Timetable
+              </ion-chip>
+            </ion-item>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="responsive-schedule-list">
+              <div *ngFor="let cls of todaysClasses" class="schedule-flex-item">
+                <div class="schedule-item-main">
+                  <div class="class-avatar-icon">
+                    <ion-icon name="easel-outline" color="tertiary" size="large"></ion-icon>
+                  </div>
+                  <div class="class-details">
+                    <h3 class="course-heading"><b>{{ cls.courseCode }} - {{ cls.courseName }}</b></h3>
+                    <p class="meta-line">
+                      <ion-icon name="time-outline"></ion-icon> {{ cls.time }} &nbsp;•&nbsp; 
+                      <ion-icon name="location-outline"></ion-icon> {{ cls.room }}
+                    </p>
+                    <p class="students-line"><ion-icon name="people-outline"></ion-icon> {{ cls.students }} Enrolled Students</p>
+                  </div>
+                </div>
+
+                <div class="schedule-item-actions">
+                  <ion-chip [color]="cls.statusColor" class="status-chip">
+                    <ion-label>{{ cls.status }}</ion-label>
+                  </ion-chip>
+                  <ion-button size="small" [color]="cls.status === 'Live Now' ? 'danger' : 'tertiary'" shape="round">
+                    {{ cls.status === 'Live Now' ? 'Join Virtual Class' : 'Start Session' }}
+                  </ion-button>
+                </div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- RIGHT COLUMN: PENDING SUBMISSIONS & QUICK CONTENT UPLOAD -->
+      <ion-col size="12" size-lg="5">
+        
+        <!-- PENDING ASSIGNMENT SUBMISSIONS -->
+        <ion-card class="fac-panel-card ion-margin-bottom">
+          <ion-card-header>
+            <ion-item lines="none">
+              <ion-card-title slot="start">Pending Student Assignments</ion-card-title>
+              <ion-button size="small" fill="clear" color="tertiary" slot="end" routerLink="/faculty/assignments">View All</ion-button>
+            </ion-item>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="responsive-sub-list">
+              <div *ngFor="let sub of pendingGrading" class="sub-flex-item">
+                <div class="sub-item-main">
+                  <ion-avatar class="sub-avatar">
+                    <ion-icon name="person-circle-outline" size="large" color="primary"></ion-icon>
+                  </ion-avatar>
+                  <div class="sub-details">
+                    <h3><b>{{ sub.student }}</b></h3>
+                    <p class="sub-title-text"><b>{{ sub.course }}</b>: {{ sub.assignment }}</p>
+                    <p class="sub-date"><ion-icon name="time-outline"></ion-icon> {{ sub.submittedDate }}</p>
+                  </div>
+                </div>
+                <div class="sub-item-action">
+                  <ion-button size="small" fill="outline" color="tertiary" routerLink="/faculty/assignments">
+                    Review
+                  </ion-button>
+                </div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- QUICK UPLOAD STUDY MATERIAL -->
+        <ion-card class="fac-panel-card">
+          <ion-card-header>
+            <ion-card-title>Quick Upload Study Material</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-list lines="none">
+              <ion-item class="input-item">
+                <ion-label position="stacked">Select Course</ion-label>
+                <ion-select placeholder="Choose course...">
+                  <ion-select-option value="cs402">CS-402: Advanced Web Engineering</ion-select-option>
+                  <ion-select-option value="cs501">CS-501: Cloud Native Microservices</ion-select-option>
+                  <ion-select-option value="ds302">DS-302: Data Analytics</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item class="input-item ion-margin-top">
+                <ion-label position="stacked">Resource Title / Topic</ion-label>
+                <ion-input placeholder="e.g. Lecture 6 Slides & Reference Notes"></ion-input>
+              </ion-item>
+
+              <ion-button expand="block" color="tertiary" class="ion-margin-top" routerLink="/faculty/course-material">
+                <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+                Upload Document / PDF
+              </ion-button>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+
+    </ion-row>
+
+  </ion-grid>
+</ion-content>
+
+<!-- SCHEDULE LECTURE MODAL -->
+<ion-modal [isOpen]="isScheduleModalOpen" (didDismiss)="closeScheduleModal()">
+  <ng-template>
     <ion-header>
       <ion-toolbar color="tertiary">
-        <ion-item lines="none" color="tertiary">
-          <ion-avatar slot="start">
-            <ion-icon name="person-circle" size="large"></ion-icon>
-          </ion-avatar>
-          <ion-label>
-            <h2><b>Dr. Sarah Jenkins</b></h2>
-            <p>Senior Faculty • CS Dept</p>
-          </ion-label>
-        </ion-item>
+        <ion-title>Schedule Live Class</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeScheduleModal()">Cancel</ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
-
-    <ion-content class="faculty-menu-content">
-      <ion-list lines="none" class="faculty-menu-list">
-        
-        <ion-list-header>
-          <ion-label>FACULTY PORTAL</ion-label>
-        </ion-list-header>
-
-        <ion-item class="active-menu">
-          <ion-icon name="grid-outline" slot="start" color="tertiary"></ion-icon>
-          <ion-label>Dashboard</ion-label>
-        </ion-item>
-
+    <ion-content class="ion-padding">
+      <ion-list lines="full">
         <ion-item>
-          <ion-icon name="easel-outline" slot="start" color="primary"></ion-icon>
-          <ion-label>My Classes</ion-label>
-          <ion-badge slot="end" color="tertiary">3 Today</ion-badge>
+          <ion-label position="stacked">Select Course</ion-label>
+          <ion-select [(ngModel)]="newLecture.course">
+            <ion-select-option value="CS-402">CS-402: Advanced Web Engineering</ion-select-option>
+            <ion-select-option value="CS-501">CS-501: Cloud Native Microservices</ion-select-option>
+            <ion-select-option value="DS-302">DS-302: Data Analytics</ion-select-option>
+          </ion-select>
         </ion-item>
-
         <ion-item>
-          <ion-icon name="document-text-outline" slot="start" color="warning"></ion-icon>
-          <ion-label>Assignments & Grading</ion-label>
-          <ion-badge slot="end" color="danger">18</ion-badge>
+          <ion-label position="stacked">Lecture Topic</ion-label>
+          <ion-input [(ngModel)]="newLecture.topic" placeholder="e.g. Microservices API Gateway Patterns"></ion-input>
         </ion-item>
-
         <ion-item>
-          <ion-icon name="cloud-upload-outline" slot="start" color="success"></ion-icon>
-          <ion-label>Upload Course Material</ion-label>
+          <ion-label position="stacked">Date & Time</ion-label>
+          <ion-input type="datetime-local" [(ngModel)]="newLecture.time"></ion-input>
         </ion-item>
-
         <ion-item>
-          <ion-icon name="checkmark-done-circle-outline" slot="start" color="secondary"></ion-icon>
-          <ion-label>Student Attendance</ion-label>
-        </ion-item>
-
-        <ion-item>
-          <ion-icon name="chatbubbles-outline" slot="start" color="medium"></ion-icon>
-          <ion-label>Student Doubts & Forum</ion-label>
-          <ion-badge slot="end" color="primary">5 New</ion-badge>
-        </ion-item>
-
-        <ion-item>
-          <ion-icon name="calendar-outline" slot="start" color="medium"></ion-icon>
-          <ion-label>Academic Schedule</ion-label>
-        </ion-item>
-
-        <ion-item routerLink="/home" class="ion-margin-top">
-          <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
-          <ion-label color="danger">Logout</ion-label>
+          <ion-label position="stacked">Room / Platform</ion-label>
+          <ion-input [(ngModel)]="newLecture.room" placeholder="Lab 304 or Zoom Link"></ion-input>
         </ion-item>
       </ion-list>
+      <ion-button expand="block" color="tertiary" class="ion-margin-top" (click)="submitScheduleLecture()">
+        Confirm & Schedule Class
+      </ion-button>
     </ion-content>
-  </ion-menu>
-
-  <!-- FACULTY MAIN CONTENT AREA -->
-  <div class="ion-page" id="faculty-main-content">
-    
-    <!-- TOP TOOLBAR HEADER -->
-    <ion-header>
-      <ion-toolbar color="light">
-        <ion-buttons slot="start">
-          <ion-menu-button menu="faculty-menu"></ion-menu-button>
-        </ion-buttons>
-
-        <ion-title>Faculty Workspace</ion-title>
-
-        <ion-buttons slot="end">
-          <ion-chip color="tertiary" outline class="ion-hide-sm-down">
-            <ion-icon name="time-outline"></ion-icon>
-            <ion-label>Term 1 - Fall 2026</ion-label>
-          </ion-chip>
-
-          <ion-button>
-            <ion-icon name="notifications-outline" size="large"></ion-icon>
-            <ion-badge color="danger">4</ion-badge>
-          </ion-button>
-
-          <ion-button routerLink="/home">
-            <ion-icon name="home-outline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content class="faculty-dashboard-content ion-padding">
-      <ion-grid>
-
-        <!-- WELCOME HEADER BANNER CARD -->
-        <ion-row>
-          <ion-col size="12">
-            <ion-card class="faculty-welcome-card">
-              <ion-card-content class="welcome-content">
-                <div class="welcome-text">
-                  <ion-chip color="tertiary">
-                    <ion-icon name="sparkles-outline"></ion-icon>
-                    <ion-label>Faculty Dashboard</ion-label>
-                  </ion-chip>
-                  <h2>Hello, Dr. Sarah Jenkins! 👋</h2>
-                  <p>You have <b>3 live lectures</b> scheduled today and <b>18 pending assignments</b> awaiting your review.</p>
-                </div>
-                <div class="welcome-action ion-hide-sm-down">
-                  <ion-button color="light" shape="round">
-                    <ion-icon name="add-circle-outline" slot="start"></ion-icon>
-                    Schedule Live Class
-                  </ion-button>
-                </div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-
-        <!-- STATS CARDS GRID -->
-        <ion-row>
-          <!-- Stat 1: Assigned Courses -->
-          <ion-col size="12" size-sm="6" size-md="3">
-            <ion-card class="fac-stat-card border-tertiary">
-              <ion-card-content>
-                <div class="stat-header">
-                  <ion-icon name="book" color="tertiary" size="large"></ion-icon>
-                  <ion-badge color="tertiary">Current Term</ion-badge>
-                </div>
-                <h2>4 Courses</h2>
-                <p>Assigned Modules</p>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-          <!-- Stat 2: Total Enrolled Students -->
-          <ion-col size="12" size-sm="6" size-md="3">
-            <ion-card class="fac-stat-card border-primary">
-              <ion-card-content>
-                <div class="stat-header">
-                  <ion-icon name="people" color="primary" size="large"></ion-icon>
-                  <ion-badge color="primary">Active</ion-badge>
-                </div>
-                <h2>240 Students</h2>
-                <p>Enrolled Across Classes</p>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-          <!-- Stat 3: Pending Submissions -->
-          <ion-col size="12" size-sm="6" size-md="3">
-            <ion-card class="fac-stat-card border-warning">
-              <ion-card-content>
-                <div class="stat-header">
-                  <ion-icon name="document-text" color="warning" size="large"></ion-icon>
-                  <ion-badge color="danger">Action Required</ion-badge>
-                </div>
-                <h2>18 Submissions</h2>
-                <p>Pending Grading</p>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-          <!-- Stat 4: Average Attendance -->
-          <ion-col size="12" size-sm="6" size-md="3">
-            <ion-card class="fac-stat-card border-success">
-              <ion-card-content>
-                <div class="stat-header">
-                  <ion-icon name="stats-chart" color="success" size="large"></ion-icon>
-                  <ion-badge color="success">High Rate</ion-badge>
-                </div>
-                <h2>94.2%</h2>
-                <p>Avg. Attendance Rate</p>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-
-        <!-- MAIN WORKSPACE ROW -->
-        <ion-row class="ion-margin-top">
-
-          <!-- LEFT COLUMN: TODAY'S TIMETABLE SCHEDULE -->
-          <ion-col size="12" size-lg="7">
-            <ion-card class="fac-panel-card">
-              <ion-card-header>
-                <ion-item lines="none">
-                  <ion-card-title slot="start">Today's Teaching Schedule</ion-card-title>
-                  <ion-chip color="tertiary" slot="end">
-                    <ion-icon name="calendar-outline"></ion-icon>
-                    Today
-                  </ion-chip>
-                </ion-item>
-              </ion-card-header>
-
-              <ion-card-content>
-                <ion-list lines="full">
-                  <ion-item *ngFor="let cls of todaysClasses">
-                    <ion-avatar slot="start" class="class-avatar">
-                      <ion-icon name="easel-outline" color="tertiary" size="large"></ion-icon>
-                    </ion-avatar>
-
-                    <ion-label class="ion-text-wrap">
-                      <h3><b>{{ cls.courseCode }} - {{ cls.courseName }}</b></h3>
-                      <p>
-                        <ion-icon name="time-outline"></ion-icon> {{ cls.time }} &nbsp;•&nbsp; 
-                        <ion-icon name="location-outline"></ion-icon> {{ cls.room }}
-                      </p>
-                      <p><ion-icon name="people-outline"></ion-icon> {{ cls.students }} Enrolled Students</p>
-                    </ion-label>
-
-                    <div slot="end" class="ion-text-end">
-                      <ion-chip [color]="cls.statusColor" class="status-chip">
-                        <ion-label>{{ cls.status }}</ion-label>
-                      </ion-chip>
-                      <br />
-                      <ion-button size="small" [color]="cls.status === 'Live Now' ? 'danger' : 'tertiary'" shape="round" class="ion-margin-top">
-                        {{ cls.status === 'Live Now' ? 'Join Virtual Class' : 'Start Session' }}
-                      </ion-button>
-                    </div>
-                  </ion-item>
-                </ion-list>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-          <!-- RIGHT COLUMN: PENDING SUBMISSIONS & QUICK CONTENT UPLOAD -->
-          <ion-col size="12" size-lg="5">
-            
-            <!-- PENDING ASSIGNMENT SUBMISSIONS -->
-            <ion-card class="fac-panel-card ion-margin-bottom">
-              <ion-card-header>
-                <ion-card-title>Pending Student Assignments</ion-card-title>
-              </ion-card-header>
-
-              <ion-card-content>
-                <ion-list lines="full">
-                  <ion-item *ngFor="let sub of pendingGrading">
-                    <ion-avatar slot="start">
-                      <ion-icon name="person-circle-outline" size="large" color="primary"></ion-icon>
-                    </ion-avatar>
-
-                    <ion-label class="ion-text-wrap">
-                      <h3><b>{{ sub.student }}</b></h3>
-                      <p><b>{{ sub.course }}</b>: {{ sub.assignment }}</p>
-                      <p class="sub-date"><ion-icon name="time-outline"></ion-icon> {{ sub.submittedDate }}</p>
-                    </ion-label>
-
-                    <ion-button size="small" fill="outline" color="tertiary" slot="end">
-                      Review
-                    </ion-button>
-                  </ion-item>
-                </ion-list>
-              </ion-card-content>
-            </ion-card>
-
-            <!-- QUICK UPLOAD STUDY MATERIAL -->
-            <ion-card class="fac-panel-card">
-              <ion-card-header>
-                <ion-card-title>Quick Upload Study Material</ion-card-title>
-              </ion-card-header>
-
-              <ion-card-content>
-                <ion-list lines="none">
-                  <ion-item class="input-item">
-                    <ion-label position="stacked">Select Course</ion-label>
-                    <ion-select placeholder="Choose course...">
-                      <ion-select-option value="cs402">CS-402: Advanced Web Engineering</ion-select-option>
-                      <ion-select-option value="cs501">CS-501: Cloud Native Microservices</ion-select-option>
-                      <ion-select-option value="ds302">DS-302: Data Analytics</ion-select-option>
-                    </ion-select>
-                  </ion-item>
-
-                  <ion-item class="input-item ion-margin-top">
-                    <ion-label position="stacked">Resource Title / Topic</ion-label>
-                    <ion-input placeholder="e.g. Lecture 6 Slides & Reference Notes"></ion-input>
-                  </ion-item>
-
-                  <ion-button expand="block" color="tertiary" class="ion-margin-top">
-                    <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
-                    Upload Document / PDF
-                  </ion-button>
-                </ion-list>
-              </ion-card-content>
-            </ion-card>
-
-          </ion-col>
-
-        </ion-row>
-
-      </ion-grid>
-    </ion-content>
-
-  </div>
-</ion-split-pane>
+  </ng-template>
+</ion-modal>

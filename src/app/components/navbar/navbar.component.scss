@@ -11,63 +11,6 @@
   backdrop-filter: blur(12px);
   border-bottom: none !important;
   transition: all 0.3s ease;
-
-  &.dark-nav {
-    background-color: rgba(15, 28, 20, 0.96);
-    border-bottom: none !important;
-    color: #ffffff;
-
-    .brand-name {
-      color: #ffffff !important;
-    }
-
-    .desktop-nav-links a {
-      color: #94a3b8;
-
-      &:hover, &.active {
-        color: #ffffff !important;
-      }
-    }
-
-    .action-icon-btn, .lang-btn {
-      background-color: #14241a;
-      border-color: #223a2b;
-      color: #e2e8f0;
-
-      &:hover {
-        background-color: #1e3a29;
-      }
-    }
-
-    .lang-menu {
-      background-color: #0f1c14;
-      border-color: #223a2b;
-
-      .lang-option {
-        color: #cbd5e1;
-
-        &:hover, &.selected {
-          background-color: #1e3a29;
-          color: #d97706;
-        }
-      }
-    }
-
-    .mobile-menu-drawer {
-      background-color: #0f1c14;
-      border-bottom: 1px solid #223a2b;
-    }
-
-    .mobile-nav-item {
-      color: #cbd5e1;
-      border-bottom: 1px solid #1e3a29;
-
-      &.active {
-        color: #ffffff !important;
-        font-weight: 700;
-      }
-    }
-  }
 }
 
 .navbar-container {
@@ -297,79 +240,7 @@
   }
 }
 
-/* LANGUAGE DROPDOWN WRAPPER */
-.lang-dropdown-wrapper {
-  position: relative;
-}
 
-.lang-btn {
-  height: 2.4rem;
-  padding: 0 0.85rem;
-  border-radius: 9999px;
-  background-color: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #334155;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  .dropdown-arrow {
-    font-size: 0.6rem;
-    color: #94a3b8;
-    transition: transform 0.2s ease;
-  }
-
-  &:hover {
-    background-color: #e2e8f0;
-
-    .dropdown-arrow {
-      color: #d97706;
-    }
-  }
-}
-
-.lang-menu {
-  position: absolute;
-  top: 120%;
-  right: 0;
-  min-width: 130px;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.6rem;
-  padding: 0.35rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12);
-  z-index: 130;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-
-  .lang-option {
-    padding: 0.45rem 0.75rem;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #334155;
-    border-radius: 0.4rem;
-    cursor: pointer;
-    transition: all 0.15s ease;
-
-    &:hover {
-      background-color: #f1f5f9;
-      color: #d97706;
-    }
-
-    &.selected {
-      background-color: rgba(217, 119, 6, 0.1);
-      color: #d97706;
-      font-weight: 700;
-    }
-  }
-}
 
 /* GET STARTED BUTTON (REPLACED REGISTER / SIGN UP) */
 .register-btn {
@@ -526,41 +397,5 @@
   }
 }
 
-.mobile-lang-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background-color: #f8fafc;
-  border-radius: 0.5rem;
 
-  .mobile-lang-chip {
-    padding: 0.35rem 0.75rem;
-    border-radius: 9999px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
 
-    &.active {
-      background: #d97706;
-      color: #ffffff;
-      border-color: #d97706;
-    }
-  }
-}
-
-.mobile-register-btn {
-  background-color: #d97706;
-  color: #ffffff !important;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 700;
-  padding: 0.85rem;
-  border-radius: 0.5rem;
-  text-decoration: none;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
-  display: block;
-}

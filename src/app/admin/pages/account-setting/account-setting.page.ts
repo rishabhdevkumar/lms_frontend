@@ -62,7 +62,7 @@ export class AccountSettingPage implements OnInit {
 
   // 5. OTHER ADVANCED SETTINGS
   otherSettings = {
-    institutionName: 'LMS University & Tech Learning Hub',
+    institutionName: 'LearnSphere University',
     academicSession: '2025-2026',
     maxFileUploadMB: 50,
     sessionTimeout: '30 Minutes',
