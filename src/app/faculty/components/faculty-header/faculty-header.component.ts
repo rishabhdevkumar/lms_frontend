@@ -46,13 +46,13 @@ export class FacultyHeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subs.add(
-      this.languageService.currentLanguage$.subscribe(lang => {
+      this.languageService.currentLanguage$.subscribe((lang: Language) => {
         this.selectedLanguage = lang;
       })
     );
 
     this.subs.add(
-      this.languageService.languages$.subscribe(langs => {
+      this.languageService.languages$.subscribe((langs: Language[]) => {
         this.languages = langs;
         this.filterLanguages();
       })

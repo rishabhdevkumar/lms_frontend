@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { HeaderComponent } from "../../components/header/header.component";
-import { AcademicService } from 'src/app/services/academic.service';
+import { HeaderComponent } from '../../components/header/header.component';
+import { DefaultService } from 'src/app/api';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-academic',
@@ -40,13 +41,13 @@ export class AcademicPage implements OnInit {
     course_id: ''
   };
 
-  // 1. SESSIONS LIST (LOADED DYNAMICALLY FROM ACADEMIC SERVICE)
+  // 1. SESSIONS LIST
   sessionsList: any[] = [];
 
-  // 2. COURSES LIST (LOADED DYNAMICALLY FROM ACADEMIC SERVICE)
+  // 2. COURSES LIST
   coursesList: any[] = [];
 
-  // 3. SEMESTERS LIST (LOADED DYNAMICALLY FROM ACADEMIC SERVICE)
+  // 3. SEMESTERS LIST
   semestersList: any[] = [];
 
   // 4. SYLLABUS LIST
@@ -58,7 +59,7 @@ export class AcademicPage implements OnInit {
   // 6. CHAPTERS LIST
   chaptersList: any[] = [];
 
-  constructor(private academicService: AcademicService) { }
+  constructor(private defaultService: DefaultService) { }
 
   ngOnInit() {
     this.loadAllDynamicData();
@@ -73,48 +74,63 @@ export class AcademicPage implements OnInit {
         this.fetchSemesters()
       ]);
     } catch (e) {
-      console.error('Error loading academic data from service:', e);
+      console.error('Error loading academic data:', e);
     } finally {
       this.isLoading = false;
     }
   }
 
-  // FETCH SESSIONS FROM SERVICE
+  // FETCH SESSIONS FROM OPENAPI DEFAULT SERVICE
   async fetchSessions() {
-    const list = await this.academicService.getAllSessions();
-    this.sessionsList = list.map((item: any) => ({
-      id: item.id,
-      sessionName: item.session_name || item.sessionName,
-      shortName: item.short_name || item.shortName || 'AY',
-      is_active: item.is_active,
-      timestamp: item.timestamp || item.created_at || new Date().toISOString().slice(0, 19).replace('T', ' ')
-    }));
+    try {
+      const res: any = await firstValueFrom(this.defaultService.sessionControllerGetAll());
+      const list = Array.isArray(res) ? res : (res?.data || res?.result || res?.sessions || []);
+      this.sessionsList = list.map((item: any) => ({
+        id: item.id,
+        sessionName: item.session_name || item.sessionName,
+        shortName: item.short_name || item.shortName || 'AY',
+        is_active: item.is_active,
+        timestamp: item.timestamp || item.created_at || new Date().toISOString().slice(0, 19).replace('T', ' ')
+      }));
+    } catch (e) {
+      console.error('Error fetching sessions:', e);
+    }
   }
 
-  // FETCH COURSES FROM SERVICE
+  // FETCH COURSES FROM OPENAPI DEFAULT SERVICE
   async fetchCourses() {
-    const list = await this.academicService.getAllCourses();
-    this.coursesList = list.map((item: any) => ({
-      id: item.id,
-      session_id: item.session_id,
-      session: this.getSessionName(item.session_id),
-      courseName: item.course_name || item.courseName,
-      shortName: item.short_name || item.shortName || 'CRS',
-      timestamp: item.timestamp || item.created_at || new Date().toISOString().slice(0, 19).replace('T', ' ')
-    }));
+    try {
+      const res: any = await firstValueFrom(this.defaultService.courseControllerGetAll());
+      const list = Array.isArray(res) ? res : (res?.data || res?.result || res?.courses || []);
+      this.coursesList = list.map((item: any) => ({
+        id: item.id,
+        session_id: item.session_id,
+        session: this.getSessionName(item.session_id),
+        courseName: item.course_name || item.courseName,
+        shortName: item.short_name || item.shortName || 'CRS',
+        timestamp: item.timestamp || item.created_at || new Date().toISOString().slice(0, 19).replace('T', ' ')
+      }));
+    } catch (e) {
+      console.error('Error fetching courses:', e);
+    }
   }
 
-  // FETCH SEMESTERS FROM SERVICE
+  // FETCH SEMESTERS FROM OPENAPI DEFAULT SERVICE
   async fetchSemesters() {
-    const list = await this.academicService.getAllSemesters();
-    this.semestersList = list.map((item: any) => ({
-      id: item.id,
-      course_id: item.course_id,
-      course: this.getCourseName(item.course_id),
-      semesterName: item.semester_name || item.semesterName,
-      shortName: item.short_name || item.shortName || 'SEM',
-      timestamp: item.timestamp || item.created_at || new Date().toISOString().slice(0, 19).replace('T', ' ')
-    }));
+    try {
+      const res: any = await firstValueFrom(this.defaultService.semesterControllerGetAll());
+      const list = Array.isArray(res) ? res : (res?.data || res?.result || res?.semesters || []);
+      this.semestersList = list.map((item: any) => ({
+        id: item.id,
+        course_id: item.course_id,
+        course: this.getCourseName(item.course_id),
+        semesterName: item.semester_name || item.semesterName,
+        shortName: item.short_name || item.shortName || 'SEM',
+        timestamp: item.timestamp || item.created_at || new Date().toISOString().slice(0, 19).replace('T', ' ')
+      }));
+    } catch (e) {
+      console.error('Error fetching semesters:', e);
+    }
   }
 
   // LOOKUP HELPERS
@@ -190,7 +206,7 @@ export class AcademicPage implements OnInit {
     };
   }
 
-  // SAVE ITEM VIA ACADEMIC SERVICE
+  // SAVE ITEM VIA OPENAPI GENERATED DEFAULT SERVICE
   async saveItem() {
     this.isSaving = true;
 
@@ -205,9 +221,9 @@ export class AcademicPage implements OnInit {
         };
 
         if (this.modalMode === 'add') {
-          await this.academicService.addSession(payload);
+          await firstValueFrom(this.defaultService.sessionControllerAdd());
         } else {
-          await this.academicService.updateSession({ id: this.editingItemId!, ...payload });
+          await firstValueFrom(this.defaultService.sessionControllerUpdate());
         }
         await this.fetchSessions();
 
@@ -221,9 +237,9 @@ export class AcademicPage implements OnInit {
         };
 
         if (this.modalMode === 'add') {
-          await this.academicService.addCourse(payload);
+          await firstValueFrom(this.defaultService.courseControllerAdd());
         } else {
-          await this.academicService.updateCourse({ id: this.editingItemId!, ...payload });
+          await firstValueFrom(this.defaultService.courseControllerUpdate());
         }
         await this.fetchCourses();
 
@@ -237,37 +253,37 @@ export class AcademicPage implements OnInit {
         };
 
         if (this.modalMode === 'add') {
-          await this.academicService.addSemester(payload);
+          await firstValueFrom(this.defaultService.semesterControllerAdd());
         } else {
-          await this.academicService.updateSemester({ id: this.editingItemId!, ...payload });
+          await firstValueFrom(this.defaultService.semesterControllerUpdate());
         }
         await this.fetchSemesters();
       }
     } catch (e) {
-      console.error('Error saving item via AcademicService:', e);
+      console.error('Error saving item via DefaultService:', e);
     } finally {
       this.isSaving = false;
       this.closeModal();
     }
   }
 
-  // DELETE ITEM VIA ACADEMIC SERVICE
+  // DELETE ITEM VIA OPENAPI GENERATED DEFAULT SERVICE
   async deleteItem(id: number) {
     if (!confirm('Are you sure you want to delete this record?')) return;
 
     try {
       if (this.activeTab === 'session') {
-        await this.academicService.deleteSession(id);
+        await firstValueFrom(this.defaultService.sessionControllerDelete(String(id)));
         await this.fetchSessions();
       } else if (this.activeTab === 'course') {
-        await this.academicService.deleteCourse(id);
+        await firstValueFrom(this.defaultService.courseControllerDelete(String(id)));
         await this.fetchCourses();
       } else if (this.activeTab === 'semester') {
-        await this.academicService.deleteSemester(id);
+        await firstValueFrom(this.defaultService.semesterControllerDelete(String(id)));
         await this.fetchSemesters();
       }
     } catch (e) {
-      console.error('Error deleting item via AcademicService:', e);
+      console.error('Error deleting item via DefaultService:', e);
     }
   }
 }

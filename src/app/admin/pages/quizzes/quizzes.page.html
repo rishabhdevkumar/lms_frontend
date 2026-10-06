@@ -1,0 +1,189 @@
+<app-header></app-header>
+
+<ion-content [fullscreen]="true" class="quizzes-page-content">
+  <div class="quizzes-wrapper">
+
+    <!-- PAGE TITLE ROW -->
+    <div class="page-title-row">
+      <div class="title-group">
+        <h1 class="page-title">Quizzes & Online Assessments</h1>
+        <span class="count-badge font-mono-code">{{ getFilteredQuizzes().length }} Quizzes Found</span>
+      </div>
+
+      <button class="btn-light-primary" (click)="openAddModal()">
+        <span>❓</span> Create New Quiz
+      </button>
+    </div>
+
+    <!-- 3 STAT CARDS -->
+    <div class="stats-overview-grid">
+      <div class="stat-mini-card">
+        <div class="stat-info">
+          <span class="stat-label">TOTAL QUIZZES</span>
+          <h3 class="stat-value">{{ quizzesList.length }}</h3>
+        </div>
+        <div class="stat-icon-badge blue-badge">📝</div>
+      </div>
+
+      <div class="stat-mini-card">
+        <div class="stat-info">
+          <span class="stat-label">ACTIVE PUBLISHED</span>
+          <h3 class="stat-value">2</h3>
+        </div>
+        <div class="stat-icon-badge green-badge">✅</div>
+      </div>
+
+      <div class="stat-mini-card">
+        <div class="stat-info">
+          <span class="stat-label">STUDENT SUBMISSIONS</span>
+          <h3 class="stat-value">116</h3>
+        </div>
+        <div class="stat-icon-badge purple-badge">📊</div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTROL CARD -->
+    <div class="quizzes-main-card">
+      
+      <!-- TOOLBAR ROW -->
+      <div class="toolbar-row">
+        <div class="search-box-container">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            placeholder="Search quizzes by title or course name..." 
+            class="quizzes-search-input" 
+          />
+        </div>
+
+        <div class="filter-pills-group">
+          <button class="filter-pill-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+            All ({{ quizzesList.length }})
+          </button>
+          <button class="filter-pill-btn green" [class.active]="activeTab === 'published'" (click)="activeTab = 'published'">
+            Published
+          </button>
+          <button class="filter-pill-btn amber" [class.active]="activeTab === 'draft'" (click)="activeTab = 'draft'">
+            Draft
+          </button>
+          <button class="filter-pill-btn gray" [class.active]="activeTab === 'closed'" (click)="activeTab = 'closed'">
+            Closed
+          </button>
+        </div>
+      </div>
+
+      <!-- QUIZZES DATA TABLE -->
+      <div class="table-responsive">
+        <table class="quizzes-data-table">
+          <thead>
+            <tr>
+              <th>QUIZ TITLE</th>
+              <th>COURSE PROGRAM</th>
+              <th>QUESTIONS & MARKS</th>
+              <th>DURATION</th>
+              <th>SUBMISSIONS</th>
+              <th>STATUS</th>
+              <th class="text-center">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let quiz of getFilteredQuizzes()">
+              <td>
+                <span class="quiz-title-bold">{{ quiz.quizTitle }}</span>
+              </td>
+              <td>
+                <span class="course-text">{{ quiz.courseName }}</span>
+              </td>
+              <td>
+                <span class="q-meta-pill">❓ {{ quiz.totalQuestions }} Qs • {{ quiz.totalMarks }} Marks</span>
+              </td>
+              <td>
+                <span class="duration-text">⏱️ {{ quiz.durationMins }} mins</span>
+              </td>
+              <td>
+                <span class="submissions-badge">📄 {{ quiz.submissionsCount }} Completed</span>
+              </td>
+              <td>
+                <span class="status-badge" 
+                      [class.pub-status]="quiz.status === 'Published'"
+                      [class.draft-status]="quiz.status === 'Draft'"
+                      [class.closed-status]="quiz.status === 'Closed'">
+                  {{ quiz.status }}
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="actions-flex">
+                  <button class="btn-light-action" (click)="openEditModal(quiz)">Edit</button>
+                  <button class="btn-light-danger" (click)="deleteQuiz(quiz.id)">Delete</button>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="getFilteredQuizzes().length === 0">
+              <td colspan="7" class="empty-msg">No quizzes found matching your search.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ADD / EDIT MODAL POPUP -->
+  <div class="custom-modal-backdrop" *ngIf="isAddModalOpen" (click)="closeModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header-banner">
+        <h3 class="modal-title">{{ modalMode === 'add' ? '+ Create New Quiz' : '✏️ Edit Quiz' }}</h3>
+        <button class="modal-close-icon" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-form-body">
+        <div class="form-group">
+          <label class="form-label">Quiz Title</label>
+          <input type="text" [(ngModel)]="formData.quizTitle" placeholder="e.g. Data Structures Assessment 1" class="modal-input" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Course Program</label>
+          <input type="text" [(ngModel)]="formData.courseName" placeholder="e.g. B.Tech Computer Science" class="modal-input" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Total Questions</label>
+            <input type="number" [(ngModel)]="formData.totalQuestions" placeholder="e.g. 20" class="modal-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total Marks</label>
+            <input type="number" [(ngModel)]="formData.totalMarks" placeholder="e.g. 50" class="modal-input" />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Duration (Minutes)</label>
+            <input type="number" [(ngModel)]="formData.durationMins" placeholder="e.g. 45" class="modal-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Publish Status</label>
+            <select [(ngModel)]="formData.status" class="modal-select">
+              <option value="Published">Published</option>
+              <option value="Draft">Draft</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-modal-cancel" (click)="closeModal()">Cancel</button>
+        <button class="btn-light-primary" (click)="saveQuiz()">
+          {{ modalMode === 'add' ? 'Save Quiz' : 'Update Quiz' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</ion-content>

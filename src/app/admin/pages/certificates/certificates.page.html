@@ -1,0 +1,129 @@
+<app-header></app-header>
+
+<ion-content [fullscreen]="true" class="certificates-page-content">
+  <div class="certificates-wrapper">
+
+    <!-- PAGE TITLE ROW -->
+    <div class="page-title-row">
+      <div class="title-group">
+        <h1 class="page-title">Certificates & Graduation Credentials</h1>
+        <span class="count-badge font-mono-code">{{ getFilteredCertificates().length }} Issued Certificates</span>
+      </div>
+
+      <button class="btn-light-primary">
+        <span>📜</span> Generate Bulk Certificates
+      </button>
+    </div>
+
+    <!-- 3 STAT CARDS -->
+    <div class="stats-overview-grid">
+      <div class="stat-mini-card">
+        <div class="stat-info">
+          <span class="stat-label">TOTAL ISSUED CERTIFICATES</span>
+          <h3 class="stat-value">268</h3>
+        </div>
+        <div class="stat-icon-badge green-badge">🎓</div>
+      </div>
+
+      <div class="stat-mini-card">
+        <div class="stat-info">
+          <span class="stat-label">PENDING APPROVAL</span>
+          <h3 class="stat-value">1</h3>
+        </div>
+        <div class="stat-icon-badge amber-badge">⏳</div>
+      </div>
+
+      <div class="stat-mini-card">
+        <div class="stat-info">
+          <span class="stat-label">VERIFIED CREDENTIALS</span>
+          <h3 class="stat-value">100%</h3>
+        </div>
+        <div class="stat-icon-badge blue-badge">🛡️</div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTROL CARD -->
+    <div class="certificates-main-card">
+      
+      <!-- TOOLBAR ROW -->
+      <div class="toolbar-row">
+        <div class="search-box-container">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            placeholder="Search by Cert ID, student name, or course..." 
+            class="certificates-search-input" 
+          />
+        </div>
+
+        <div class="filter-pills-group">
+          <button class="filter-pill-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+            All ({{ certificates.length }})
+          </button>
+          <button class="filter-pill-btn green" [class.active]="activeTab === 'issued'" (click)="activeTab = 'issued'">
+            Issued
+          </button>
+          <button class="filter-pill-btn amber" [class.active]="activeTab === 'pending'" (click)="activeTab = 'pending'">
+            Pending Approval
+          </button>
+        </div>
+      </div>
+
+      <!-- DATA TABLE -->
+      <div class="table-responsive">
+        <table class="certificates-data-table">
+          <thead>
+            <tr>
+              <th>CERT ID</th>
+              <th>STUDENT NAME</th>
+              <th>COURSE PROGRAM</th>
+              <th>GRADE ACQUIRED</th>
+              <th>ISSUE DATE</th>
+              <th>STATUS</th>
+              <th class="text-center">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cert of getFilteredCertificates()">
+              <td>
+                <span class="cert-code-pill">{{ cert.certId }}</span>
+              </td>
+              <td>
+                <span class="student-name-bold">{{ cert.studentName }}</span>
+              </td>
+              <td>
+                <span class="course-text">{{ cert.courseName }}</span>
+              </td>
+              <td>
+                <span class="grade-pill">{{ cert.grade }}</span>
+              </td>
+              <td>
+                <span class="date-text">{{ cert.issueDate }}</span>
+              </td>
+              <td>
+                <span class="status-badge" 
+                      [class.issued-status]="cert.status === 'Issued'"
+                      [class.pending-status]="cert.status === 'Pending Approval'">
+                  {{ cert.status }}
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="actions-flex">
+                  <button *ngIf="cert.status === 'Pending Approval'" class="btn-light-action" (click)="issueCertificate(cert)">Approve & Issue</button>
+                  <button class="btn-light-action">View PDF</button>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="getFilteredCertificates().length === 0">
+              <td colspan="7" class="empty-msg">No certificates found matching your search.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</ion-content>

@@ -1,18 +1,18 @@
 <ion-split-pane contentId="main-admin-content" when="md">
-  <!-- ADMIN DARK GREEN SIDEBAR MENU -->
+  <!-- ADMIN LIGHT SIDEBAR MENU -->
   <ion-menu contentId="main-admin-content" type="overlay" menuId="admin-menu">
     
-    <!-- BRAND LOGO HEADER (DARK GREEN + AMBER ACCENT) -->
+    <!-- BRAND LOGO HEADER -->
     <div class="sidebar-brand-header">
       <a class="brand-logo" routerLink="/admin/dashboard">
         <div class="logo-badge">
-          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
             <path d="M6 12v5c3 3 9 3 12 0v-5"/>
           </svg>
         </div>
         <div class="brand-text-group">
-          <span class="brand-name">LearnSphere</span>
+          <span class="brand-name">EduDesk LMS</span>
         </div>
       </a>
     </div>
@@ -29,27 +29,45 @@
         <ion-item routerLink="/admin/add-student" routerLinkActive="active-menu">
           <ion-icon name="people-outline" slot="start"></ion-icon>
           <ion-label>Students</ion-label>
-          <span class="badge-count amber">2,850</span>
-        </ion-item>
-
-        <ion-item routerLink="/admin/add-agent" routerLinkActive="active-menu">
-          <ion-icon name="person-add-outline" slot="start"></ion-icon>
-          <ion-label>Faculty</ion-label>
-          <span class="badge-count green">142</span>
         </ion-item>
 
         <ion-item routerLink="/admin/academic" routerLinkActive="active-menu">
-          <ion-icon name="school-outline" slot="start"></ion-icon>
-          <ion-label>Academics</ion-label>
+          <ion-icon name="book-outline" slot="start"></ion-icon>
+          <ion-label>Courses</ion-label>
+        </ion-item>
+
+        <ion-item routerLink="/admin/add-agent" routerLinkActive="active-menu">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-label>Instructors</ion-label>
+        </ion-item>
+
+        <ion-item routerLink="/admin/batches" routerLinkActive="active-menu">
+          <ion-icon name="layers-outline" slot="start"></ion-icon>
+          <ion-label>Batches</ion-label>
+        </ion-item>
+
+        <ion-item routerLink="/admin/quizzes" routerLinkActive="active-menu">
+          <ion-icon name="help-circle-outline" slot="start"></ion-icon>
+          <ion-label>Quizzes</ion-label>
         </ion-item>
 
         <ion-item routerLink="/admin/attendance" routerLinkActive="active-menu">
-          <ion-icon name="finger-print-outline" slot="start"></ion-icon>
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
           <ion-label>Attendance</ion-label>
         </ion-item>
 
-        <ion-item routerLinkActive="active-menu">
-          <ion-icon name="stats-chart-outline" slot="start"></ion-icon>
+        <ion-item routerLink="/admin/payments" routerLinkActive="active-menu">
+          <ion-icon name="wallet-outline" slot="start"></ion-icon>
+          <ion-label>Payments</ion-label>
+        </ion-item>
+
+        <ion-item routerLink="/admin/certificates" routerLinkActive="active-menu">
+          <ion-icon name="ribbon-outline" slot="start"></ion-icon>
+          <ion-label>Certificates</ion-label>
+        </ion-item>
+
+        <ion-item routerLink="/admin/reports" routerLinkActive="active-menu">
+          <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
           <ion-label>Reports</ion-label>
         </ion-item>
 
