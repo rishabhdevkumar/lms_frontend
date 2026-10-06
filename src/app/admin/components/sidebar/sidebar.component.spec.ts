@@ -9,8 +9,7 @@ describe('SidebarComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SidebarComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [SidebarComponent, IonicModule.forRoot()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(SidebarComponent);

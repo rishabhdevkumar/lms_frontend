@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { HeaderComponent } from "../../components/header/header.component";
+import { HeaderComponent } from '../../components/header/header.component';
 import { student, Session, Course, Semester, Country, State, District, City } from 'src/app/interfaces';
-import { ApiService } from 'src/app/services/api';
+import { StudentService, DefaultService } from 'src/app/api';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-add-student',
@@ -29,13 +30,13 @@ export class AddStudentPage implements OnInit {
   isAddEditModalOpen = false;
   modalMode: 'add' | 'edit' = 'add';
   
-  // DYNAMIC MODAL TAB CONTROL (3 STEPS MATCHING BACKEND STORED PROCEDURE)
+  // DYNAMIC MODAL TAB CONTROL
   activeFormTab: 'basic' | 'academic' | 'parent' = 'basic';
   activeViewTab: 'basic' | 'academic' | 'parent' = 'basic';
 
   selectedStudent: student | null = null;
 
-  // DYNAMIC DROPDOWN LISTS (LOADED FROM API)
+  // DYNAMIC DROPDOWN LISTS (LOADED FROM OPENAPI API)
   sessions: Session[] = [];
   courses: Course[] = [];
   semesters: Semester[] = [];
@@ -44,20 +45,23 @@ export class AddStudentPage implements OnInit {
   districts: District[] = [];
   cities: City[] = [];
 
-  // DYNAMIC STUDENTS DATASET FROM API DATABASE
+  // DYNAMIC STUDENTS DATASET FROM OPENAPI STUDENT SERVICE
   studentsList: student[] = [];
 
-  // FULL STUDENT FORM DATA (DYNAMIC DTO)
+  // FULL STUDENT FORM DATA
   formData: student = this.createEmptyStudent();
 
-  constructor(private api: ApiService) { }
+  constructor(
+    private studentApiService: StudentService,
+    private defaultService: DefaultService
+  ) { }
 
   ngOnInit() {
     this.loadInitialDynamicData();
   }
 
   // =========================================================================
-  // PURE DYNAMIC API DATA LOADING
+  // PURE DYNAMIC OPENAPI DATA LOADING
   // =========================================================================
   async loadInitialDynamicData() {
     this.isLoading = true;
@@ -73,69 +77,107 @@ export class AddStudentPage implements OnInit {
         this.fetchStudentsList()
       ]);
     } catch (e) {
-      console.error('Error loading dynamic API data:', e);
+      console.error('Error loading dynamic OpenAPI data:', e);
     } finally {
       this.isLoading = false;
     }
   }
 
   async fetchSessions() {
-    const res: any = await this.api.post('/session/getall');
-    if (res) {
-      this.sessions = Array.isArray(res) ? res : (res.data || res.result || res.sessions || []);
+    try {
+      const res: any = await firstValueFrom(this.defaultService.sessionControllerGetAll());
+      if (res) {
+        this.sessions = Array.isArray(res) ? res : (res.data || res.result || res.sessions || []);
+      }
+    } catch (e) {
+      console.error('Error fetching sessions:', e);
     }
   }
 
   async fetchCourses() {
-    const res: any = await this.api.post('/course/getall');
-    if (res) {
-      this.courses = Array.isArray(res) ? res : (res.data || res.result || res.courses || []);
+    try {
+      const res: any = await firstValueFrom(this.defaultService.courseControllerGetAll());
+      if (res) {
+        this.courses = Array.isArray(res) ? res : (res.data || res.result || res.courses || []);
+      }
+    } catch (e) {
+      console.error('Error fetching courses:', e);
     }
   }
 
   async fetchSemesters() {
-    const res: any = await this.api.post('/semester/getall');
-    if (res) {
-      this.semesters = Array.isArray(res) ? res : (res.data || res.result || res.semesters || []);
+    try {
+      const res: any = await firstValueFrom(this.defaultService.semesterControllerGetAll());
+      if (res) {
+        this.semesters = Array.isArray(res) ? res : (res.data || res.result || res.semesters || []);
+      }
+    } catch (e) {
+      console.error('Error fetching semesters:', e);
     }
   }
 
   async fetchCountries() {
-    const res: any = await this.api.post('/country/getall');
-    if (res) {
-      this.countries = Array.isArray(res) ? res : (res.data || res.result || res.countries || []);
+    try {
+      const res: any = await firstValueFrom(this.defaultService.countryControllerGetAll());
+      if (res) {
+        this.countries = Array.isArray(res) ? res : (res.data || res.result || res.countries || []);
+      }
+    } catch (e) {
+      console.error('Error fetching countries:', e);
     }
   }
 
   async fetchStates() {
-    const res: any = await this.api.post('/state/getall');
-    if (res) {
-      this.states = Array.isArray(res) ? res : (res.data || res.result || res.states || []);
+    try {
+      const res: any = await firstValueFrom(this.defaultService.stateControllerGetAll());
+      if (res) {
+        this.states = Array.isArray(res) ? res : (res.data || res.result || res.states || []);
+      }
+    } catch (e) {
+      console.error('Error fetching states:', e);
     }
   }
 
   async fetchDistricts() {
-    const res: any = await this.api.post('/destrict/getall');
-    if (res) {
-      this.districts = Array.isArray(res) ? res : (res.data || res.result || res.districts || []);
+    try {
+      const res: any = await firstValueFrom(this.defaultService.destrictControllerGetAll());
+      if (res) {
+        this.districts = Array.isArray(res) ? res : (res.data || res.result || res.districts || []);
+      }
+    } catch (e) {
+      console.error('Error fetching districts:', e);
     }
   }
 
   async fetchCities() {
-    const res: any = await this.api.post('/city/getall');
-    if (res) {
-      this.cities = Array.isArray(res) ? res : (res.data || res.result || res.cities || []);
+    try {
+      const res: any = await firstValueFrom(this.defaultService.cityControllerGetAll());
+      if (res) {
+        this.cities = Array.isArray(res) ? res : (res.data || res.result || res.cities || []);
+      }
+    } catch (e) {
+      console.error('Error fetching cities:', e);
     }
   }
 
   async fetchStudentsList() {
-    const res: any = await this.api.post('/student/getall');
-    if (res) {
-      this.studentsList = Array.isArray(res) ? res : (res.data || res.result || res.students || []);
+    try {
+      const res: any = await firstValueFrom(this.studentApiService.studentControllerGetAll());
+      if (res) {
+        this.studentsList = Array.isArray(res) ? res : (res.data || res.result || res.students || []);
+      }
+    } catch (e) {
+      console.error('Error fetching students:', e);
     }
   }
 
   async fetchNextRollNo(): Promise<string> {
+    try {
+      const res: any = await firstValueFrom(this.studentApiService.studentControllerGetNextRollNo());
+      if (res && res.rollNo) return res.rollNo;
+    } catch (e) {
+      console.error('Error fetching next roll no:', e);
+    }
     const count = this.studentsList.length + 1;
     const pad = count < 10 ? `00${count}` : count < 100 ? `0${count}` : `${count}`;
     return `ST-2026-${pad}`;
@@ -339,7 +381,7 @@ export class AddStudentPage implements OnInit {
     this.formErrors = {};
   }
 
-  // SAVE STUDENT TO DATABASE VIA DYNAMIC API CALL MATCHING BACKEND ENDPOINTS (/student/quick_add or /student/update)
+  // SAVE STUDENT TO DATABASE VIA OPENAPI GENERATED STUDENT SERVICE
   async saveStudent() {
     if (!this.validateCurrentStep()) {
       return;
@@ -348,46 +390,29 @@ export class AddStudentPage implements OnInit {
     this.isSaving = true;
 
     try {
-      const backendPayload = {
-        roll_no: this.formData.roll_no,
-        name: this.formData.name,
-        email: this.formData.email,
-        password: this.formData.password,
-        phone: this.formData.phone,
-        dob: this.formData.dob,
-        gender: this.formData.gender,
-        blood_group: this.formData.blood_group,
-        session_id: this.formData.session_id,
-        course_id: this.formData.course_id,
-        semester_id: this.formData.semester_id,
-        father_name: this.formData.father_name,
-        father_mob_no: this.formData.father_mob_no,
-        mother_name: this.formData.mother_name,
-        other_mob_no: this.formData.other_mob_no
-      };
-
       if (this.modalMode === 'add') {
-        const res: any = await this.api.post('/student/quick_add', backendPayload);
-        console.log('API Student Add Response:', res);
+        const res: any = await firstValueFrom(this.studentApiService.studentControllerQuickAdd({
+          name: this.formData.name || '',
+          email: this.formData.email || '',
+          phone: this.formData.phone
+        }));
+        console.log('OpenAPI Student Add Response:', res);
       } else if (this.modalMode === 'edit' && this.selectedStudent) {
-        const res: any = await this.api.post('/student/update', {
-          id: this.selectedStudent.id,
-          ...backendPayload
-        });
-        console.log('API Student Update Response:', res);
+        const res: any = await firstValueFrom(this.studentApiService.studentControllerUpdate());
+        console.log('OpenAPI Student Update Response:', res);
       }
 
-      // Re-fetch dynamic student list from database API
+      // Re-fetch dynamic student list from OpenAPI Student Service
       await this.fetchStudentsList();
     } catch (e) {
-      console.error('Error saving student to API database:', e);
+      console.error('Error saving student via OpenAPI Student API:', e);
     } finally {
       this.isSaving = false;
       this.closeAddEditModal();
     }
   }
 
-  // TOGGLE STATUS DYNAMICALLY VIA API
+  // TOGGLE STATUS VIA OPENAPI API
   async toggleStudentStatus(std: student) {
     const currentStatus = Boolean(std.status);
     const newStatus = !currentStatus;
@@ -395,7 +420,7 @@ export class AddStudentPage implements OnInit {
 
     if (confirm(`Are you sure you want to ${actionText} ${std.name}?`)) {
       std.status = newStatus;
-      await this.api.post('/student/update', { id: std.id, status: newStatus });
+      await firstValueFrom(this.studentApiService.studentControllerUpdate());
       await this.fetchStudentsList();
     }
   }

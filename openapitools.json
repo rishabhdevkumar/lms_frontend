@@ -1,7 +1,18 @@
-{
+﻿{
   "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
   "spaces": 2,
   "generator-cli": {
-    "version": "7.25.0"
+    "version": "7.25.0",
+    "generators": {
+      "lms-api": {
+        "generatorName": "typescript-angular",
+        "inputSpec": "../lms_backend/swagger.json",
+        "output": "#{cwd}/src/app/api",
+        "additionalProperties": {
+          "providedInRoot": true,
+          "stringEnums": true
+        }
+      }
+    }
   }
 }

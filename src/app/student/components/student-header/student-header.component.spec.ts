@@ -9,8 +9,7 @@ describe('StudentHeaderComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ StudentHeaderComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [StudentHeaderComponent, IonicModule.forRoot()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(StudentHeaderComponent);

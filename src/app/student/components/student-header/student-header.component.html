@@ -15,7 +15,7 @@
     </ion-buttons>
 
     <!-- RIGHT : ACTIONS -->
-    <ion-buttons slot="end">
+    <ion-buttons slot="end" class="header-actions">
 
       <!-- LANGUAGE SWITCH -->
       <ion-select
@@ -26,15 +26,63 @@
         <ion-select-option value="hi">HI</ion-select-option>
       </ion-select>
 
-      <!-- LOGIN BUTTON -->
-      <ion-button routerLink="/login" class="auth-btn">
-        SIGN-IN
-      </ion-button>
+      <!-- NOTIFICATION BELL BUTTON -->
+      <button class="notif-bell-btn" (click)="toggleNotifications()" title="Notifications">
+        <span class="bell-icon">🔔</span>
+        <span class="notif-badge" *ngIf="notificationsCount > 0">{{ notificationsCount }}</span>
+      </button>
 
-      <!-- REGISTER BUTTON -->
-      <ion-button fill="solid" shape="round" size="small" color="medium" class="auth-btn" routerLink="/login">
-        SIGN-UP
-      </ion-button>
+      <!-- PROFILE USER BUTTON -->
+      <button class="profile-avatar-btn" (click)="toggleProfileMenu()" title="Student Profile">
+        <div class="avatar-box">ST</div>
+        <span class="profile-name">Aarav</span>
+        <span class="dropdown-icon">▼</span>
+      </button>
+
+      <!-- NOTIFICATIONS POPOVER -->
+      <ion-popover [isOpen]="isNotificationsOpen" (didDismiss)="isNotificationsOpen = false">
+        <ng-template>
+          <div class="popover-notif-header">
+            <h4>Student Notifications</h4>
+            <button class="btn-clear-notif" (click)="markAllRead()" *ngIf="notificationsCount > 0">Mark Read</button>
+          </div>
+          <div class="popover-notif-body">
+            <div class="notif-item-row" *ngFor="let item of notifications" [class.unread]="!item.read">
+              <div class="notif-icon-circle">🔔</div>
+              <div class="notif-details">
+                <div class="notif-title-text">{{ item.title }}</div>
+                <div class="notif-desc-text">{{ item.desc }}</div>
+                <div class="notif-time-stamp">{{ item.time }}</div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </ion-popover>
+
+      <!-- PROFILE POPOVER -->
+      <ion-popover [isOpen]="showProfileMenu" (didDismiss)="showProfileMenu = false">
+        <ng-template>
+          <ion-content class="profile-popover-content">
+            <div class="popover-user-header">
+              <div class="user-avatar-large">ST</div>
+              <div>
+                <div class="user-name">{{ studentName }}</div>
+                <div class="user-email">{{ studentRoll }}</div>
+              </div>
+            </div>
+            <ion-list lines="none" class="popover-menu-list">
+              <ion-item routerLink="/student-dashboard" (click)="showProfileMenu = false" [button]="true">
+                <ion-icon class="ion-margin-end" name="grid-outline"></ion-icon>
+                Student Dashboard
+              </ion-item>
+              <ion-item routerLink="/home" (click)="logout()" [button]="true" lines="none" class="logout-pop-item">
+                <ion-icon class="ion-margin-end" name="log-out-outline" color="danger"></ion-icon>
+                Logout
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
 
       <!-- MOBILE MENU -->
       <ion-menu-button class="mobile-menu"></ion-menu-button>

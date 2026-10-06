@@ -339,17 +339,18 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 0.78rem;
     font-weight: 700;
-    color: #d97706;
-    background-color: rgba(217, 119, 6, 0.1);
-    border: 1px solid rgba(217, 119, 6, 0.3);
+    color: #2563eb;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
     padding: 0.35rem 0.85rem;
     border-radius: 0.5rem;
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover {
-      background-color: #d97706;
+      background-color: #2563eb;
       color: #ffffff;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
     }
   }
 }
@@ -366,60 +367,76 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.875rem;
   font-weight: 700;
-  padding: 0.8rem 1.25rem;
+  padding: 0.85rem 1.25rem;
   border-radius: 0.75rem;
   text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  span {
+    font-size: 1.05rem;
+    margin-right: 0.25rem;
+  }
 
   &.primary-amber {
-    background-color: #d97706;
-    color: #ffffff !important;
-    border: none;
-    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+    background: #eff6ff;
+    color: #2563eb !important;
+    border: 1.5px solid #bfdbfe;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
 
     &:hover {
-      background-color: #b45309;
+      background: #dbeafe;
+      color: #1d4ed8 !important;
+      border-color: #93c5fd;
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
     }
   }
 
   &.secondary-green {
-    background-color: #059669;
-    color: #ffffff !important;
-    border: none;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    background: #ecfdf5;
+    color: #059669 !important;
+    border: 1.5px solid #a7f3d0;
+    box-shadow: 0 2px 6px rgba(5, 150, 105, 0.08);
 
     &:hover {
-      background-color: #047857;
+      background: #d1fae5;
+      color: #047857 !important;
+      border-color: #6ee7b7;
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
     }
   }
 
   &.dark-brand {
-    background-color: #0f1c14;
-    color: #ffffff !important;
-    border: none;
-    box-shadow: 0 4px 12px rgba(15, 28, 20, 0.3);
+    background: #f5f3ff;
+    color: #7c3aed !important;
+    border: 1.5px solid #ddd6fe;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.08);
 
     &:hover {
-      background-color: #1e3a29;
+      background: #ede9fe;
+      color: #6d28d9 !important;
+      border-color: #c4b5fd;
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
     }
   }
 
   &.outline-btn {
-    background-color: #ffffff;
+    background-color: #f8fafc;
     border: 1.5px solid #cbd5e1;
-    color: #334155;
+    color: #475569;
 
     &:hover {
-      border-color: #0f172a;
-      background-color: #f8fafc;
+      border-color: #2563eb;
+      color: #2563eb;
+      background-color: #eff6ff;
+      transform: translateY(-2px);
     }
   }
 }

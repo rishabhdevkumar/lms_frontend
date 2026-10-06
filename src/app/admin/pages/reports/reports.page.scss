@@ -1,0 +1,265 @@
+:host {
+  display: block;
+}
+
+.reports-page-content {
+  --background: #f8fafc;
+}
+
+.reports-wrapper {
+  padding: 1.75rem 2rem 4.5rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* PAGE HEADER */
+.page-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+
+  .page-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+
+  .sub-tag {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    background: #ffffff;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+  }
+}
+
+/* 4 STATS GRID */
+.reports-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.35rem 1.5rem;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.07);
+    border-color: #cbd5e1;
+  }
+
+  .stat-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-val {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+}
+
+/* MAIN GRID */
+.reports-main-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
+  }
+}
+
+/* CHART CARD */
+.chart-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.6rem;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+
+  .card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .legend-badge {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #2563eb;
+    }
+  }
+}
+
+.chart-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.revenue-svg-chart {
+  width: 100%;
+  height: 200px;
+  overflow: visible;
+}
+
+.month-labels-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0.5rem 0 0.5rem;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 0.5rem;
+
+  .month-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #94a3b8;
+  }
+}
+
+/* DOWNLOAD CARD & ATTRACTIVE BUTTONS */
+.download-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.6rem;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+
+  .card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 1.25rem 0;
+  }
+}
+
+.download-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.download-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #f8fafc;
+  }
+
+  .item-info {
+    display: flex;
+    flex-direction: column;
+
+    .item-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #334155;
+    }
+  }
+}
+
+/* HIGHLY ATTRACTIVE MODERN ROYAL BLUE BUTTON STYLING */
+.btn-attractive-download {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #2563eb !important;
+  background-color: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  padding: 0.55rem 1.15rem;
+  border-radius: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: -0.01em;
+
+  .dl-icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.25rem;
+    color: #2563eb;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    background-color: #dbeafe;
+    color: #1d4ed8 !important;
+    border-color: #93c5fd;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    transform: translateY(-2px);
+
+    .dl-icon {
+      transform: translateY(2px);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &.loading {
+    opacity: 0.8;
+    cursor: wait;
+    background: #eff6ff;
+  }
+}

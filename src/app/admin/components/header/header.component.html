@@ -9,22 +9,45 @@
     <!-- RIGHT SIDE ACTIONS (NOTIFICATION, PROFILE) -->
     <ion-buttons slot="end" class="header-actions-group">
 
-      <!-- NOTIFICATION BELL WITH AMBER BADGE -->
-      <button class="header-action-btn notification-wrapper" id="notify-popover-trigger" title="Notifications">
-        <span class="bell-icon">🔔</span>
-        <span class="notify-badge">3</span>
-      </button>
+      <!-- NOTIFICATION BELL WRAPPER & DROPDOWN -->
+      <div class="header-dropdown-wrapper">
+        <button class="header-action-btn notification-wrapper" (click)="toggleNotificationsMenu($event)" title="Notifications">
+          <span class="bell-icon">🔔</span>
+          <span class="notify-badge" *ngIf="notificationsCount > 0">{{ notificationsCount }}</span>
+        </button>
 
-      <!-- PROFILE USER BUTTON WITH POPOVER MENU -->
-      <button class="profile-avatar-btn" id="admin-profile-trigger" title="Admin Profile">
-        <div class="avatar-box">AD</div>
-        <span class="admin-name hidden sm:inline">Admin</span>
-        <span class="dropdown-icon">▼</span>
-      </button>
+        <div class="header-dropdown-card notif-card" *ngIf="isNotificationsOpen">
+          <div class="popover-notif-header">
+            <h4>Notifications</h4>
+            <button class="btn-clear-notif" (click)="markAllNotificationsRead()" *ngIf="notificationsCount > 0">Mark Read</button>
+          </div>
+          <div class="popover-notif-body">
+            <div class="notif-item-row" *ngFor="let item of notificationsList" [class.unread]="!item.read">
+              <div class="notif-icon-circle">
+                <span *ngIf="item.type === 'student'">👤</span>
+                <span *ngIf="item.type === 'system'">⚙️</span>
+                <span *ngIf="item.type === 'payment'">💳</span>
+              </div>
+              <div class="notif-details">
+                <div class="notif-title-text">{{ item.title }}</div>
+                <div class="notif-desc-text">{{ item.desc }}</div>
+                <div class="notif-time-stamp">{{ item.time }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <ion-popover trigger="admin-profile-trigger" [dismissOnSelect]="true">
-        <ng-template>
-          <ion-content class="profile-popover-content">
+      <!-- PROFILE USER WRAPPER & DROPDOWN -->
+      <div class="header-dropdown-wrapper">
+        <button class="profile-avatar-btn" (click)="toggleProfileMenu($event)" title="Admin Profile">
+          <div class="avatar-box">AD</div>
+          <span class="admin-name hidden sm:inline">Admin</span>
+          <span class="dropdown-icon">▼</span>
+        </button>
+
+        <div class="header-dropdown-card profile-card" *ngIf="showProfileMenu">
+          <div class="profile-popover-content">
             <div class="popover-user-header">
               <div class="user-avatar-large">AD</div>
               <div>
@@ -33,27 +56,27 @@
               </div>
             </div>
             <ion-list lines="none" class="popover-menu-list">
-              <ion-item routerLink="/admin/account-setting" [button]="true">
+              <ion-item routerLink="/admin/account-setting" (click)="showProfileMenu = false" [button]="true">
                 <ion-icon class="ion-margin-end" name="person-circle-outline"></ion-icon>
                 Account Settings
               </ion-item>
-              <ion-item routerLink="/admin/academic" [button]="true">
+              <ion-item routerLink="/admin/academic" (click)="showProfileMenu = false" [button]="true">
                 <ion-icon class="ion-margin-end" name="settings-outline"></ion-icon>
                 System Setup
               </ion-item>
               <ion-item (click)="openLanguageModal()" [button]="true" class="lang-pop-item">
                 <ion-icon class="ion-margin-end" name="globe-outline"></ion-icon>
                 Change Language
-                <ion-badge slot="end" color="warning" class="active-lang-badge">{{ selectedLanguage.code | uppercase }}</ion-badge>
+                <ion-badge slot="end" color="warning" class="active-lang-badge">{{ selectedLanguage?.code | uppercase }}</ion-badge>
               </ion-item>
-              <ion-item routerLink="/home" [button]="true" lines="none" class="logout-pop-item">
+              <ion-item routerLink="/home" (click)="showProfileMenu = false" [button]="true" lines="none" class="logout-pop-item">
                 <ion-icon class="ion-margin-end" name="log-out-outline"></ion-icon>
                 Logout
               </ion-item>
             </ion-list>
-          </ion-content>
-        </ng-template>
-      </ion-popover>
+          </div>
+        </div>
+      </div>
 
     </ion-buttons>
   </ion-toolbar>

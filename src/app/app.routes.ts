@@ -51,10 +51,45 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'batches',
+        loadComponent: () =>
+          import('./admin/pages/batches/batches.page').then(
+            (m) => m.BatchesPage,
+          ),
+      },
+      {
+        path: 'quizzes',
+        loadComponent: () =>
+          import('./admin/pages/quizzes/quizzes.page').then(
+            (m) => m.QuizzesPage,
+          ),
+      },
+      {
+        path: 'payments',
+        loadComponent: () =>
+          import('./admin/pages/payments/payments.page').then(
+            (m) => m.PaymentsPage,
+          ),
+      },
+      {
+        path: 'certificates',
+        loadComponent: () =>
+          import('./admin/pages/certificates/certificates.page').then(
+            (m) => m.CertificatesPage,
+          ),
+      },
+      {
         path: 'attendance',
         loadComponent: () =>
           import('./admin/pages/attendance/attendance.page').then(
             (m) => m.AttendancePage,
+          ),
+      },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./admin/pages/reports/reports.page').then(
+            (m) => m.ReportsPage,
           ),
       },
       {

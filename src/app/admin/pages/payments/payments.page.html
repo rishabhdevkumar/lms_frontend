@@ -1,0 +1,130 @@
+<app-header></app-header>
+
+<ion-content [fullscreen]="true" class="payments-page-content">
+  <div class="payments-wrapper">
+
+    <!-- PAGE TITLE ROW -->
+    <div class="page-title-row">
+      <div class="title-group">
+        <h1 class="page-title">Payments & Fee Transactions</h1>
+        <span class="count-badge font-mono-code">${{ getTotalRevenue() }} Total Revenue</span>
+      </div>
+
+      <button class="btn-light-primary">
+        <span>💳</span> Export Financial Ledger
+      </button>
+    </div>
+
+    <!-- 3 STAT CARDS -->
+    <div class="stats-overview-grid">
+      <div class="stat-mini-card">
+        <div class="stat-info">
+          <span class="stat-label">SUCCESSFUL PAYMENTS</span>
+          <h3 class="stat-value">${{ getTotalRevenue() }}</h3>
+        </div>
+        <div class="stat-icon-badge green-badge">💰</div>
+      </div>
+
+      <div class="stat-mini-card">
+        <div class="stat-info">
+          <span class="stat-label">PENDING FEES DUE</span>
+          <h3 class="stat-value">$450</h3>
+        </div>
+        <div class="stat-icon-badge amber-badge">⏳</div>
+      </div>
+
+      <div class="stat-mini-card">
+        <div class="stat-info">
+          <span class="stat-label">REFUNDS PROCESSED</span>
+          <h3 class="stat-value">$350</h3>
+        </div>
+        <div class="stat-icon-badge coral-badge">↩️</div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTROL CARD -->
+    <div class="payments-main-card">
+      
+      <!-- TOOLBAR ROW -->
+      <div class="toolbar-row">
+        <div class="search-box-container">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            placeholder="Search by Txn ID, student name, or course..." 
+            class="payments-search-input" 
+          />
+        </div>
+
+        <div class="filter-pills-group">
+          <button class="filter-pill-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+            All Transactions ({{ transactions.length }})
+          </button>
+          <button class="filter-pill-btn green" [class.active]="activeTab === 'completed'" (click)="activeTab = 'completed'">
+            Completed
+          </button>
+          <button class="filter-pill-btn amber" [class.active]="activeTab === 'pending'" (click)="activeTab = 'pending'">
+            Pending
+          </button>
+          <button class="filter-pill-btn red" [class.active]="activeTab === 'refunded'" (click)="activeTab = 'refunded'">
+            Refunded
+          </button>
+        </div>
+      </div>
+
+      <!-- PAYMENTS DATA TABLE -->
+      <div class="table-responsive">
+        <table class="payments-data-table">
+          <thead>
+            <tr>
+              <th>TXN ID</th>
+              <th>STUDENT NAME</th>
+              <th>COURSE PROGRAM</th>
+              <th>AMOUNT</th>
+              <th>PAYMENT METHOD</th>
+              <th>DATE</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let txn of getFilteredTransactions()">
+              <td>
+                <span class="txn-code-pill">{{ txn.txnId }}</span>
+              </td>
+              <td>
+                <span class="student-name-bold">{{ txn.studentName }}</span>
+              </td>
+              <td>
+                <span class="course-text">{{ txn.courseName }}</span>
+              </td>
+              <td>
+                <span class="amount-val">${{ txn.amount }}</span>
+              </td>
+              <td>
+                <span class="method-text">💳 {{ txn.paymentMethod }}</span>
+              </td>
+              <td>
+                <span class="date-text">{{ txn.date }}</span>
+              </td>
+              <td>
+                <span class="status-badge" 
+                      [class.completed-status]="txn.status === 'Completed'"
+                      [class.pending-status]="txn.status === 'Pending'"
+                      [class.refunded-status]="txn.status === 'Refunded'">
+                  {{ txn.status }}
+                </span>
+              </td>
+            </tr>
+
+            <tr *ngIf="getFilteredTransactions().length === 0">
+              <td colspan="7" class="empty-msg">No transactions found matching your search term.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</ion-content>
