@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LanguageService, Language } from 'src/app/services/language.service';
+import { AuthService, User } from 'src/app/services/auth.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -15,6 +16,10 @@ import { Subscription } from 'rxjs';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   adminName = 'Admin';
+  adminEmail = 'admin@lms-hub.com';
+  adminInitials = 'AD';
+  currentUser: User | null = null;
+
   notificationsCount = 3;
   showProfileMenu = false;
   isNotificationsOpen = false;
@@ -59,6 +64,37 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.notificationsCount = 0;
   }
 
+  private getInitials(name: string): string {
+    if (!name) return 'AD';
+    const cleanName = name.trim();
+    const parts = cleanName.split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    }
+    return cleanName.slice(0, 2).toUpperCase();
+  }
+
+  private updateUserInfo(user: User | null) {
+    if (user && user.name) {
+      this.currentUser = user;
+      this.adminName = user.name;
+      this.adminEmail = user.email || this.adminEmail;
+      this.adminInitials = this.getInitials(user.name);
+    } else {
+      const savedUserStr = localStorage.getItem('lms_auth_user');
+      if (savedUserStr) {
+        try {
+          const savedUser = JSON.parse(savedUserStr);
+          if (savedUser && savedUser.name) {
+            this.adminName = savedUser.name;
+            this.adminEmail = savedUser.email || this.adminEmail;
+            this.adminInitials = this.getInitials(savedUser.name);
+          }
+        } catch (e) {}
+      }
+    }
+  }
+
   // Language state & modal controls
   selectedLanguage!: Language;
   languages: Language[] = [];
@@ -80,9 +116,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private subs = new Subscription();
 
-  constructor(private languageService: LanguageService) {}
+  constructor(
+    private languageService: LanguageService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
+    this.updateUserInfo(this.authService.currentUserValue);
+
+    this.subs.add(
+      this.authService.currentUser$.subscribe((user) => {
+        this.updateUserInfo(user);
+      })
+    );
+
     this.subs.add(
       this.languageService.currentLanguage$.subscribe((lang: Language) => {
         this.selectedLanguage = lang;
@@ -182,5 +229,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   openNotifications() {
     this.toggleNotificationsMenu();
+  }
+
+  logout() {
+    this.showProfileMenu = false;
+    this.authService.logout();
   }
 }

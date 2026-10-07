@@ -242,7 +242,28 @@
 
 
 
-/* GET STARTED BUTTON (REPLACED REGISTER / SIGN UP) */
+/* SIGN IN BUTTON */
+.signin-btn {
+  background-color: transparent;
+  color: #0f172a !important;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.55rem 1.1rem;
+  border-radius: 9999px;
+  border: 1.5px solid #cbd5e1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #d97706;
+    color: #d97706 !important;
+    background-color: rgba(217, 119, 6, 0.05);
+  }
+}
+
+/* GET STARTED BUTTON */
 .register-btn {
   background-color: #d97706;
   color: #ffffff !important;
@@ -258,6 +279,8 @@
   transition: all 0.2s ease;
   box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25);
   white-space: nowrap;
+  border: none;
+  cursor: pointer;
 
   @media (min-width: 640px) {
     display: flex;
@@ -268,6 +291,240 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
   }
+}
+
+/* REAL-TIME LOGGED IN DASHBOARD BUTTON & USER PROFILE */
+.dashboard-btn {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff !important;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.55rem 1.25rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: #d97706;
+    box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
+    transform: translateY(-1px);
+  }
+}
+
+.user-profile-wrapper {
+  position: relative;
+
+  .user-avatar-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.7rem 0.3rem 0.4rem;
+    border-radius: 9999px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #d97706;
+      background: #ffffff;
+    }
+
+    .avatar-circle {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: #d97706;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-name-text {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #0f172a;
+      max-width: 110px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .role-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 0.15rem 0.45rem;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      color: #475569;
+
+      &.student { background: rgba(34, 197, 94, 0.15); color: #16a34a; }
+      &.faculty { background: rgba(59, 130, 246, 0.15); color: #2563eb; }
+      &.admin { background: rgba(217, 119, 6, 0.15); color: #d97706; }
+    }
+
+    .dropdown-chevron {
+      font-size: 0.65rem;
+      color: #64748b;
+    }
+  }
+
+  .user-dropdown-menu {
+    position: absolute;
+    top: 125%;
+    right: 0;
+    width: 230px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 0.75rem;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.18);
+    z-index: 150;
+    animation: popScaleModal 0.2s ease-out;
+
+    .dropdown-user-header {
+      padding: 0.4rem 0.5rem;
+
+      .header-name {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: #0f172a;
+      }
+
+      .header-email {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.78rem;
+        color: #64748b;
+        word-break: break-all;
+      }
+
+      .role-badge-small {
+        display: inline-block;
+        margin-top: 0.3rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #d97706;
+      }
+    }
+
+    .dropdown-divider {
+      border: none;
+      border-top: 1px solid #f1f5f9;
+      margin: 0.5rem 0;
+    }
+
+    .dropdown-item {
+      width: 100%;
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      border-radius: 0.5rem;
+      border: none;
+      background: transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: #f8fafc;
+        color: #0f172a;
+      }
+
+      &.logout-item {
+        color: #dc2626;
+        &:hover { background: rgba(239, 68, 68, 0.08); }
+      }
+    }
+  }
+}
+
+/* MOBILE CONTROLS SECTION */
+.mobile-signin-btn {
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 9999px;
+  border: 1.5px solid #cbd5e1;
+  background: transparent;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.mobile-register-btn {
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 9999px;
+  border: none;
+  background: #d97706;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.mobile-user-card {
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+
+  .mobile-user-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    color: #0f172a;
+    font-size: 0.9rem;
+  }
+  .mobile-user-role {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #d97706;
+    margin-top: 0.2rem;
+  }
+}
+
+.mobile-dashboard-btn {
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 9999px;
+  border: none;
+  background: #0f172a;
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.mobile-logout-btn {
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
 }
 
 /* HAMBURGER MENU BUTTON */
@@ -373,6 +630,7 @@
   gap: 0.85rem;
   padding-top: 0.5rem;
 }
+
 
 .mobile-toggles-row {
   display: grid;

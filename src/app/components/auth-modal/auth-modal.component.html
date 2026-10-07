@@ -1,150 +1,186 @@
-<!-- AUTH MODAL OVERLAY BACKDROP -->
 <div class="auth-modal-backdrop" *ngIf="isOpen" (click)="closeModal()">
   <div class="auth-modal-dialog" (click)="$event.stopPropagation()">
-    <button class="modal-close-icon" (click)="closeModal()" title="Close Modal">✕</button>
 
+    <!-- CLOSE BUTTON -->
+    <button class="modal-close-icon" (click)="closeModal()" aria-label="Close Modal">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- HEADER SECTION -->
     <div class="auth-card-header">
       <div class="brand-badge-small">
-        <span class="badge-icon">🎓</span>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+          <path d="M6 12v5c3 3 9 3 12 0v-5" />
+        </svg>
         <span>LearnSphere</span>
       </div>
 
       <h2 class="auth-title">
-        {{ authMode === 'signin' ? 'Welcome Back!' : 'Create Your Account' }}
+        {{ authMode === 'signin' ? 'Welcome Back' : 'Create Your Account' }}
       </h2>
       <p class="auth-subtitle">
-        {{ authMode === 'signin' ? 'Sign in to access your courses and live classes.' : 'Join thousands of students and mentors today.' }}
+        {{ authMode === 'signin' ? 'Enter your credentials to access your account dashboard.' : 'Join LearnSphere to
+        unlock personalized learning.' }}
       </p>
 
-      <!-- MODE SWITCHER PILL TABS -->
+      <!-- MODE TABS (SIGN IN / SIGN UP) -->
       <div class="mode-tabs">
-        <button type="button" 
-                class="mode-tab-btn" 
-                [class.active]="authMode === 'signin'" 
-                (click)="setAuthMode('signin')">
+        <button type="button" class="mode-tab-btn" [class.active]="authMode === 'signin'"
+          (click)="setAuthMode('signin')">
           Sign In
         </button>
 
-        <button type="button" 
-                class="mode-tab-btn" 
-                [class.active]="authMode === 'signup'" 
-                (click)="setAuthMode('signup')">
+        <button type="button" class="mode-tab-btn" [class.active]="authMode === 'signup'"
+          (click)="setAuthMode('signup')">
           Sign Up
         </button>
       </div>
     </div>
 
-    <!-- ROLE SELECTOR (ONLY FOR SIGN UP MODE) -->
-    <div class="role-selector-wrapper" *ngIf="authMode === 'signup'">
-      <span class="role-label">Select Account Type:</span>
-      <div class="role-chips">
-        <button type="button" 
-                class="role-chip" 
-                [class.selected]="userRole === 'student'" 
-                (click)="setUserRole('student')">
-          <span class="chip-icon">🎓</span> Student
-        </button>
-
-        <button type="button" 
-                class="role-chip" 
-                [class.selected]="userRole === 'faculty'" 
-                (click)="setUserRole('faculty')">
-          <span class="chip-icon">👨‍🏫</span> Faculty
-        </button>
-      </div>
+    <!-- FEEDBACK ALERT MESSAGES -->
+    <div class="auth-alert error-alert" *ngIf="errorMessage">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage }}</span>
     </div>
 
-    <!-- DYNAMIC AUTH FORM -->
+    <div class="auth-alert success-alert" *ngIf="successMessage">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <!-- DYNAMIC AUTH FORM WITH IONIC FLOATING LABELS -->
     <form (ngSubmit)="onSubmit()" class="auth-form">
 
       <!-- FULL NAME (ONLY FOR SIGN UP) -->
-      <div class="form-group" *ngIf="authMode === 'signup'">
-        <label class="form-label">Full Name</label>
-        <div class="input-wrapper">
-          <span class="input-icon">👤</span>
-          <input type="text" 
-                 [(ngModel)]="fullName" 
-                 name="fullName" 
-                 placeholder="Enter your full name" 
-                 required 
-                 class="form-input" />
+      <div class="field-group" *ngIf="authMode === 'signup'">
+        <ion-input label="Full Name" labelPlacement="floating" fill="outline" type="text" [(ngModel)]="fullName"
+          (ionInput)="clearFieldError('fullName')" name="fullName" placeholder="Enter your full name"
+          [class.ion-invalid]="!!fieldErrors.fullName" class="ionic-floating-input">
+          <ion-icon slot="start" name="person-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+        </ion-input>
+        <div class="field-error-msg" *ngIf="fieldErrors.fullName">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ fieldErrors.fullName }}</span>
         </div>
       </div>
 
       <!-- EMAIL ADDRESS -->
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <div class="input-wrapper">
-          <span class="input-icon">✉️</span>
-          <input type="email" 
-                 [(ngModel)]="email" 
-                 name="email" 
-                 placeholder="name@example.com" 
-                 required 
-                 class="form-input" />
+      <div class="field-group">
+        <ion-input label="Email Address" labelPlacement="floating" fill="outline" type="email" [(ngModel)]="email"
+          (ionInput)="clearFieldError('email')" name="email" placeholder="name@example.com"
+          [class.ion-invalid]="!!fieldErrors.email" class="ionic-floating-input">
+          <ion-icon slot="start" name="mail-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+        </ion-input>
+        <div class="field-error-msg" *ngIf="fieldErrors.email">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ fieldErrors.email }}</span>
         </div>
       </div>
 
       <!-- PASSWORD -->
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <div class="input-wrapper">
-          <span class="input-icon">🔒</span>
-          <input type="password" 
-                 [(ngModel)]="password" 
-                 name="password" 
-                 placeholder="••••••••" 
-                 required 
-                 class="form-input" />
+      <div class="field-group">
+        <ion-input label="Password" labelPlacement="floating" fill="outline" type="password" [(ngModel)]="password"
+          (ionInput)="clearFieldError('password')" name="password" placeholder="••••••••"
+          [class.ion-invalid]="!!fieldErrors.password" class="ionic-floating-input">
+          <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+        </ion-input>
+        <div class="field-error-msg" *ngIf="fieldErrors.password">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ fieldErrors.password }}</span>
         </div>
       </div>
 
       <!-- CONFIRM PASSWORD (ONLY FOR SIGN UP) -->
-      <div class="form-group" *ngIf="authMode === 'signup'">
-        <label class="form-label">Confirm Password</label>
-        <div class="input-wrapper">
-          <span class="input-icon">🛡️</span>
-          <input type="password" 
-                 [(ngModel)]="confirmPassword" 
-                 name="confirmPassword" 
-                 placeholder="••••••••" 
-                 required 
-                 class="form-input" />
+      <div class="field-group" *ngIf="authMode === 'signup'">
+        <ion-input label="Confirm Password" labelPlacement="floating" fill="outline" type="password"
+          [(ngModel)]="confirmPassword" (ionInput)="clearFieldError('confirmPassword')" name="confirmPassword"
+          placeholder="••••••••" [class.ion-invalid]="!!fieldErrors.confirmPassword" class="ionic-floating-input">
+          <ion-icon slot="start" name="shield-checkmark-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+        </ion-input>
+        <div class="field-error-msg" *ngIf="fieldErrors.confirmPassword">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ fieldErrors.confirmPassword }}</span>
         </div>
       </div>
 
-      <!-- CHECKBOXES -->
-      <div class="form-options-row" *ngIf="authMode === 'signin'">
-        <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" />
-          <span>Remember me</span>
-        </label>
-        <a href="javascript:void(0)" class="forgot-link">Forgot password?</a>
+
+      <div class="form-options-col" *ngIf="authMode === 'signup'">
+        <div class="form-options-row">
+          <ion-checkbox [(ngModel)]="agreeTerms" (ionChange)="clearFieldError('agreeTerms')" name="agreeTerms"
+            labelPlacement="end" class="ionic-checkbox-item">
+            <span class="checkbox-label-text">I agree to Terms of Service & Privacy Policy</span>
+          </ion-checkbox>
+        </div>
+        <div class="field-error-msg" *ngIf="fieldErrors.agreeTerms">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ fieldErrors.agreeTerms }}</span>
+        </div>
       </div>
 
-      <div class="form-options-row" *ngIf="authMode === 'signup'">
-        <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="agreeTerms" name="agreeTerms" required />
-          <span>I agree to the Terms of Service & Privacy Policy</span>
-        </label>
-      </div>
-
-      <!-- SUBMIT ACTION BUTTON -->
-      <button type="submit" class="submit-btn">
-        <span *ngIf="authMode === 'signin'">Sign In to Account ➔</span>
-        <span *ngIf="authMode === 'signup'">Create Free Account 🚀</span>
+      <!-- SUBMIT BUTTON -->
+      <button type="submit" class="submit-action-btn" [disabled]="isLoading">
+        <span *ngIf="isLoading" class="spinner-inline">
+          <svg class="animate-spin" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"></circle>
+          </svg>
+          Processing...
+        </span>
+        <span *ngIf="!isLoading">
+          {{ authMode === 'signin' ? 'Sign In' : 'Create Account' }}
+        </span>
       </button>
 
     </form>
 
-    <!-- BOTTOM TOGGLE FOOTER -->
+    <!-- FOOTER TOGGLE -->
     <div class="auth-card-footer">
       <span *ngIf="authMode === 'signup'">
-        Already have an account? 
+        Already have an account?
         <a href="javascript:void(0)" class="toggle-link" (click)="setAuthMode('signin')">Sign In</a>
       </span>
       <span *ngIf="authMode === 'signin'">
-        Don't have an account yet? 
+        Don't have an account yet?
         <a href="javascript:void(0)" class="toggle-link" (click)="setAuthMode('signup')">Create Account</a>
       </span>
     </div>

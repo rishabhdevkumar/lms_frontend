@@ -1,80 +1,39 @@
 // Database Table Interfaces matching MySQL ERD Schema
 
-export interface student {
+export interface users {
   id?: number;
-  roll_no?: string | number;
-  name?: string;
-  email?: string;
-  password?: string;
+  roll_no?: number | string;
+  name: string;
+  email: string;
+  password: string;
   language?: string;
-  phone?: string;
-  dob?: string;
+  phone?: any;
+  dob?: Date | string;
   gender?: string;
-  category?: string; 
-  nationality?: string;
+  role?: string;
   blood_group?: string;
-  session_id?: number | string;
-  course_id?: number | string;
-  semester_id?: number | string;
-  aadhar_no?: string;
-  aadhar_card?: string;
+  session_id?: any;
+  course_id?: any;
+  semester_id?: any;
+  aadhar_n?: number | string;
   father_name?: string;
   father_mob_no?: string;
-  father_occupation?: string;
   mother_name?: string;
-  mother_occupation?: string;
+  mother_mob_no?: string;
   other_mob_no?: string;
-  
-  // Temporary Address
-  temp_house_no?: string;
-  temp_pincode?: string;
-  temp_locality?: string;
-  temp_area?: string;
-  temp_city_id?: number | string;
-  temp_destrict_id?: number | string;
-  temp_state_id?: number | string;
-  temp_country_id?: number | string;
-  
-  // Permanent Address
-  perm_house_no?: string;
-  perm_pincode?: string;
-  perm_locality?: string;
-  perm_area?: string;
-  perm_destrict_id?: number | string;
-  perm_city_id?: number | string;
-  perm_state_id?: number | string;
-  perm_country_id?: number | string;
-  
-  // Educational Qualifications
-  qualification?: string;
   board_10th?: string;
-  passing_year_10th?: number | string;
-  total_marks_10th?: number | string;
-  division_10th?: string;
-  percentage_10th?: number | string;
-  admit_card_10th?: string;
-  marksheet_10th?: string;
-
+  total_marks_10th?: number;
+  percentage_10th?: any;
   board_12th?: string;
-  passing_year_12th?: number | string;
-  total_marks_12th?: number | string;
-  division_12th?: string;
-  percentage_12th?: number | string;
-  admit_card_12th?: string;
-  marksheet_12th?: string;
-
-  // Pre Registration & University Info
-  pre_registration_no?: string;
-  pre_subject?: string;
-  KU_reg_no?: string;
-  ku_roll_no?: string;
-  migration?: string;
-  transfer?: string;
-  status?: boolean | string;
+  total_marks_12th?: number;
+  percentage_12th?: string;
+  status?: boolean;
 }
 
-// Alias for PascalCase usage
-export type Student = student;
+// Aliases for compatibility
+export type User = users;
+export type student = users;
+export type Student = users;
 
 export interface Session {
   id: number;

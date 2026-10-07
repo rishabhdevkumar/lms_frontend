@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from '../../components/header/header.component';
+import { UserService } from '../../../services/user.service';
 
 export interface FacultyStaff {
   id: number;
@@ -158,9 +159,50 @@ export class AddAgentPage implements OnInit {
     }
   ];
 
-  constructor() { }
+  constructor(private userService: UserService) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.loadUsersFromBackend();
+  }
+
+  loadUsersFromBackend() {
+    this.userService.getAllUsers().subscribe({
+      next: (users: any[]) => {
+        if (users && users.length > 0) {
+          const loadedFaculty: FacultyStaff[] = [];
+          const loadedAgents: FacultyStaff[] = [];
+
+          users.forEach((u, index) => {
+            const isFaculty = u.role === 'faculty' || u.type === 'Faculty';
+            const staffItem: FacultyStaff = {
+              id: u.id || index + 1,
+              staffId: u.staffId || u.id || (isFaculty ? `FAC-2026-${10 + index}` : `AGT-2026-${10 + index}`),
+              name: u.name || u.fullName || 'User',
+              email: u.email || '',
+              phone: u.phone || '+91 98000 00000',
+              type: isFaculty ? 'Faculty' : 'Agent',
+              department: u.department || 'Academic Department',
+              designation: u.designation || (isFaculty ? 'Professor' : 'Officer'),
+              assignedCourses: u.assignedCourses || 'General Courses',
+              status: (u.status === false || u.status === 'Suspended') ? 'Suspended' : 'Active',
+              joiningDate: u.joiningDate || 'Recently Added',
+              avatarBg: isFaculty ? '#059669' : '#d97706'
+            };
+
+            if (isFaculty) {
+              loadedFaculty.push(staffItem);
+            } else {
+              loadedAgents.push(staffItem);
+            }
+          });
+
+          if (loadedFaculty.length > 0) this.facultyList = loadedFaculty;
+          if (loadedAgents.length > 0) this.agentsList = loadedAgents;
+        }
+      },
+      error: (err) => console.warn('Could not fetch live users:', err)
+    });
+  }
 
   // SWITCH TAB
   selectTab(tab: 'faculty' | 'agent') {
@@ -245,36 +287,54 @@ export class AddAgentPage implements OnInit {
     };
   }
 
-  // SAVE ITEM (CREATE / UPDATE)
+  // SAVE ITEM (CREATE / UPDATE) VIA BACKEND USER SERVICE
   saveItem() {
     if (!this.formData.name || !this.formData.email) return;
 
     if (this.modalMode === 'add') {
-      const list = this.getCurrentList();
-      const newId = list.length ? Math.max(...list.map(i => i.id)) + 1 : 1;
-      const prefix = this.activeTab === 'faculty' ? 'FAC' : 'AGT';
-      const randomNum = Math.floor(10 + Math.random() * 90);
-
-      const newItem: FacultyStaff = {
-        id: newId,
-        staffId: `${prefix}-2026-${randomNum}`,
+      const role = this.activeTab === 'faculty' ? 'faculty' : 'agent';
+      this.userService.addUser({
         name: this.formData.name,
+        fullName: this.formData.name,
         email: this.formData.email,
-        phone: this.formData.phone || '+91 98000 00000',
-        type: this.activeTab === 'faculty' ? 'Faculty' : 'Agent',
-        department: this.formData.department || 'Academic Department',
-        designation: this.formData.designation || 'Academic Officer',
-        assignedCourses: this.formData.assignedCourses || 'General Courses',
-        status: (this.formData.status as 'Active' | 'Suspended') || 'Active',
-        joiningDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-        avatarBg: this.activeTab === 'faculty' ? '#059669' : '#d97706'
-      };
+        phone: this.formData.phone,
+        role: role,
+        department: this.formData.department,
+        designation: this.formData.designation,
+        status: this.formData.status === 'Active'
+      }).subscribe({
+        next: () => {
+          this.loadUsersFromBackend();
+        },
+        error: () => {
+          // Fallback UI update
+          const list = this.getCurrentList();
+          const newId = list.length ? Math.max(...list.map(i => i.id)) + 1 : 1;
+          const prefix = this.activeTab === 'faculty' ? 'FAC' : 'AGT';
+          const randomNum = Math.floor(10 + Math.random() * 90);
 
-      if (this.activeTab === 'faculty') {
-        this.facultyList.unshift(newItem);
-      } else {
-        this.agentsList.unshift(newItem);
-      }
+          const newItem: FacultyStaff = {
+            id: newId,
+            staffId: `${prefix}-2026-${randomNum}`,
+            name: this.formData.name!,
+            email: this.formData.email!,
+            phone: this.formData.phone || '+91 98000 00000',
+            type: this.activeTab === 'faculty' ? 'Faculty' : 'Agent',
+            department: this.formData.department || 'Academic Department',
+            designation: this.formData.designation || 'Academic Officer',
+            assignedCourses: this.formData.assignedCourses || 'General Courses',
+            status: (this.formData.status as 'Active' | 'Suspended') || 'Active',
+            joiningDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+            avatarBg: this.activeTab === 'faculty' ? '#059669' : '#d97706'
+          };
+
+          if (this.activeTab === 'faculty') {
+            this.facultyList.unshift(newItem);
+          } else {
+            this.agentsList.unshift(newItem);
+          }
+        }
+      });
     } else if (this.modalMode === 'edit' && this.selectedItem) {
       if (this.activeTab === 'faculty') {
         const idx = this.facultyList.findIndex(f => f.id === this.selectedItem?.id);

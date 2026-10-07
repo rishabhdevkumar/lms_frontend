@@ -98,7 +98,7 @@
 
         <!-- LOGOUT LINK -->
         <ion-menu-toggle menu="faculty-menu" auto-hide="false">
-          <ion-item routerLink="/home" lines="none" class="logout-item">
+          <ion-item (click)="logout()" lines="none" class="logout-item" [button]="true">
             <ion-icon name="log-out-outline" slot="start"></ion-icon>
             <ion-label>Logout</ion-label>
           </ion-item>

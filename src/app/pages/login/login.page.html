@@ -1,0 +1,203 @@
+<ion-content [fullscreen]="true" class="login-page-content">
+
+  <app-navbar></app-navbar>
+
+  <div class="login-wrapper">
+    <div class="login-container">
+
+      <!-- LEFT SIDE HERO GRAPHIC BANNER -->
+      <div class="login-hero-banner">
+        <div class="hero-badge">🎓 LearnSphere Platform</div>
+        <h1 class="hero-heading">
+          Empowering Your <br />
+          <span class="gradient-text">Learning Journey</span>
+        </h1>
+        <p class="hero-subtext">
+          Access world-class education, live classes, real-time collaboration, and career-building certificates.
+        </p>
+
+        <div class="feature-pills">
+          <div class="pill">⚡ Real-time Verification</div>
+          <div class="pill">🛡️ Role-Based Access</div>
+          <div class="pill">📜 Certified Credentials</div>
+        </div>
+
+        <div class="hero-testimonial">
+          <div class="stars">★★★★★</div>
+          <p>"LearnSphere helped me master full-stack development and land my dream developer job!"</p>
+          <div class="author">— Alex Rivera, Senior Engineer</div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE AUTH FORM CARD -->
+      <div class="login-card shadow-2xl">
+
+        <div class="card-header">
+          <h2 class="card-title">
+            {{ authMode === 'signin' ? 'Welcome Back!' : 'Create Your Account' }}
+          </h2>
+          <p class="card-subtitle">
+            {{ authMode === 'signin' ? 'Sign in to access your custom learning dashboard.' : 'Start your transformation with LearnSphere today.' }}
+          </p>
+
+          <!-- MODE TAB TOGGLES -->
+          <div class="mode-tabs">
+            <button type="button" 
+                    class="tab-btn" 
+                    [class.active]="authMode === 'signin'" 
+                    (click)="setAuthMode('signin')">
+              Sign In
+            </button>
+            <button type="button" 
+                    class="tab-btn" 
+                    [class.active]="authMode === 'signup'" 
+                    (click)="setAuthMode('signup')">
+              Sign Up
+            </button>
+          </div>
+        </div>
+
+        <!-- ROLE SELECTOR -->
+        <div class="role-selector-section">
+          <span class="role-label">Select Access Role:</span>
+          <div class="role-grid">
+            <button type="button" 
+                    class="role-card" 
+                    [class.selected]="userRole === 'student'" 
+                    (click)="setUserRole('student')">
+              <span class="role-icon">🎓</span>
+              <span class="role-title">Student</span>
+            </button>
+
+            <button type="button" 
+                    class="role-card" 
+                    [class.selected]="userRole === 'faculty'" 
+                    (click)="setUserRole('faculty')">
+              <span class="role-icon">👨‍🏫</span>
+              <span class="role-title">Faculty</span>
+            </button>
+
+            <button type="button" 
+                    class="role-card" 
+                    [class.selected]="userRole === 'admin'" 
+                    (click)="setUserRole('admin')">
+              <span class="role-icon">🛡️</span>
+              <span class="role-title">Admin</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ALERT FEEDBACK -->
+        <div class="alert-box error-alert" *ngIf="errorMessage">
+          ⚠️ {{ errorMessage }}
+        </div>
+
+        <div class="alert-box success-alert" *ngIf="successMessage">
+          ✅ {{ successMessage }}
+        </div>
+
+        <!-- AUTH FORM -->
+        <form (ngSubmit)="onSubmit()" class="auth-form">
+
+          <!-- FULL NAME (SIGN UP ONLY) -->
+          <div class="ionic-field-wrapper" *ngIf="authMode === 'signup'">
+            <ion-item fill="outline" class="ionic-custom-item">
+              <ion-label position="stacked" class="ionic-custom-label">Full Name</ion-label>
+              <span slot="start" class="input-icon-slot">👤</span>
+              <ion-input type="text" 
+                         [(ngModel)]="fullName" 
+                         name="fullName" 
+                         placeholder="John Doe" 
+                         required 
+                         class="ionic-custom-input"></ion-input>
+            </ion-item>
+          </div>
+
+          <!-- EMAIL ADDRESS -->
+          <div class="ionic-field-wrapper">
+            <ion-item fill="outline" class="ionic-custom-item">
+              <ion-label position="stacked" class="ionic-custom-label">Email Address</ion-label>
+              <span slot="start" class="input-icon-slot">✉️</span>
+              <ion-input type="email" 
+                         [(ngModel)]="email" 
+                         name="email" 
+                         placeholder="name@example.com" 
+                         required 
+                         class="ionic-custom-input"></ion-input>
+            </ion-item>
+          </div>
+
+          <!-- PASSWORD -->
+          <div class="ionic-field-wrapper">
+            <ion-item fill="outline" class="ionic-custom-item">
+              <ion-label position="stacked" class="ionic-custom-label">Password</ion-label>
+              <span slot="start" class="input-icon-slot">🔒</span>
+              <ion-input type="password" 
+                         [(ngModel)]="password" 
+                         name="password" 
+                         placeholder="••••••••" 
+                         required 
+                         class="ionic-custom-input"></ion-input>
+            </ion-item>
+          </div>
+
+          <!-- CONFIRM PASSWORD (SIGN UP ONLY) -->
+          <div class="ionic-field-wrapper" *ngIf="authMode === 'signup'">
+            <ion-item fill="outline" class="ionic-custom-item">
+              <ion-label position="stacked" class="ionic-custom-label">Confirm Password</ion-label>
+              <span slot="start" class="input-icon-slot">🛡️</span>
+              <ion-input type="password" 
+                         [(ngModel)]="confirmPassword" 
+                         name="confirmPassword" 
+                         placeholder="••••••••" 
+                         required 
+                         class="ionic-custom-input"></ion-input>
+            </ion-item>
+          </div>
+
+          <!-- OPTIONS -->
+          <div class="form-options" *ngIf="authMode === 'signin'">
+            <ion-checkbox [(ngModel)]="rememberMe" name="rememberMe" labelPlacement="end" class="ionic-checkbox-item">
+              <span class="checkbox-label-text">Remember me on this device</span>
+            </ion-checkbox>
+            <a href="javascript:void(0)" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <div class="form-options" *ngIf="authMode === 'signup'">
+            <ion-checkbox [(ngModel)]="agreeTerms" name="agreeTerms" labelPlacement="end" class="ionic-checkbox-item">
+              <span class="checkbox-label-text">I agree to Terms of Service & Privacy Policy</span>
+            </ion-checkbox>
+          </div>
+
+          <!-- SUBMIT ACTION -->
+          <ion-button type="submit" expand="block" class="submit-ionic-btn" [disabled]="isLoading">
+            <ion-spinner name="crescent" *ngIf="isLoading" class="btn-spinner"></ion-spinner>
+            <span *ngIf="isLoading" class="btn-text">Authenticating...</span>
+            <ng-container *ngIf="!isLoading">
+              <span *ngIf="authMode === 'signin'">Sign In as {{ userRole | titlecase }} ➔</span>
+              <span *ngIf="authMode === 'signup'">Create {{ userRole | titlecase }} Account 🚀</span>
+            </ng-container>
+          </ion-button>
+
+        </form>
+
+        <!-- FOOTER TOGGLE -->
+        <div class="card-footer">
+          <span *ngIf="authMode === 'signup'">
+            Already have an account? 
+            <a href="javascript:void(0)" class="toggle-mode-link" (click)="setAuthMode('signin')">Sign In</a>
+          </span>
+          <span *ngIf="authMode === 'signin'">
+            Don't have an account yet? 
+            <a href="javascript:void(0)" class="toggle-mode-link" (click)="setAuthMode('signup')">Create Account</a>
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <app-footer></app-footer>
+
+</ion-content>

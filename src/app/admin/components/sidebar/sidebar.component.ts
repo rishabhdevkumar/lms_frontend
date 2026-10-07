@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,10 +12,13 @@ import { IonicModule } from '@ionic/angular';
   standalone: true,
   imports: [IonicModule, RouterModule, FormsModule, CommonModule],
 })
-export class SidebarComponent  implements OnInit {
+export class SidebarComponent implements OnInit {
 
-  constructor() { }
+  constructor(private authService: AuthService) {}
 
   ngOnInit() {}
 
+  logout() {
+    this.authService.logout();
+  }
 }
