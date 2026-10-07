@@ -41,18 +41,18 @@
       <!-- PROFILE USER WRAPPER & DROPDOWN -->
       <div class="header-dropdown-wrapper">
         <button class="profile-avatar-btn" (click)="toggleProfileMenu($event)" title="Admin Profile">
-          <div class="avatar-box">AD</div>
-          <span class="admin-name hidden sm:inline">Admin</span>
+          <div class="avatar-box">{{ adminInitials }}</div>
+          <span class="admin-name hidden sm:inline">{{ adminName }}</span>
           <span class="dropdown-icon">▼</span>
         </button>
 
         <div class="header-dropdown-card profile-card" *ngIf="showProfileMenu">
           <div class="profile-popover-content">
             <div class="popover-user-header">
-              <div class="user-avatar-large">AD</div>
+              <div class="user-avatar-large">{{ adminInitials }}</div>
               <div>
-                <div class="user-name">Rishabh Admin</div>
-                <div class="user-email">admin@lms-hub.com</div>
+                <div class="user-name">{{ adminName }}</div>
+                <div class="user-email">{{ adminEmail }}</div>
               </div>
             </div>
             <ion-list lines="none" class="popover-menu-list">
@@ -67,9 +67,9 @@
               <ion-item (click)="openLanguageModal()" [button]="true" class="lang-pop-item">
                 <ion-icon class="ion-margin-end" name="globe-outline"></ion-icon>
                 Change Language
-                <ion-badge slot="end" color="warning" class="active-lang-badge">{{ selectedLanguage?.code | uppercase }}</ion-badge>
+                <ion-badge slot="end" color="warning" class="active-lang-badge">{{ selectedLanguage.code | uppercase }}</ion-badge>
               </ion-item>
-              <ion-item routerLink="/home" (click)="showProfileMenu = false" [button]="true" lines="none" class="logout-pop-item">
+              <ion-item (click)="logout()" [button]="true" lines="none" class="logout-pop-item">
                 <ion-icon class="ion-margin-end" name="log-out-outline"></ion-icon>
                 Logout
               </ion-item>

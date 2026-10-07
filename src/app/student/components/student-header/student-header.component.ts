@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { AuthService, User } from '../../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-student-header',
@@ -11,7 +13,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [IonicModule, RouterModule, FormsModule, CommonModule],
 })
-export class StudentHeaderComponent implements OnInit {
+export class StudentHeaderComponent implements OnInit, OnDestroy {
 
   isLoggedIn = true;
   notificationsCount = 3;
@@ -20,6 +22,9 @@ export class StudentHeaderComponent implements OnInit {
 
   studentName = 'Aarav Sharma';
   studentRoll = 'STU-2026-88';
+  studentEmail = 'aarav@lms-edu.com';
+
+  currentUser: User | null = null;
 
   notifications = [
     { id: 1, title: 'New Quiz Assigned', desc: 'CS-101 Mid-term Quiz is now live', time: '15 mins ago', read: false },
@@ -27,19 +32,31 @@ export class StudentHeaderComponent implements OnInit {
     { id: 3, title: 'Class Timetable Update', desc: 'Tomorrow\'s class shifted to Hall 2', time: '1 day ago', read: true }
   ];
 
+  private subs = new Subscription();
+
   constructor(
-    private router: Router
-  ) {
-    this.checkLogin();
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit() {
+    this.subs.add(
+      this.authService.currentUser$.subscribe((user) => {
+        this.currentUser = user;
+        if (user) {
+          this.studentName = user.name || 'Student';
+          this.studentRoll = user.rollNo || user.id || 'STU-2026-88';
+          this.studentEmail = user.email || '';
+          this.isLoggedIn = true;
+        } else {
+          this.isLoggedIn = false;
+        }
+      })
+    );
   }
 
-  ngOnInit() {}
-
-  checkLogin() {
-    const token = localStorage.getItem('token');
-    if (token) {
-      this.isLoggedIn = true;
-    }
+  ngOnDestroy() {
+    this.subs.unsubscribe();
   }
 
   toggleNotifications() {
@@ -62,10 +79,7 @@ export class StudentHeaderComponent implements OnInit {
   }
 
   logout() {
-    localStorage.clear();
-    this.isLoggedIn = false;
     this.showProfileMenu = false;
-    this.router.navigate(['/home']);
+    this.authService.logout();
   }
-
 }

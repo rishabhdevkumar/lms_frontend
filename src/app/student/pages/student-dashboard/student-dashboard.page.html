@@ -1,13 +1,170 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>student_dashboard</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="student-dashboard-content">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">student_dashboard</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <app-navbar></app-navbar>
+
+  <div class="student-dashboard-wrapper">
+    <div class="dashboard-container">
+
+      <!-- WELCOME HERO BANNER -->
+      <div class="student-hero-banner">
+        <div class="hero-left">
+          <div class="avatar-badge">🎓 Student Portal</div>
+          <h1 class="hero-title">
+            Welcome Back, <span class="gradient-name">{{ getStudentName() }}</span>! 👋
+          </h1>
+          <p class="hero-subtitle">
+            Track your course progress, complete upcoming assignments, and keep learning with LearnSphere LMS.
+          </p>
+          <div class="student-id-pill" *ngIf="currentUser?.rollNo || currentUser?.id">
+            🆔 Student ID: {{ currentUser?.rollNo || currentUser?.id }}
+          </div>
+        </div>
+
+        <div class="hero-right-card">
+          <div class="attendance-ring">
+            <span class="ring-value">{{ attendancePercentage }}%</span>
+            <span class="ring-label">Overall Attendance</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- METRICS STATS CARDS GRID -->
+      <div class="stats-grid">
+        <div class="stat-card green-card">
+          <div class="stat-header">
+            <span class="stat-icon">📚</span>
+            <span class="stat-badge">Active</span>
+          </div>
+          <h3 class="stat-number">{{ enrolledCount }}</h3>
+          <p class="stat-label">Enrolled Courses</p>
+        </div>
+
+        <div class="stat-card blue-card">
+          <div class="stat-header">
+            <span class="stat-icon">📈</span>
+            <span class="stat-badge green-bg">Good</span>
+          </div>
+          <h3 class="stat-number">{{ attendancePercentage }}%</h3>
+          <p class="stat-label">Class Attendance</p>
+        </div>
+
+        <div class="stat-card amber-card">
+          <div class="stat-header">
+            <span class="stat-icon">📝</span>
+            <span class="stat-badge amber-bg">Due Soon</span>
+          </div>
+          <h3 class="stat-number">{{ assignmentsPending }}</h3>
+          <p class="stat-label">Pending Assignments</p>
+        </div>
+
+        <div class="stat-card purple-card">
+          <div class="stat-header">
+            <span class="stat-icon">📜</span>
+            <span class="stat-badge purple-bg">Verified</span>
+          </div>
+          <h3 class="stat-number">{{ certificatesEarned }}</h3>
+          <p class="stat-label">Certificates Earned</p>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT GRID (2 COLUMNS: COURSES & ASSIGNMENTS) -->
+      <div class="main-sections-grid">
+
+        <!-- LEFT COLUMN: ENROLLED COURSES -->
+        <div class="section-card courses-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">My Enrolled Courses</h2>
+              <p class="section-subtitle">Continue learning where you left off</p>
+            </div>
+            <a routerLink="/home" class="view-all-btn">Browse All ➔</a>
+          </div>
+
+          <div class="courses-list">
+            <div class="course-item-card" *ngFor="let course of enrolledCourses">
+              <div class="course-icon-badge" [style.background]="course.badgeColor">
+                {{ course.thumbnail }}
+              </div>
+
+              <div class="course-details">
+                <div class="course-header-row">
+                  <span class="course-code">{{ course.code }}</span>
+                  <span class="instructor-name">👨‍🏫 {{ course.instructor }}</span>
+                </div>
+                <h3 class="course-title">{{ course.title }}</h3>
+
+                <div class="progress-container">
+                  <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" 
+                         [style.width.%]="course.progress" 
+                         [style.background]="course.badgeColor"></div>
+                  </div>
+                  <div class="progress-text">
+                    <span>{{ course.lessonsCompleted }}/{{ course.totalLessons }} Lessons</span>
+                    <span class="percentage-bold">{{ course.progress }}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: UPCOMING ASSIGNMENTS & QUICK LINKS -->
+        <div class="sidebar-sections">
+
+          <!-- ASSIGNMENTS CARD -->
+          <div class="section-card assignments-card">
+            <div class="section-header">
+              <h2 class="section-title">Upcoming Tasks</h2>
+              <span class="count-pill">{{ recentAssignments.length }} Items</span>
+            </div>
+
+            <div class="assignments-list">
+              <div class="assignment-item" *ngFor="let item of recentAssignments">
+                <div class="assignment-status-icon" 
+                     [class.pending]="item.status === 'Pending'" 
+                     [class.graded]="item.status === 'Graded'">
+                  {{ item.status === 'Pending' ? '⏰' : '✅' }}
+                </div>
+
+                <div class="assignment-info">
+                  <h4 class="assignment-title">{{ item.title }}</h4>
+                  <p class="assignment-course">{{ item.course }}</p>
+                  <div class="assignment-meta">
+                    <span class="due-date">📅 Due: {{ item.dueDate }}</span>
+                    <span class="score-badge" *ngIf="item.score">Grade: {{ item.score }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUICK LINKS CARD -->
+          <div class="section-card quick-links-card">
+            <h2 class="section-title">Quick Actions</h2>
+            <div class="quick-buttons-grid">
+              <a routerLink="/home" class="quick-btn">
+                <span>📚</span> Course Catalog
+              </a>
+              <a routerLink="/home" class="quick-btn">
+                <span>📅</span> Class Schedule
+              </a>
+              <a routerLink="/home" class="quick-btn">
+                <span>📊</span> My Grades
+              </a>
+              <a routerLink="/home" class="quick-btn">
+                <span>💬</span> Doubt Q&A Forum
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <app-footer></app-footer>
+
 </ion-content>

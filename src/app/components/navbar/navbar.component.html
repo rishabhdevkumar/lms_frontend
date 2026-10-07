@@ -1,4 +1,4 @@
-<!-- LMS REUSABLE NAVBAR WITH FULL MOBILE & TABLET RESPONSIVENESS -->
+<!-- LMS REUSABLE NAVBAR WITH REAL-TIME AUTH & ROLE-BASED DASHBOARD LINK -->
 <header class="navbar-header">
   <div class="navbar-container">
 
@@ -37,7 +37,7 @@
       </a>
     </nav>
 
-    <!-- RIGHT SIDE ACTIONS (SEARCH, GET STARTED) -->
+    <!-- RIGHT SIDE ACTIONS -->
     <div class="desktop-actions">
 
       <!-- 🔍 SEARCH COURSE TOGGLE -->
@@ -53,10 +53,45 @@
         </div>
       </div>
 
-      <!-- 🚀 GET STARTED BUTTON (OPENS AUTH MODAL) -->
-      <button class="register-btn" (click)="openAuthModal('signup')">
-        Get Started
-      </button>
+      <!-- LOGGED OUT STATE: GET STARTED BUTTON ONLY -->
+      <ng-container *ngIf="!isLoggedIn">
+        <button class="register-btn" (click)="openAuthModal('signup')">
+          Get Started
+        </button>
+      </ng-container>
+
+      <!-- LOGGED IN STATE: USER BADGE & DASHBOARD BUTTON -->
+      <ng-container *ngIf="isLoggedIn && currentUser">
+        <button class="dashboard-btn" (click)="goToDashboard()">
+          <span>📊 Dashboard</span>
+        </button>
+
+        <div class="user-profile-wrapper">
+          <button class="user-avatar-btn" (click)="toggleUserDropdown()" title="User Profile">
+            <div class="avatar-circle">
+              {{ currentUser.name.charAt(0) | uppercase }}
+            </div>
+            <span class="user-name-text">{{ currentUser.name }}</span>
+            <span class="role-pill" [ngClass]="userRole">{{ userRole | uppercase }}</span>
+            <span class="dropdown-chevron">▼</span>
+          </button>
+
+          <div class="user-dropdown-menu" *ngIf="isUserDropdownOpen">
+            <div class="dropdown-user-header">
+              <div class="header-name">{{ currentUser.name }}</div>
+              <div class="header-email">{{ currentUser.email }}</div>
+              <span class="role-badge-small">{{ userRole | titlecase }} Account</span>
+            </div>
+            <hr class="dropdown-divider" />
+            <button class="dropdown-item" (click)="goToDashboard()">
+              <span>🚀 My Dashboard</span>
+            </button>
+            <button class="dropdown-item logout-item" (click)="logout()">
+              <span>🚪 Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </ng-container>
 
       <!-- ☰ HAMBURGER MENU BUTTON -->
       <button class="hamburger-btn" (click)="toggleMobileMenu()" aria-label="Toggle Navigation Menu">
@@ -90,10 +125,24 @@
 
       <!-- CONTROL BUTTONS GRID -->
       <div class="mobile-controls-section">
-        <!-- GET STARTED BUTTON (OPENS AUTH MODAL) -->
-        <button class="mobile-register-btn" (click)="openAuthModal('signup')">
-          Get Started
-        </button>
+        <ng-container *ngIf="!isLoggedIn">
+          <button class="mobile-register-btn" (click)="openAuthModal('signup')">
+            Get Started
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="isLoggedIn && currentUser">
+          <div class="mobile-user-card">
+            <div class="mobile-user-name">👤 {{ currentUser.name }}</div>
+            <div class="mobile-user-role">Role: {{ userRole | uppercase }}</div>
+          </div>
+          <button class="mobile-dashboard-btn" (click)="goToDashboard()">
+            Go to My Dashboard
+          </button>
+          <button class="mobile-logout-btn" (click)="logout()">
+            Sign Out
+          </button>
+        </ng-container>
       </div>
 
     </div>
@@ -101,5 +150,5 @@
 
 </header>
 
-<!-- REUSABLE AUTH MODAL COMPONENT (LOGIN & SIGN UP) -->
+<!-- REUSABLE AUTH MODAL COMPONENT -->
 <app-auth-modal [isOpen]="isAuthModalOpen" [authMode]="authMode" (closed)="closeAuthModal()"></app-auth-modal>

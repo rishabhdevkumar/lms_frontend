@@ -33,17 +33,17 @@
       <div class="header-profile-wrapper">
         <button class="profile-trigger-btn" (click)="toggleProfileMenu()">
           <div class="avatar-badge">
-            <span>SJ</span>
+            <span>{{ facultyInitials }}</span>
           </div>
-          <span class="profile-name ion-hide-sm-down">Dr. Sarah</span>
+          <span class="profile-name ion-hide-sm-down">{{ facultyName }}</span>
           <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
         </button>
 
         <!-- PROFILE DROPDOWN MENU -->
         <div class="profile-dropdown-card" *ngIf="showProfileMenu">
           <div class="dropdown-header">
-            <h4>Dr. Sarah Jenkins</h4>
-            <p>Senior Faculty • CS Dept</p>
+            <h4>{{ facultyName }}</h4>
+            <p>Faculty Member • CS Dept</p>
           </div>
           <ion-list lines="none" class="dropdown-list">
             <ion-item routerLink="/faculty/profile" (click)="showProfileMenu = false">
@@ -58,7 +58,7 @@
               <ion-icon name="language-outline" slot="start"></ion-icon>
               <ion-label>Language Settings</ion-label>
             </ion-item>
-            <ion-item routerLink="/home" (click)="showProfileMenu = false" class="logout-link">
+            <ion-item (click)="logout()" class="logout-link" button="true">
               <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
               <ion-label color="danger">Logout</ion-label>
             </ion-item>

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LanguageService, Language } from 'src/app/services/language.service';
+import { AuthService, User } from 'src/app/services/auth.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -17,8 +18,10 @@ export class FacultyHeaderComponent implements OnInit, OnDestroy {
   @Input() pageTitle: string = 'Faculty Portal';
 
   facultyName = 'Dr. Sarah Jenkins';
+  facultyInitials = 'SJ';
   notificationsCount = 4;
   showProfileMenu = false;
+  currentUser: User | null = null;
 
   // Language state & modal controls
   selectedLanguage!: Language;
@@ -42,9 +45,22 @@ export class FacultyHeaderComponent implements OnInit, OnDestroy {
 
   private subs = new Subscription();
 
-  constructor(private languageService: LanguageService) {}
+  constructor(
+    private languageService: LanguageService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
+    this.subs.add(
+      this.authService.currentUser$.subscribe((user) => {
+        this.currentUser = user;
+        if (user) {
+          this.facultyName = user.name || 'Faculty Member';
+          this.facultyInitials = user.name ? user.name.slice(0, 2).toUpperCase() : 'FC';
+        }
+      })
+    );
+
     this.subs.add(
       this.languageService.currentLanguage$.subscribe((lang: Language) => {
         this.selectedLanguage = lang;
@@ -116,5 +132,10 @@ export class FacultyHeaderComponent implements OnInit, OnDestroy {
 
   toggleProfileMenu() {
     this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  logout() {
+    this.showProfileMenu = false;
+    this.authService.logout();
   }
 }
