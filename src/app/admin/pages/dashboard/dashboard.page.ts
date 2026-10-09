@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from '../../components/header/header.component';
+import { AuthService, User } from 'src/app/services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,7 +14,10 @@ import { HeaderComponent } from '../../components/header/header.component';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule, RouterModule, HeaderComponent]
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage implements OnInit, OnDestroy {
+
+  adminName: string = 'Admin';
+  private subs = new Subscription();
 
   isStudentModalOpen = false;
   selectedStudent: any = null;
@@ -113,9 +118,56 @@ export class DashboardPage implements OnInit {
     }
   ];
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.updateAdminName(this.authService.currentUserValue);
+    this.subs.add(
+      this.authService.currentUser$.subscribe((user) => {
+        this.updateAdminName(user);
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subs.unsubscribe();
+  }
+
+  private updateAdminName(user: User | null) {
+    if (user) {
+      this.adminName = this.getUserDisplayName(user);
+    } else {
+      const savedUserStr = localStorage.getItem('lms_auth_user');
+      if (savedUserStr) {
+        try {
+          const savedUser = JSON.parse(savedUserStr);
+          if (savedUser) {
+            this.adminName = this.getUserDisplayName(savedUser);
+          }
+        } catch (e) {}
+      } else {
+        this.adminName = 'Rishabh Dev Kumar';
+      }
+    }
+  }
+
+  private getUserDisplayName(userObj: any): string {
+    if (!userObj) return 'Rishabh Dev Kumar';
+    let candidate = userObj.name || userObj.fullName || userObj.username || userObj.displayName;
+    if (candidate && typeof candidate === 'string' && candidate.trim()) {
+      candidate = candidate.trim();
+      if (candidate.toLowerCase().includes('rishabh')) return 'Rishabh Dev Kumar';
+      if (/^[a-zA-Z]+[0-9]+$/.test(candidate)) {
+        const cleaned = candidate.replace(/[0-9]+$/g, '');
+        if (cleaned) return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+      }
+      return candidate;
+    }
+    if (userObj.email && typeof userObj.email === 'string') {
+      if (userObj.email.toLowerCase().includes('rishabh')) return 'Rishabh Dev Kumar';
+    }
+    return 'Rishabh Dev Kumar';
+  }
 
   // STUDENT VIEW MODAL
   openStudentModal(student: any) {

@@ -1,0 +1,148 @@
+<ion-content [fullscreen]="true" class="live-classes-page-content">
+
+  <app-navbar></app-navbar>
+
+  <!-- HERO LIVE BANNER -->
+  <section class="live-hero-banner">
+    <div class="hero-container">
+      
+      <!-- HERO TOP ROW: LIVE STREAM CARD -->
+      <div class="live-stream-featured-card">
+        
+        <div class="featured-media-box">
+          <img [src]="activeLiveStream.thumbnail" [alt]="activeLiveStream.title" />
+          
+          <div class="overlay-gradient"></div>
+          
+          <div class="live-badge-glow">
+            <span class="red-dot"></span>
+            <span>LIVE NOW</span>
+          </div>
+
+          <div class="viewers-pill">
+            👥 {{ activeLiveStream.viewersCount }}
+          </div>
+
+          <button class="btn-play-stream" (click)="joinLiveStream(activeLiveStream)">
+            ▶ Join Stream
+          </button>
+        </div>
+
+        <div class="featured-details">
+          <div class="tag-row">
+            <span class="topic-tag">{{ activeLiveStream.topicTag }}</span>
+            <span class="category-name">{{ activeLiveStream.category }}</span>
+          </div>
+
+          <h2 class="featured-title">{{ activeLiveStream.title }}</h2>
+
+          <div class="instructor-profile-box">
+            <img [src]="activeLiveStream.instructorAvatar" [alt]="activeLiveStream.instructorName" class="avatar" />
+            <div>
+              <div class="instructor-name">{{ activeLiveStream.instructorName }}</div>
+              <div class="instructor-role">{{ activeLiveStream.instructorRole }}</div>
+            </div>
+          </div>
+
+          <div class="featured-actions">
+            <button class="btn-primary-join" (click)="joinLiveStream(activeLiveStream)">
+              🔴 Enter Interactive Room
+            </button>
+            <span class="duration-badge">⏱️ Duration: {{ activeLiveStream.duration }}</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SESSIONS LIST & FILTER TABS -->
+  <section class="sessions-section">
+    <div class="section-container">
+      
+      <!-- FILTER TABS ROW -->
+      <div class="filter-header-row">
+        <div class="title-group">
+          <h2>Interactive Schedule & Webinars</h2>
+          <p>Join real-time coding sessions, ask questions live, or watch previous recordings</p>
+        </div>
+
+        <div class="tabs-group">
+          <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">All Sessions</button>
+          <button class="tab-btn" [class.active]="activeTab === 'live'" (click)="activeTab = 'live'">🔴 Live Now</button>
+          <button class="tab-btn" [class.active]="activeTab === 'upcoming'" (click)="activeTab = 'upcoming'">📅 Upcoming</button>
+          <button class="tab-btn" [class.active]="activeTab === 'recorded'" (click)="activeTab = 'recorded'">📺 Recorded</button>
+        </div>
+      </div>
+
+      <!-- SESSIONS GRID -->
+      <div class="sessions-grid">
+        <div class="session-card" *ngFor="let item of filteredSessions">
+          
+          <div class="card-thumb-box">
+            <img [src]="item.thumbnail" [alt]="item.title" />
+            
+            <div class="status-badge" [ngClass]="item.status">
+              <span *ngIf="item.status === 'live'">🔴 LIVE NOW</span>
+              <span *ngIf="item.status === 'upcoming'">📅 {{ item.date }}</span>
+              <span *ngIf="item.status === 'recorded'">📺 REPLAY</span>
+            </div>
+
+            <span class="duration-pill">{{ item.duration }}</span>
+          </div>
+
+          <div class="card-content">
+            
+            <div class="card-tag">{{ item.topicTag }}</div>
+            <h3 class="session-title">{{ item.title }}</h3>
+
+            <div class="instructor-mini-row">
+              <img [src]="item.instructorAvatar" [alt]="item.instructorName" class="avatar-small" />
+              <div>
+                <div class="name">{{ item.instructorName }}</div>
+                <div class="role">{{ item.instructorRole }}</div>
+              </div>
+            </div>
+
+            <!-- CARD ACTION FOOTER -->
+            <div class="card-action-footer">
+              
+              <ng-container *ngIf="item.status === 'live'">
+                <span class="live-viewers">{{ item.viewersCount }}</span>
+                <button class="btn-card-action btn-red" (click)="joinLiveStream(item)">
+                  Join Stream
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="item.status === 'upcoming'">
+                <span class="scheduled-time">{{ item.scheduledTime }}</span>
+                <button class="btn-card-action btn-amber" (click)="reserveSeat(item)">
+                  Reserve Seat
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="item.status === 'recorded'">
+                <span class="recorded-tag">Full HD Replay</span>
+                <button class="btn-card-action btn-outline" (click)="joinLiveStream(item)">
+                  Watch Recording
+                </button>
+              </ng-container>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-float" *ngIf="showToast">
+    <span class="toast-icon">📺</span>
+    <span class="toast-text">{{ toastMessage }}</span>
+  </div>
+
+</ion-content>

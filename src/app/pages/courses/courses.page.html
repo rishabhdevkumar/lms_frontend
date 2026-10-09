@@ -1,0 +1,142 @@
+<ion-content [fullscreen]="true" class="courses-page-content">
+
+  <app-navbar></app-navbar>
+
+  <!-- HERO BANNER SECTION -->
+  <section class="courses-hero-banner">
+    <div class="hero-container">
+      <div class="hero-badge">🎓 LearnSphere Academy</div>
+      <h1 class="hero-title">
+        Explore World-Class <span class="gradient-text">Courses & Masterclasses</span>
+      </h1>
+      <p class="hero-subtext">
+        Advance your career with hands-on projects, industry certifications, and 1-on-1 mentorship from leading engineers and experts.
+      </p>
+
+      <!-- SEARCH & FILTER TOOLBAR -->
+      <div class="search-filter-card">
+        <div class="search-input-box">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            placeholder="Search by course title, topic, or mentor..." 
+            class="search-input"
+          />
+          <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery=''">✕</button>
+        </div>
+
+        <div class="filter-dropdown-box">
+          <select [(ngModel)]="selectedLevel" class="level-select">
+            <option value="all">All Difficulty Levels</option>
+            <option value="beginner">Beginner Level</option>
+            <option value="intermediate">Intermediate Level</option>
+            <option value="advanced">Advanced Level</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- CATEGORY PILLS BAR -->
+      <div class="category-pills-row">
+        <button 
+          *ngFor="let cat of categories" 
+          class="cat-pill-btn" 
+          [class.active]="selectedCategory === cat.id"
+          (click)="setCategory(cat.id)"
+        >
+          <span class="pill-icon">{{ cat.icon }}</span>
+          <span>{{ cat.name }}</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- COURSES GRID SECTION -->
+  <section class="courses-grid-section">
+    <div class="grid-container">
+
+      <!-- SECTION HEADER INFO -->
+      <div class="grid-header-row">
+        <div class="grid-title-group">
+          <h2>Available Programs ({{ filteredCourses.length }})</h2>
+          <p>Hand-picked courses designed to fast-track your career</p>
+        </div>
+      </div>
+
+      <!-- COURSES CARDS GRID -->
+      <div class="courses-grid" *ngIf="filteredCourses.length > 0">
+        <div class="course-card" *ngFor="let course of filteredCourses">
+          
+          <!-- IMAGE THUMBNAIL & BADGE -->
+          <div class="card-image-box">
+            <img [src]="course.image" [alt]="course.title" loading="lazy" />
+            <span class="course-badge" [style.backgroundColor]="course.badgeColor">{{ course.badge }}</span>
+            <span class="course-level-pill">{{ course.level | uppercase }}</span>
+          </div>
+
+          <!-- CARD BODY -->
+          <div class="card-body">
+            
+            <div class="card-meta-row">
+              <span class="cat-tag">{{ course.categoryName }}</span>
+              <div class="rating-box">
+                <span class="star-icon">⭐</span>
+                <span class="rating-value">{{ course.rating }}</span>
+                <span class="reviews-count">({{ course.reviewsCount }})</span>
+              </div>
+            </div>
+
+            <h3 class="course-title">{{ course.title }}</h3>
+
+            <div class="course-stats-row">
+              <span class="stat-item">⏱️ {{ course.duration }}</span>
+              <span class="stat-item">📚 {{ course.lessons }} Lessons</span>
+              <span class="stat-item">👥 {{ course.studentsCount }} Enrolled</span>
+            </div>
+
+            <!-- INSTRUCTOR INFO -->
+            <div class="instructor-row">
+              <img [src]="course.instructorAvatar" [alt]="course.instructorName" class="avatar-img" />
+              <div class="instructor-info">
+                <div class="instructor-name">{{ course.instructorName }}</div>
+                <div class="instructor-title">{{ course.instructorTitle }}</div>
+              </div>
+            </div>
+
+            <!-- PRICE & ENROLL ACTION FOOTER -->
+            <div class="card-footer-row">
+              <div class="price-box">
+                <span class="price-current">${{ course.price }}</span>
+                <span class="price-original">${{ course.originalPrice }}</span>
+              </div>
+              <button class="btn-enroll" (click)="enrollCourse(course)">
+                Enroll Now
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- EMPTY SEARCH STATE -->
+      <div class="empty-state-card" *ngIf="filteredCourses.length === 0">
+        <div class="empty-icon">🔍</div>
+        <h3>No courses found matching "{{ searchQuery }}"</h3>
+        <p>Try clearing your search query or selecting a different category filter.</p>
+        <button class="btn-reset-filters" (click)="searchQuery=''; selectedCategory='all'; selectedLevel='all'">
+          Reset All Filters
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-float" *ngIf="showToast">
+    <span class="toast-icon">🚀</span>
+    <span class="toast-text">{{ toastMessage }}</span>
+  </div>
+
+</ion-content>

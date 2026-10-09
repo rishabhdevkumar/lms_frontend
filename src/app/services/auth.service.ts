@@ -144,7 +144,7 @@ export class AuthService {
           finalRole = 'student';
         } else {
           // If email is rishabh1234@gmail.com or contains admin, treat as admin
-          if (email.toLowerCase().includes('admin') || email.toLowerCase().includes('rishabh')) {
+          if (email.toLowerCase().includes('admin') || email.toLowerCase() === 'rishabh1234@gmail.com') {
             finalRole = 'admin';
           } else {
             finalRole = role || 'student';
@@ -168,7 +168,7 @@ export class AuthService {
         }
 
         console.warn('Backend API server unreachable, defaulting to demo authentication session:', err?.message || err);
-        const fallbackRole: UserRole = (email.toLowerCase().includes('admin') || email.toLowerCase().includes('rishabh'))
+        const fallbackRole: UserRole = (email.toLowerCase().includes('admin') || email.toLowerCase() === 'rishabh1234@gmail.com')
           ? 'admin' 
           : (email.toLowerCase().includes('faculty') ? 'faculty' : (role || 'student'));
 
@@ -199,7 +199,7 @@ export class AuthService {
     role: UserRole = 'student'
   ): Observable<{ success: boolean; message: string; user?: User }> {
     const basePath = this.getBasePath();
-    const signupRole: UserRole = (email.toLowerCase().includes('admin') || email.toLowerCase().includes('rishabh')) 
+    const signupRole: UserRole = (email.toLowerCase().includes('admin') || email.toLowerCase() === 'rishabh1234@gmail.com') 
       ? 'admin' 
       : (role || 'student');
 
@@ -229,7 +229,7 @@ export class AuthService {
         ).toLowerCase();
 
         let finalRole: UserRole = signupRole;
-        if (rawRole === 'admin' || rawRole.includes('admin') || email.toLowerCase().includes('admin') || email.toLowerCase().includes('rishabh')) {
+        if (rawRole === 'admin' || rawRole.includes('admin') || email.toLowerCase().includes('admin') || email.toLowerCase() === 'rishabh1234@gmail.com') {
           finalRole = 'admin';
         }
 
@@ -291,7 +291,7 @@ export class AuthService {
    * Navigate role-wise after authentication:
    * - Admin -> /admin/dashboard
    * - Faculty -> /faculty/dashboard
-   * - Student / General -> /home
+   * - Student -> /student-dashboard
    */
   public navigateToDashboard(role?: UserRole): void {
     const targetRole = role || this.currentUserValue?.role || this.userRoleValue || 'student';
@@ -299,6 +299,8 @@ export class AuthService {
       this.router.navigate(['/admin/dashboard']);
     } else if (targetRole === 'faculty') {
       this.router.navigate(['/faculty/dashboard']);
+    } else if (targetRole === 'student') {
+      this.router.navigate(['/student-dashboard']);
     } else {
       this.router.navigate(['/home']);
     }
@@ -315,7 +317,9 @@ export class AuthService {
 
   private extractNameFromEmail(email: string): string {
     if (!email) return 'User';
-    const parts = email.split('@')[0].split('.');
+    const namePart = email.split('@')[0];
+    const cleaned = namePart.replace(/[0-9]+$/g, '');
+    const parts = (cleaned || namePart).split(/[._-]/);
     return parts
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(' ');
