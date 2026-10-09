@@ -6,7 +6,6 @@ ion-menu {
   --width: 240px !important;
   --min-width: 230px !important;
   --max-width: 260px !important;
-  width: 240px !important;
   --background: #ffffff !important;
   border-right: 1px solid #e2e8f0 !important;
 }
@@ -19,8 +18,11 @@ ion-menu {
 /* BRAND HEADER IN SIDEBAR */
 .sidebar-brand-header {
   background-color: #ffffff;
-  padding: 1.4rem 1.25rem 1.2rem 1.25rem;
+  padding: 1.2rem 1rem 1.1rem 1.25rem;
   border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   .brand-logo {
     display: flex;
@@ -57,6 +59,35 @@ ion-menu {
         letter-spacing: -0.03em;
         color: #2563eb;
       }
+    }
+  }
+
+  .close-sidebar-btn {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    ion-icon {
+      font-size: 1.3rem;
+      pointer-events: none !important;
+    }
+
+    &:hover {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #ef4444;
+      transform: rotate(90deg);
     }
   }
 }
@@ -131,3 +162,10 @@ ion-menu {
     --background: #fef2f2 !important;
   }
 }
+
+@media (min-width: 1024px) {
+  .close-sidebar-btn {
+    display: none !important;
+  }
+}
+

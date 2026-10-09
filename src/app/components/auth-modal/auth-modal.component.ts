@@ -129,7 +129,7 @@ export class AuthModalComponent {
 
     this.isLoading = true;
 
-    const roleToPass: UserRole = (cleanEmail.toLowerCase().includes('admin') || cleanEmail.toLowerCase().includes('rishabh')) ? 'admin' : 'student';
+    const roleToPass: UserRole = (cleanEmail.toLowerCase().includes('admin') || cleanEmail.toLowerCase() === 'rishabh1234@gmail.com') ? 'admin' : 'student';
 
     if (this.authMode === 'signin') {
       this.authService.login(cleanEmail, cleanPassword, roleToPass).subscribe({

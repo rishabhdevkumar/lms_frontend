@@ -1,10 +1,10 @@
-<ion-split-pane contentId="main-admin-content" when="md">
-  <!-- ADMIN LIGHT SIDEBAR MENU -->
-  <ion-menu contentId="main-admin-content" type="overlay" menuId="admin-menu">
+<ion-split-pane contentId="main-admin-content" when="lg">
+  <!-- ADMIN LIGHT SIDEBAR MENU (RIGHT DRAWER ON MOBILE, LEFT SPLIT-PANE ON DESKTOP) -->
+  <ion-menu [side]="menuSide" contentId="main-admin-content" type="overlay" menuId="admin-menu">
     
-    <!-- BRAND LOGO HEADER -->
+    <!-- BRAND LOGO HEADER & CLOSE BUTTON -->
     <div class="sidebar-brand-header">
-      <a class="brand-logo" routerLink="/admin/dashboard">
+      <a class="brand-logo" routerLink="/admin/dashboard" (click)="closeSidebar()">
         <div class="logo-badge">
           <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
@@ -15,63 +15,65 @@
           <span class="brand-name">EduDesk LMS</span>
         </div>
       </a>
+
+      <!-- CLOSE SIDEBAR BUTTON FOR TABLET & MOBILE -->
+      <ion-menu-toggle menu="admin-menu">
+        <button class="close-sidebar-btn" (click)="closeSidebar()" type="button" title="Close Sidebar" aria-label="Close sidebar">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </ion-menu-toggle>
     </div>
 
     <ion-content class="sidebar-content">
       
       <ion-list class="sidebar-menu" lines="none">
         
-        <ion-item routerLink="/admin/dashboard" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/dashboard" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="grid-outline" slot="start"></ion-icon>
           <ion-label>Dashboard</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/admin/add-student" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/add-student" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="people-outline" slot="start"></ion-icon>
-          <ion-label>Students</ion-label>
+          <ion-label>Users</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/admin/academic" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/academic" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="book-outline" slot="start"></ion-icon>
           <ion-label>Courses</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/admin/add-agent" routerLinkActive="active-menu">
-          <ion-icon name="person-outline" slot="start"></ion-icon>
-          <ion-label>Instructors</ion-label>
-        </ion-item>
-
-        <ion-item routerLink="/admin/batches" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/batches" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="layers-outline" slot="start"></ion-icon>
           <ion-label>Batches</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/admin/quizzes" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/quizzes" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="help-circle-outline" slot="start"></ion-icon>
           <ion-label>Quizzes</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/admin/attendance" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/attendance" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="calendar-outline" slot="start"></ion-icon>
           <ion-label>Attendance</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/admin/payments" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/payments" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="wallet-outline" slot="start"></ion-icon>
           <ion-label>Payments</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/admin/certificates" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/certificates" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="ribbon-outline" slot="start"></ion-icon>
           <ion-label>Certificates</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/admin/reports" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/reports" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
           <ion-label>Reports</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/admin/account-setting" routerLinkActive="active-menu">
+        <ion-item routerLink="/admin/account-setting" routerLinkActive="active-menu" (click)="closeSidebar()">
           <ion-icon name="settings-outline" slot="start"></ion-icon>
           <ion-label>Settings</ion-label>
         </ion-item>
@@ -87,5 +89,5 @@
   </ion-menu>
 
   <!-- ROUTER OUTLET FOR ADMIN PAGES -->
-  <ion-router-outlet id="main-admin-content"></ion-router-outlet>
+  <ion-router-outlet id="main-admin-content" (click)="onContentClick()"></ion-router-outlet>
 </ion-split-pane>

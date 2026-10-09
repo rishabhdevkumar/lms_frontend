@@ -12,8 +12,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/login/login.page').then((m) => m.LoginPage),
   },
   {
-    path: 'signup',
-    loadComponent: () => import('./pages/login/login.page').then((m) => m.LoginPage),
+    path: 'courses',
+    loadComponent: () => import('./pages/courses/courses.page').then((m) => m.CoursesPage),
+  },
+  {
+    path: 'live-classes',
+    loadComponent: () => import('./pages/live-classes/live-classes.page').then((m) => m.LiveClassesPage),
+  },
+  {
+    path: 'pricing',
+    loadComponent: () => import('./pages/pricing/pricing.page').then((m) => m.PricingPage),
   },
 
 
@@ -42,13 +50,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./admin/pages/account-setting/account-setting.page').then(
             (m) => m.AccountSettingPage,
-          ),
-      },
-      {
-        path: 'add-agent',
-        loadComponent: () =>
-          import('./admin/pages/add-agent/add-agent.page').then(
-            (m) => m.AddAgentPage,
           ),
       },
       {

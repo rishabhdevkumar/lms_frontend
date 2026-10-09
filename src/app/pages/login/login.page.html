@@ -100,59 +100,35 @@
         <form (ngSubmit)="onSubmit()" class="auth-form">
 
           <!-- FULL NAME (SIGN UP ONLY) -->
-          <div class="ionic-field-wrapper" *ngIf="authMode === 'signup'">
-            <ion-item fill="outline" class="ionic-custom-item">
-              <ion-label position="stacked" class="ionic-custom-label">Full Name</ion-label>
-              <span slot="start" class="input-icon-slot">👤</span>
-              <ion-input type="text" 
-                         [(ngModel)]="fullName" 
-                         name="fullName" 
-                         placeholder="John Doe" 
-                         required 
-                         class="ionic-custom-input"></ion-input>
-            </ion-item>
+          <div class="field-group" *ngIf="authMode === 'signup'">
+            <ion-input label="Full Name" labelPlacement="floating" fill="outline" type="text" [(ngModel)]="fullName" 
+                       name="fullName" placeholder="Enter your full name" class="ionic-floating-input">
+              <ion-icon slot="start" name="person-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+            </ion-input>
           </div>
 
           <!-- EMAIL ADDRESS -->
-          <div class="ionic-field-wrapper">
-            <ion-item fill="outline" class="ionic-custom-item">
-              <ion-label position="stacked" class="ionic-custom-label">Email Address</ion-label>
-              <span slot="start" class="input-icon-slot">✉️</span>
-              <ion-input type="email" 
-                         [(ngModel)]="email" 
-                         name="email" 
-                         placeholder="name@example.com" 
-                         required 
-                         class="ionic-custom-input"></ion-input>
-            </ion-item>
+          <div class="field-group">
+            <ion-input label="Email Address" labelPlacement="floating" fill="outline" type="email" [(ngModel)]="email" 
+                       name="email" placeholder="name@example.com" class="ionic-floating-input">
+              <ion-icon slot="start" name="mail-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+            </ion-input>
           </div>
 
           <!-- PASSWORD -->
-          <div class="ionic-field-wrapper">
-            <ion-item fill="outline" class="ionic-custom-item">
-              <ion-label position="stacked" class="ionic-custom-label">Password</ion-label>
-              <span slot="start" class="input-icon-slot">🔒</span>
-              <ion-input type="password" 
-                         [(ngModel)]="password" 
-                         name="password" 
-                         placeholder="••••••••" 
-                         required 
-                         class="ionic-custom-input"></ion-input>
-            </ion-item>
+          <div class="field-group">
+            <ion-input label="Password" labelPlacement="floating" fill="outline" type="password" [(ngModel)]="password" 
+                       name="password" placeholder="••••••••" class="ionic-floating-input">
+              <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+            </ion-input>
           </div>
 
           <!-- CONFIRM PASSWORD (SIGN UP ONLY) -->
-          <div class="ionic-field-wrapper" *ngIf="authMode === 'signup'">
-            <ion-item fill="outline" class="ionic-custom-item">
-              <ion-label position="stacked" class="ionic-custom-label">Confirm Password</ion-label>
-              <span slot="start" class="input-icon-slot">🛡️</span>
-              <ion-input type="password" 
-                         [(ngModel)]="confirmPassword" 
-                         name="confirmPassword" 
-                         placeholder="••••••••" 
-                         required 
-                         class="ionic-custom-input"></ion-input>
-            </ion-item>
+          <div class="field-group" *ngIf="authMode === 'signup'">
+            <ion-input label="Confirm Password" labelPlacement="floating" fill="outline" type="password" 
+                       [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="••••••••" class="ionic-floating-input">
+              <ion-icon slot="start" name="shield-checkmark-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+            </ion-input>
           </div>
 
           <!-- OPTIONS -->

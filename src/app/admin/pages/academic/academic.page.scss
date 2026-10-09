@@ -80,12 +80,6 @@
     gap: 1rem;
     margin-bottom: 1.5rem;
 
-    @media (min-width: 640px) {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
-
     .title-group {
       display: flex;
       align-items: center;
@@ -109,6 +103,25 @@
         background-color: rgba(217, 119, 6, 0.1);
         color: #d97706;
         border: 1px solid rgba(217, 119, 6, 0.25);
+        white-space: nowrap;
+      }
+    }
+
+    .header-actions-subrow {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+
+      @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+
+        .search-input-wrapper,
+        .btn-add-new-amber {
+          max-width: 100% !important;
+          width: 100% !important;
+        }
       }
     }
 
@@ -119,7 +132,7 @@
       color: #2563eb !important;
       background: #eff6ff !important;
       border: 1.5px solid #bfdbfe !important;
-      padding: 0.65rem 1.35rem;
+      padding: 0.6rem 1.35rem;
       border-radius: 0.75rem;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
@@ -127,6 +140,7 @@
       align-items: center;
       gap: 0.5rem;
       transition: all 0.25s ease;
+      white-space: nowrap;
 
       span {
         font-size: 1.1rem;
@@ -148,26 +162,29 @@
 /* SEARCH INPUT WRAPPER */
 .search-input-wrapper {
   position: relative;
-  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 300px;
 
   .search-icon-inside {
     position: absolute;
-    left: 1.15rem;
+    left: 1rem;
     top: 50%;
     transform: translateY(-50%);
     font-size: 0.9rem;
     color: #d97706;
+    z-index: 2;
+    pointer-events: none;
   }
 
   .academic-search-input {
     width: 100%;
-    padding: 0.75rem 1.15rem 0.75rem 2.65rem;
+    padding: 0.6rem 1rem 0.6rem 2.85rem;
     border-radius: 9999px;
     border: 1.5px solid #cbd5e1;
     background-color: #ffffff;
     color: #0f172a;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 500;
     outline: none;
     transition: all 0.2s ease;
@@ -257,18 +274,10 @@
 
 .sl-pill {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
-  font-weight: 800;
-  width: 1.85rem;
-  height: 1.85rem;
-  border-radius: 50%;
-  background-color: #14241a;
-  color: #ffffff !important;
-  border: 1.5px solid #d97706;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  display: inline-block;
 }
 
 .short-name-badge {
@@ -416,19 +425,25 @@
 
   .modal-form-input {
     width: 100%;
-    padding: 0.55rem 0.85rem;
-    border-radius: 0.55rem;
+    padding: 0.65rem 0.95rem;
+    border-radius: 12px;
     border: 1.5px solid #cbd5e1 !important;
     background-color: #ffffff !important;
     color: #0f172a !important;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     font-weight: 500;
     outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      border-color: #94a3b8 !important;
+    }
 
     &:focus {
-      border-color: #d97706 !important;
-      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18) !important;
+      border-color: #2563eb !important;
+      border-width: 2px !important;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14) !important;
     }
   }
 }

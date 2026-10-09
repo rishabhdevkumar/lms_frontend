@@ -41,6 +41,8 @@ export class AcademicPage implements OnInit {
     course_id: ''
   };
 
+  formErrors: { [key: string]: string } = {};
+
   // 1. SESSIONS LIST
   sessionsList: any[] = [];
 
@@ -174,6 +176,7 @@ export class AcademicPage implements OnInit {
     this.modalMode = 'add';
     this.editingItemId = null;
     this.resetFormData();
+    this.formErrors = {};
     this.isAddEditModalOpen = true;
   }
 
@@ -182,11 +185,13 @@ export class AcademicPage implements OnInit {
     this.modalMode = 'edit';
     this.editingItemId = item.id;
     this.formData = { ...item };
+    this.formErrors = {};
     this.isAddEditModalOpen = true;
   }
 
   closeModal() {
     this.isAddEditModalOpen = false;
+    this.formErrors = {};
     this.resetFormData();
   }
 
@@ -204,16 +209,62 @@ export class AcademicPage implements OnInit {
       session_id: this.sessionsList[0]?.id || '',
       course_id: this.coursesList[0]?.id || ''
     };
+    this.formErrors = {};
+  }
+
+  // VALIDATE FORM BEFORE SAVE
+  validateForm(): boolean {
+    this.formErrors = {};
+    if (this.activeTab === 'session') {
+      if (!this.formData.sessionName || !this.formData.sessionName.trim()) {
+        this.formErrors['sessionName'] = 'Session name is required';
+      }
+      if (!this.formData.shortName || !this.formData.shortName.trim()) {
+        this.formErrors['shortName'] = 'Short name is required';
+      }
+    } else if (this.activeTab === 'course') {
+      if (!this.formData.courseName || !this.formData.courseName.trim()) {
+        this.formErrors['courseName'] = 'Course name is required';
+      }
+      if (!this.formData.shortName || !this.formData.shortName.trim()) {
+        this.formErrors['shortName'] = 'Course short name is required';
+      }
+    } else if (this.activeTab === 'semester') {
+      if (!this.formData.semesterName || !this.formData.semesterName.trim()) {
+        this.formErrors['semesterName'] = 'Semester name is required';
+      }
+    } else if (this.activeTab === 'syllabus') {
+      if (!this.formData.syllabusTitle || !this.formData.syllabusTitle.trim()) {
+        this.formErrors['syllabusTitle'] = 'Syllabus title is required';
+      }
+    } else if (this.activeTab === 'subject') {
+      if (!this.formData.subjectName || !this.formData.subjectName.trim()) {
+        this.formErrors['subjectName'] = 'Subject name is required';
+      }
+      if (!this.formData.subjectCode || !this.formData.subjectCode.trim()) {
+        this.formErrors['subjectCode'] = 'Subject code is required';
+      }
+    } else if (this.activeTab === 'chapter') {
+      if (!this.formData.chapterNo || !String(this.formData.chapterNo).trim()) {
+        this.formErrors['chapterNo'] = 'Chapter number is required';
+      }
+      if (!this.formData.chapterName || !this.formData.chapterName.trim()) {
+        this.formErrors['chapterName'] = 'Chapter title is required';
+      }
+    }
+    return Object.keys(this.formErrors).length === 0;
   }
 
   // SAVE ITEM VIA OPENAPI GENERATED DEFAULT SERVICE
   async saveItem() {
+    if (!this.validateForm()) {
+      return;
+    }
+
     this.isSaving = true;
 
     try {
       if (this.activeTab === 'session') {
-        if (!this.formData.sessionName) return;
-        
         const payload = {
           session_name: this.formData.sessionName,
           short_name: this.formData.shortName || 'AY',
@@ -228,8 +279,6 @@ export class AcademicPage implements OnInit {
         await this.fetchSessions();
 
       } else if (this.activeTab === 'course') {
-        if (!this.formData.courseName) return;
-
         const payload = {
           session_id: this.formData.session_id || (this.sessionsList[0]?.id || 1),
           course_name: this.formData.courseName,
@@ -244,8 +293,6 @@ export class AcademicPage implements OnInit {
         await this.fetchCourses();
 
       } else if (this.activeTab === 'semester') {
-        if (!this.formData.semesterName) return;
-
         const payload = {
           course_id: this.formData.course_id || (this.coursesList[0]?.id || 1),
           semester_name: this.formData.semesterName,

@@ -4,45 +4,59 @@
   
   <div class="students-wrapper">
 
-    <!-- TOP HEADER & STAT CARDS -->
+    <!-- TOP HEADER & STAT CARDS (4 CARDS) -->
     <div class="stats-overview-grid">
-      <div class="stat-mini-card brand-darkgreen">
+      
+      <!-- Card 1: Total Users -->
+      <div class="stat-mini-card brand-blue">
         <div class="stat-info">
-          <span class="stat-label">TOTAL ENROLLED STUDENTS</span>
-          <h3 class="stat-value">{{ studentsList.length }}</h3>
+          <span class="stat-label">TOTAL USERS</span>
+          <h3 class="stat-value">{{ getTotalUsersCount() }}</h3>
+        </div>
+        <div class="stat-icon-badge">👥</div>
+      </div>
+
+      <!-- Card 2: Total Faculty -->
+      <div class="stat-mini-card brand-purple">
+        <div class="stat-info">
+          <span class="stat-label">TOTAL FACULTY</span>
+          <h3 class="stat-value">{{ getTotalFacultyCount() }}</h3>
+        </div>
+        <div class="stat-icon-badge">👨‍🏫</div>
+      </div>
+
+      <!-- Card 3: Total Students -->
+      <div class="stat-mini-card brand-emerald">
+        <div class="stat-info">
+          <span class="stat-label">TOTAL STUDENTS</span>
+          <h3 class="stat-value">{{ getTotalStudentsCount() }}</h3>
         </div>
         <div class="stat-icon-badge">🎓</div>
       </div>
 
-      <div class="stat-mini-card brand-emerald">
+      <!-- Card 4: Active Students -->
+      <div class="stat-mini-card brand-darkgreen">
         <div class="stat-info">
           <span class="stat-label">ACTIVE STUDENTS</span>
-          <h3 class="stat-value">{{ getActiveCount() }}</h3>
+          <h3 class="stat-value">{{ getActiveStudentsCount() }}</h3>
         </div>
         <div class="stat-icon-badge">✅</div>
       </div>
 
-      <div class="stat-mini-card brand-coral">
-        <div class="stat-info">
-          <span class="stat-label">SUSPENDED / ON HOLD</span>
-          <h3 class="stat-value">{{ getSuspendedCount() }}</h3>
-        </div>
-        <div class="stat-icon-badge">🚫</div>
-      </div>
     </div>
 
-    <!-- MAIN STUDENT CONTROL CARD -->
+    <!-- MAIN USERS CONTROL CARD -->
     <div class="students-main-card">
       
       <!-- CARD HEADER & ACTION BUTTON -->
       <div class="card-top-header">
         <div class="title-group">
-          <h2 class="section-title">Student Directory & Database Records</h2>
-          <span class="count-pill">{{ getFilteredStudents().length }} Records Found</span>
+          <h2 class="section-title">Users Directory & Database Records</h2>
+          <span class="count-pill">{{ getFilteredUsers().length }} Records Found</span>
         </div>
 
         <button class="btn-register-student" (click)="openAddModal()">
-          <span>➕</span> Add New Student
+          <span>➕</span> Add New User
         </button>
       </div>
 
@@ -53,7 +67,7 @@
           <input 
             type="text" 
             [(ngModel)]="searchText" 
-            placeholder="Search by name, email, roll no, phone, father name, course..." 
+            placeholder="Search by name, email, roll no, role, phone, course, department..." 
             class="student-search-input" 
           />
         </div>
@@ -63,116 +77,148 @@
             class="filter-pill-btn" 
             [class.active]="statusFilter === 'All'" 
             (click)="statusFilter = 'All'">
-            All ({{ studentsList.length }})
+            All ({{ usersList.length }})
           </button>
           <button 
             class="filter-pill-btn green" 
+            [class.active]="statusFilter === 'Student'" 
+            (click)="statusFilter = 'Student'">
+            Students ({{ getTotalStudentsCount() }})
+          </button>
+          <button 
+            class="filter-pill-btn purple" 
+            [class.active]="statusFilter === 'Faculty'" 
+            (click)="statusFilter = 'Faculty'">
+            Faculty ({{ getTotalFacultyCount() }})
+          </button>
+          <button 
+            class="filter-pill-btn gold" 
+            [class.active]="statusFilter === 'Admin'" 
+            (click)="statusFilter = 'Admin'">
+            Admins ({{ getAdminCount() }})
+          </button>
+          <button 
+            class="filter-pill-btn red" 
             [class.active]="statusFilter === 'Active'" 
             (click)="statusFilter = 'Active'">
             Active ({{ getActiveCount() }})
           </button>
-          <button 
-            class="filter-pill-btn red" 
-            [class.active]="statusFilter === 'Suspended'" 
-            (click)="statusFilter = 'Suspended'">
-            Suspended ({{ getSuspendedCount() }})
-          </button>
         </div>
       </div>
 
-      <!-- GETALL STUDENTS DATA TABLE -->
+      <!-- UNIFIED USERS DATA TABLE -->
       <div class="table-responsive">
         <table class="students-data-table">
           <thead>
             <tr>
+              <th class="text-center" style="width: 60px;">SL NO</th>
               <th>ROLL NO</th>
-              <th>STUDENT</th>
-              <th>COURSE & SEMESTER</th>
-              <th>CONTACT & PARENT</th>
+              <th>NAME & EMAIL</th>
+              <th>GENDER</th>
+              <th>DATE OF BIRTH</th>
+              <th>PHONE</th>
               <th>STATUS</th>
-              <th class="text-center">ACTIONS</th>
+              <th class="text-center" style="width: 80px;">ACTIONS</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let std of getFilteredStudents()">
+            <tr *ngFor="let usr of getFilteredUsers(); let i = index">
               
+              <!-- SL NO -->
+              <td class="text-center sl-no-cell">
+                <span class="sl-no-text">{{ i + 1 }}</span>
+              </td>
+
               <!-- ROLL NO -->
               <td>
-                <span class="roll-no-text">{{ std.roll_no }}</span>
+                <span class="roll-no-text">{{ usr.roll_no || usr.id }}</span>
               </td>
 
-              <!-- STUDENT NAME & EMAIL -->
+              <!-- USER NAME & EMAIL TOGETHER WITH ROLE BADGE -->
               <td>
                 <div class="student-profile-cell">
-                  <div class="student-avatar">
-                    {{ getInitials(std.name) }}
+                  <div class="student-avatar" [ngClass]="{
+                    'av-admin': usr.role === 'Admin',
+                    'av-faculty': usr.role === 'Faculty',
+                    'av-student': usr.role === 'Student'
+                  }">
+                    {{ getInitials(usr.name) }}
                   </div>
                   <div class="student-meta">
-                    <span class="student-name">{{ std.name }}</span>
-                    <span class="student-email">{{ std.email }}</span>
+                    <div class="name-role-header">
+                      <span class="student-name">{{ usr.name }}</span>
+                      <span class="role-pill-tag" [ngClass]="{
+                        'tag-student': usr.role === 'Student',
+                        'tag-faculty': usr.role === 'Faculty',
+                        'tag-admin': usr.role === 'Admin'
+                      }">{{ usr.role }}</span>
+                    </div>
+                    <span class="student-email">{{ usr.email }}</span>
                   </div>
                 </div>
               </td>
 
-              <!-- COURSE & SEMESTER -->
+              <!-- GENDER -->
               <td>
-                <div class="course-sem-cell">
-                  <span class="course-text">{{ getCourseName(std.course_id) }}</span>
-                  <span class="sem-text">{{ getSemesterName(std.semester_id) }}</span>
-                </div>
+                <span *ngIf="usr.gender" class="gender-tag" [ngClass]="usr.gender.toLowerCase()">
+                  {{ usr.gender }}
+                </span>
+                <span *ngIf="!usr.gender" class="no-data-text">—</span>
               </td>
 
-              <!-- PHONE & PARENT -->
+              <!-- DATE OF BIRTH -->
               <td>
-                <div class="contact-cell">
-                  <span class="phone-text">{{ std.phone || 'N/A' }}</span>
-                  <span class="meta-tag">Father: {{ std.father_name || 'N/A' }}</span>
-                </div>
+                <span *ngIf="usr.dob" class="dob-text">{{ usr.dob }}</span>
+                <span *ngIf="!usr.dob" class="no-data-text">—</span>
+              </td>
+
+              <!-- CONTACT PHONE -->
+              <td>
+                <span *ngIf="usr.phone" class="phone-text">{{ usr.phone }}</span>
+                <span *ngIf="!usr.phone" class="no-data-text">—</span>
               </td>
 
               <!-- STATUS BADGE -->
               <td>
-                <span class="status-pill-badge" [class.status-active]="std.status" [class.status-suspended]="!std.status">
-                  {{ std.status ? 'Active' : 'Suspended' }}
+                <span class="status-pill-badge" [class.status-active]="usr.status === 'Active'" [class.status-suspended]="usr.status === 'Suspended'">
+                  {{ usr.status }}
                 </span>
               </td>
 
-              <!-- ACTION BUTTONS -->
-              <td class="text-center">
-                <div class="actions-flex-group">
-                  
-                  <button class="btn-action-view" (click)="openViewModal(std)" title="View Full Profile">
-                    View
+              <!-- ACTION BUTTON WITH 3-VERTICAL-DOTS POPUP MENU -->
+              <td class="text-center action-td">
+                <div class="action-menu-wrapper" (click)="$event.stopPropagation()">
+                  <button class="btn-three-dots" (click)="toggleActionMenu(usr.id, $event)" title="Actions">
+                    <ion-icon name="ellipsis-vertical" class="dots-icon"></ion-icon>
                   </button>
 
-                  <button class="btn-action-edit" (click)="openEditModal(std)" title="Edit Record">
-                    Edit
-                  </button>
-
-                  <button 
-                    *ngIf="std.status" 
-                    class="btn-action-suspend" 
-                    (click)="toggleStudentStatus(std)" 
-                    title="Suspend Student">
-                    Suspend
-                  </button>
-
-                  <button 
-                    *ngIf="!std.status" 
-                    class="btn-action-activate" 
-                    (click)="toggleStudentStatus(std)" 
-                    title="Activate Student">
-                    Activate
-                  </button>
-
+                  <!-- FLOATING ACTIONS POPUP DROPDOWN MENU -->
+                  <div class="action-dropdown-popover" *ngIf="activeMenuUserId === usr.id">
+                    <button class="dropdown-item" (click)="onMenuAction('view', usr)">
+                      <ion-icon name="eye-outline" class="item-ion-icon"></ion-icon>
+                      <span class="item-label">View</span>
+                    </button>
+                    <button class="dropdown-item" (click)="onMenuAction('edit', usr)">
+                      <ion-icon name="create-outline" class="item-ion-icon"></ion-icon>
+                      <span class="item-label">Edit</span>
+                    </button>
+                    <button class="dropdown-item" (click)="onMenuAction('toggle-status', usr)" [class.suspend]="usr.status === 'Active'" [class.activate]="usr.status === 'Suspended'">
+                      <ion-icon [name]="usr.status === 'Active' ? 'pause-circle-outline' : 'checkmark-circle-outline'" class="item-ion-icon"></ion-icon>
+                      <span class="item-label">{{ usr.status === 'Active' ? 'Suspend' : 'Activate' }}</span>
+                    </button>
+                    <button class="dropdown-item" (click)="onMenuAction('change-password', usr)">
+                      <ion-icon name="key-outline" class="item-ion-icon"></ion-icon>
+                      <span class="item-label">Change Password</span>
+                    </button>
+                  </div>
                 </div>
               </td>
 
             </tr>
 
             <!-- EMPTY SEARCH MESSAGE -->
-            <tr *ngIf="getFilteredStudents().length === 0">
-              <td colspan="6" class="empty-msg">No student records found matching your search.</td>
+            <tr *ngIf="getFilteredUsers().length === 0">
+              <td colspan="8" class="empty-msg">No user records found matching your search.</td>
             </tr>
           </tbody>
         </table>
@@ -235,11 +281,11 @@
           <div class="info-row">
             <div class="info-cell">
               <span class="cell-label">DATE OF BIRTH</span>
-              <span class="cell-value">{{ selectedStudent.dob || 'N/A' }}</span>
+              <span class="cell-value">{{ selectedStudent.dob || '—' }}</span>
             </div>
             <div class="info-cell">
               <span class="cell-label">GENDER</span>
-              <span class="cell-value">{{ selectedStudent.gender }}</span>
+              <span class="cell-value">{{ selectedStudent.gender || '—' }}</span>
             </div>
           </div>
           <div class="info-row">
@@ -325,105 +371,108 @@
       <!-- FORM BODY CONTAINER -->
       <div class="modal-form-body">
         
-        <!-- STEP 1: PERSONAL DETAILS (ACTIVE BACKEND FIELDS + REQUIRED VALIDATION) -->
+        <!-- STEP 1: PERSONAL DETAILS (MATCHING DB USERS SCHEMA) -->
         <div *ngIf="activeFormTab === 'basic'" class="form-step-section">
           <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Full Name <span class="required-star">*</span></label>
+            <div class="floating-field" [class.has-error]="!!formErrors['name']">
               <input 
                 type="text" 
                 [(ngModel)]="formData.name" 
-                placeholder="e.g. Vikramaditya Roy" 
-                class="modal-form-input" 
-                [class.input-error]="formErrors['name']" 
+                id="stu_name"
+                placeholder=" " 
+                class="floating-input" 
               />
+              <label for="stu_name" class="floating-label">Full Name *</label>
               <span class="field-error-text" *ngIf="formErrors['name']">⚠️ {{ formErrors['name'] }}</span>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Roll No <span class="auto-badge">(Auto-Generated from DB)</span></label>
+            <div class="floating-field">
               <input 
                 type="text" 
                 [(ngModel)]="formData.roll_no" 
-                class="modal-form-input readonly-input" 
+                id="stu_roll"
+                placeholder=" " 
+                class="floating-input readonly-input" 
                 readonly 
               />
+              <label for="stu_roll" class="floating-label">Roll No (Auto-Generated)</label>
             </div>
           </div>
 
           <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Email Address <span class="required-star">*</span></label>
+            <div class="floating-field" [class.has-error]="!!formErrors['email']">
               <input 
                 type="email" 
                 [(ngModel)]="formData.email" 
-                placeholder="student@lms-edu.com" 
-                class="modal-form-input" 
-                [class.input-error]="formErrors['email']" 
+                id="stu_email"
+                placeholder=" " 
+                class="floating-input" 
               />
+              <label for="stu_email" class="floating-label">Email Address *</label>
               <span class="field-error-text" *ngIf="formErrors['email']">⚠️ {{ formErrors['email'] }}</span>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Account Password <span class="required-star">*</span></label>
+            <div class="floating-field" [class.has-error]="!!formErrors['password']">
               <input 
                 type="password" 
                 [(ngModel)]="formData.password" 
-                placeholder="Default login password" 
-                class="modal-form-input"
-                [class.input-error]="formErrors['password']"
+                id="stu_password"
+                placeholder=" " 
+                class="floating-input"
               />
+              <label for="stu_password" class="floating-label">Account Password *</label>
               <span class="field-error-text" *ngIf="formErrors['password']">⚠️ {{ formErrors['password'] }}</span>
             </div>
           </div>
 
           <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Phone Number <span class="required-star">*</span></label>
+            <div class="floating-field" [class.has-error]="!!formErrors['phone']">
               <input 
                 type="text" 
                 [(ngModel)]="formData.phone" 
-                placeholder="+91 98000 00000" 
-                class="modal-form-input"
-                [class.input-error]="formErrors['phone']"
+                id="stu_phone"
+                placeholder=" " 
+                class="floating-input"
               />
+              <label for="stu_phone" class="floating-label">Phone Number *</label>
               <span class="field-error-text" *ngIf="formErrors['phone']">⚠️ {{ formErrors['phone'] }}</span>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Date of Birth <span class="required-star">*</span></label>
+            <div class="floating-field" [class.has-error]="!!formErrors['dob']">
               <input 
                 type="date" 
                 [(ngModel)]="formData.dob" 
-                class="modal-form-input"
-                [class.input-error]="formErrors['dob']"
+                id="stu_dob"
+                placeholder=" " 
+                class="floating-input"
               />
+              <label for="stu_dob" class="floating-label">Date of Birth *</label>
               <span class="field-error-text" *ngIf="formErrors['dob']">⚠️ {{ formErrors['dob'] }}</span>
             </div>
           </div>
 
           <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Gender <span class="required-star">*</span></label>
+            <div class="floating-field" [class.has-error]="!!formErrors['gender']">
               <select 
                 [(ngModel)]="formData.gender" 
-                class="modal-form-select"
-                [class.input-error]="formErrors['gender']"
+                id="stu_gender"
+                class="floating-select"
               >
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
+              <label for="stu_gender" class="floating-label">Gender *</label>
               <span class="field-error-text" *ngIf="formErrors['gender']">⚠️ {{ formErrors['gender'] }}</span>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Blood Group <span class="required-star">*</span></label>
+            <div class="floating-field">
               <select 
                 [(ngModel)]="formData.blood_group" 
-                class="modal-form-select"
-                [class.input-error]="formErrors['blood_group']"
+                id="stu_blood"
+                class="floating-select"
               >
+                <option value="">Select Blood Group</option>
                 <option value="A+">A+</option>
                 <option value="A-">A-</option>
                 <option value="B+">B+</option>
@@ -433,96 +482,152 @@
                 <option value="AB+">AB+</option>
                 <option value="AB-">AB-</option>
               </select>
-              <span class="field-error-text" *ngIf="formErrors['blood_group']">⚠️ {{ formErrors['blood_group'] }}</span>
+              <label for="stu_blood" class="floating-label">Blood Group</label>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.language" 
+                id="stu_lang"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_lang" class="floating-label">Language</label>
+            </div>
+
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.aadhar_n" 
+                id="stu_aadhar"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_aadhar" class="floating-label">Aadhar Card Number</label>
             </div>
           </div>
         </div>
 
-        <!-- STEP 2: COURSE & ACADEMIC (ACTIVE BACKEND FIELDS + REQUIRED VALIDATION) -->
+        <!-- STEP 2: COURSE & ACADEMIC (MATCHING DB USERS SCHEMA) -->
         <div *ngIf="activeFormTab === 'academic'" class="form-step-section">
-          <div class="form-group">
-            <label class="form-label">Academic Session <span class="required-star">*</span></label>
+          <!-- 1. ACADEMIC SESSION -->
+          <div class="floating-field" [class.has-error]="!!formErrors['session_id']">
             <select 
               [(ngModel)]="formData.session_id" 
-              class="modal-form-select"
-              [class.input-error]="formErrors['session_id']"
+              (change)="onSessionChange()"
+              id="stu_session"
+              class="floating-select"
             >
-              <option value="" disabled>Select Session</option>
+              <option value="" disabled selected></option>
               <option *ngFor="let s of sessions" [value]="s.id">{{ s.session_name }}</option>
             </select>
+            <label for="stu_session" class="floating-label">Academic Session *</label>
             <span class="field-error-text" *ngIf="formErrors['session_id']">⚠️ {{ formErrors['session_id'] }}</span>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Course Program <span class="required-star">*</span></label>
+          <!-- 2. COURSE PROGRAM (ENABLED ONLY AFTER SESSION IS SELECTED) -->
+          <div class="floating-field" [class.has-error]="!!formErrors['course_id']">
             <select 
               [(ngModel)]="formData.course_id" 
-              class="modal-form-select"
-              [class.input-error]="formErrors['course_id']"
+              (change)="onCourseChange()"
+              [disabled]="!formData.session_id"
+              id="stu_course"
+              class="floating-select"
             >
-              <option value="" disabled>Select Course</option>
+              <option value="" disabled selected></option>
               <option *ngFor="let c of courses" [value]="c.id">{{ c.course_name }}</option>
             </select>
+            <label for="stu_course" class="floating-label">Course Program *</label>
             <span class="field-error-text" *ngIf="formErrors['course_id']">⚠️ {{ formErrors['course_id'] }}</span>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Semester <span class="required-star">*</span></label>
+          <!-- 3. SEMESTER (ENABLED ONLY AFTER COURSE IS SELECTED) -->
+          <div class="floating-field" [class.has-error]="!!formErrors['semester_id']">
             <select 
               [(ngModel)]="formData.semester_id" 
-              class="modal-form-select"
-              [class.input-error]="formErrors['semester_id']"
+              [disabled]="!formData.course_id"
+              id="stu_semester"
+              class="floating-select"
             >
-              <option value="" disabled>Select Semester</option>
+              <option value="" disabled selected></option>
               <option *ngFor="let sem of semesters" [value]="sem.id">{{ sem.semester_name }}</option>
             </select>
+            <label for="stu_semester" class="floating-label">Semester *</label>
             <span class="field-error-text" *ngIf="formErrors['semester_id']">⚠️ {{ formErrors['semester_id'] }}</span>
+          </div>
+
+          <div class="form-row-2">
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.board_10th" 
+                id="stu_board10"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_board10" class="floating-label">10th Board Name</label>
+            </div>
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.percentage_10th" 
+                id="stu_perc10"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_perc10" class="floating-label">10th Percentage (%)</label>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.board_12th" 
+                id="stu_board12"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_board12" class="floating-label">12th Board Name</label>
+            </div>
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.percentage_12th" 
+                id="stu_perc12"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_perc12" class="floating-label">12th Percentage (%)</label>
+            </div>
           </div>
         </div>
 
-        <!-- STEP 3: PARENT & EMERGENCY INFO (ACTIVE BACKEND FIELDS + REQUIRED VALIDATION) -->
+        <!-- STEP 3: PARENTS DETAILS (MATCHING DB USERS SCHEMA) -->
         <div *ngIf="activeFormTab === 'parent'" class="form-step-section">
           <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Father's Name <span class="required-star">*</span></label>
+            <div class="floating-field">
               <input 
                 type="text" 
                 [(ngModel)]="formData.father_name" 
-                placeholder="Father's full name" 
-                class="modal-form-input" 
-                [class.input-error]="formErrors['father_name']"
+                id="stu_father"
+                placeholder=" " 
+                class="floating-input" 
               />
-              <span class="field-error-text" *ngIf="formErrors['father_name']">⚠️ {{ formErrors['father_name'] }}</span>
+              <label for="stu_father" class="floating-label">Father's Name</label>
             </div>
-            <div class="form-group">
-              <label class="form-label">Father's Mobile Number <span class="required-star">*</span></label>
-              <input 
-                type="text" 
-                [(ngModel)]="formData.father_mob_no" 
-                placeholder="+91 98000 00000" 
-                class="modal-form-input" 
-                [class.input-error]="formErrors['father_mob_no']"
-              />
-              <span class="field-error-text" *ngIf="formErrors['father_mob_no']">⚠️ {{ formErrors['father_mob_no'] }}</span>
-            </div>
-          </div>
-
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Mother's Name <span class="required-star">*</span></label>
+            <div class="floating-field">
               <input 
                 type="text" 
                 [(ngModel)]="formData.mother_name" 
-                placeholder="Mother's full name" 
-                class="modal-form-input" 
-                [class.input-error]="formErrors['mother_name']"
+                id="stu_mother"
+                placeholder=" " 
+                class="floating-input" 
               />
-              <span class="field-error-text" *ngIf="formErrors['mother_name']">⚠️ {{ formErrors['mother_name'] }}</span>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Secondary / Emergency Mobile Number</label>
-              <input type="text" [(ngModel)]="formData.other_mob_no" placeholder="+91 98000 00000" class="modal-form-input" />
+              <label for="stu_mother" class="floating-label">Mother's Name</label>
             </div>
           </div>
         </div>
@@ -545,6 +650,78 @@
         <!-- REGISTER STUDENT / SAVE CHANGES BUTTON (ONLY SHOWN ON LAST STEP 3: PARENT INFO) -->
         <button *ngIf="activeFormTab === 'parent'" class="btn-modal-primary" (click)="saveStudent()" [disabled]="isSaving">
           {{ isSaving ? 'Saving...' : (modalMode === 'add' ? 'Register Student' : 'Save Changes') }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================== -->
+  <!-- 3. CHANGE PASSWORD MODAL -->
+  <!-- ========================================================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isChangePasswordModalOpen" (click)="closeChangePasswordModal()">
+    <div class="custom-modal-card modal-small" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header-banner">
+        <div class="header-title-box">
+          <span class="header-icon">🔑</span>
+          <h3>Change User Password</h3>
+        </div>
+        <button class="modal-close-icon" (click)="closeChangePasswordModal()">✕</button>
+      </div>
+
+      <div class="modal-body-container" *ngIf="changePasswordUser">
+        
+        <div class="user-target-info">
+          <div class="user-target-avatar" [ngClass]="{
+            'av-admin': changePasswordUser.role === 'Admin',
+            'av-faculty': changePasswordUser.role === 'Faculty',
+            'av-student': changePasswordUser.role === 'Student'
+          }">
+            {{ getInitials(changePasswordUser.name) }}
+          </div>
+          <div class="user-target-details">
+            <h4 class="user-target-name">{{ changePasswordUser.name }}</h4>
+            <p class="user-target-email">{{ changePasswordUser.email }} • Role: <strong>{{ changePasswordUser.role }}</strong></p>
+          </div>
+        </div>
+
+        <div class="alert-box alert-error" *ngIf="changePasswordError">
+          ⚠️ {{ changePasswordError }}
+        </div>
+        <div class="alert-box alert-success" *ngIf="changePasswordSuccess">
+          ✅ {{ changePasswordSuccess }}
+        </div>
+
+        <div class="form-grid-single">
+          <div class="form-group">
+            <label class="form-label required">New Password</label>
+            <input 
+              type="password" 
+              [(ngModel)]="newPasswordInput" 
+              placeholder="Enter new strong password (min 6 chars)" 
+              class="modal-form-input" 
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Confirm New Password</label>
+            <input 
+              type="password" 
+              [(ngModel)]="confirmPasswordInput" 
+              placeholder="Re-enter new password" 
+              class="modal-form-input" 
+            />
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-modal-secondary" (click)="closeChangePasswordModal()">Cancel</button>
+        <button class="btn-modal-primary" (click)="submitChangePassword()" [disabled]="isChangingPassword">
+          <span *ngIf="!isChangingPassword">🔑 Update Password</span>
+          <span *ngIf="isChangingPassword">Updating...</span>
         </button>
       </div>
 

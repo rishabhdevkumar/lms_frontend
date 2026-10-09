@@ -319,7 +319,12 @@
 }
 
 .user-profile-wrapper {
+  display: none;
   position: relative;
+
+  @media (min-width: 1100px) {
+    display: block;
+  }
 
   .user-avatar-btn {
     display: flex;
@@ -381,76 +386,128 @@
       color: #64748b;
     }
   }
+}
 
-  .user-dropdown-menu {
-    position: absolute;
-    top: 125%;
-    right: 0;
-    width: 230px;
+/* IONIC PROFILE POPOVER STYLING */
+ion-popover.header-profile-popover {
+  --width: 240px;
+  --max-width: 260px;
+  --offset-y: 14px !important;
+  --offset-x: -20px !important;
+  --margin-top: 14px !important;
+  --border-radius: 1rem;
+  --box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.18);
+
+  &::part(content) {
+    margin-top: 14px !important;
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.18);
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 1rem;
-    padding: 0.75rem;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.18);
-    z-index: 150;
-    animation: popScaleModal 0.2s ease-out;
+  }
+}
 
-    .dropdown-user-header {
-      padding: 0.4rem 0.5rem;
+.profile-popover-content {
+  padding: 0.75rem;
 
-      .header-name {
+  .popover-user-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 0.4rem 0.75rem 0.4rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 0.5rem;
+
+    .user-avatar-large {
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(217, 119, 6, 0.25);
+    }
+
+    .user-info-text {
+      display: flex;
+      flex-direction: column;
+
+      .user-name {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 0.9rem;
         font-weight: 800;
+        font-size: 0.92rem;
         color: #0f172a;
-      }
-
-      .header-email {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 0.78rem;
-        color: #64748b;
-        word-break: break-all;
+        line-height: 1.2;
       }
 
       .role-badge-small {
-        display: inline-block;
-        margin-top: 0.3rem;
-        font-size: 0.7rem;
+        margin-top: 0.2rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.72rem;
         font-weight: 700;
         color: #d97706;
       }
     }
+  }
 
-    .dropdown-divider {
-      border: none;
-      border-top: 1px solid #f1f5f9;
-      margin: 0.5rem 0;
-    }
+  .popover-menu-list {
+    background: transparent;
+    padding: 0;
 
-    .dropdown-item {
-      width: 100%;
-      text-align: left;
-      padding: 0.55rem 0.75rem;
-      border-radius: 0.5rem;
-      border: none;
-      background: transparent;
+    .dropdown-popover-item {
+      --padding-start: 0.5rem;
+      --padding-end: 0.5rem;
+      --min-height: 2.6rem;
+      --border-radius: 0.5rem;
+      --background-hover: #f8fafc;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: #334155;
+      margin-bottom: 0.2rem;
       cursor: pointer;
-      transition: all 0.15s ease;
 
-      &:hover {
-        background: #f8fafc;
-        color: #0f172a;
+      .menu-item-icon {
+        font-size: 1.15rem;
+        margin-right: 0.6rem;
+        color: #475569;
       }
 
-      &.logout-item {
-        color: #dc2626;
-        &:hover { background: rgba(239, 68, 68, 0.08); }
+      &.logout-pop-item {
+        margin-top: 0.3rem;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 0.3rem;
+        .menu-item-icon {
+          color: #dc2626;
+        }
       }
     }
+  }
+}
+
+.mobile-control-item-btn {
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 9999px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  padding-left: 1.25rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #d97706;
+    background: #fffbe6;
   }
 }
 
@@ -482,22 +539,47 @@
 }
 
 .mobile-user-card {
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 0.85rem;
   border: 1px solid #e2e8f0;
+  margin-bottom: 0.5rem;
 
-  .mobile-user-name {
+  .mobile-user-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    color: #ffffff;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 800;
-    color: #0f172a;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
-  .mobile-user-role {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #d97706;
-    margin-top: 0.2rem;
+
+  .mobile-user-info {
+    display: flex;
+    flex-direction: column;
+
+    .mobile-user-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      color: #0f172a;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+    .mobile-user-role {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #d97706;
+      margin-top: 0.2rem;
+    }
   }
 }
 

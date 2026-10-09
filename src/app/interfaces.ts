@@ -1,4 +1,3 @@
-// Database Table Interfaces matching MySQL ERD Schema
 
 export interface users {
   id?: number;
@@ -17,10 +16,7 @@ export interface users {
   semester_id?: any;
   aadhar_n?: number | string;
   father_name?: string;
-  father_mob_no?: string;
   mother_name?: string;
-  mother_mob_no?: string;
-  other_mob_no?: string;
   board_10th?: string;
   total_marks_10th?: number;
   percentage_10th?: any;

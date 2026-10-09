@@ -1,22 +1,37 @@
 <ion-header class="admin-top-header">
   <ion-toolbar class="admin-toolbar">
     
-    <!-- MOBILE HAMBURGER MENU BUTTON -->
-    <ion-buttons slot="start">
-      <ion-menu-button color="dark"></ion-menu-button>
-    </ion-buttons>
+    <!-- LEFT SIDE BRAND LOGO FOR TABLET & MOBILE VIEW -->
+    <div slot="start" class="mobile-header-brand">
+      <a class="brand-logo" routerLink="/admin/dashboard">
+        <div class="logo-badge">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+        <span class="brand-name">EduDesk LMS</span>
+      </a>
+    </div>
 
-    <!-- RIGHT SIDE ACTIONS (NOTIFICATION, PROFILE) -->
+    <!-- RIGHT SIDE ACTIONS (NOTIFICATION, PROFILE, TOP RIGHT HAMBURGER MENU) -->
     <ion-buttons slot="end" class="header-actions-group">
 
       <!-- NOTIFICATION BELL WRAPPER & DROPDOWN -->
-      <div class="header-dropdown-wrapper">
-        <button class="header-action-btn notification-wrapper" (click)="toggleNotificationsMenu($event)" title="Notifications">
-          <span class="bell-icon">🔔</span>
-          <span class="notify-badge" *ngIf="notificationsCount > 0">{{ notificationsCount }}</span>
-        </button>
+      <button class="header-action-btn notification-wrapper" (click)="toggleNotificationsMenu($event)" title="Notifications">
+        <span class="bell-icon">🔔</span>
+        <span class="notify-badge" *ngIf="notificationsCount > 0">{{ notificationsCount }}</span>
+      </button>
 
-        <div class="header-dropdown-card notif-card" *ngIf="isNotificationsOpen">
+      <ion-popover
+        [isOpen]="isNotificationsOpen"
+        [event]="notifPopoverEvent"
+        (didDismiss)="isNotificationsOpen = false"
+        side="bottom"
+        alignment="end"
+        class="header-notif-popover"
+      >
+        <ng-template>
           <div class="popover-notif-header">
             <h4>Notifications</h4>
             <button class="btn-clear-notif" (click)="markAllNotificationsRead()" *ngIf="notificationsCount > 0">Mark Read</button>
@@ -35,48 +50,66 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </ng-template>
+      </ion-popover>
 
       <!-- PROFILE USER WRAPPER & DROPDOWN -->
-      <div class="header-dropdown-wrapper">
-        <button class="profile-avatar-btn" (click)="toggleProfileMenu($event)" title="Admin Profile">
-          <div class="avatar-box">{{ adminInitials }}</div>
-          <span class="admin-name hidden sm:inline">{{ adminName }}</span>
-          <span class="dropdown-icon">▼</span>
-        </button>
+      <button class="profile-avatar-btn" (click)="toggleProfileMenu($event)" title="Admin Profile">
+        <div class="avatar-box">{{ adminInitials }}</div>
+        <span class="admin-name">{{ adminName }}</span>
+        <span class="dropdown-icon">▼</span>
+      </button>
 
-        <div class="header-dropdown-card profile-card" *ngIf="showProfileMenu">
+      <!-- TOP RIGHT HAMBURGER MENU BUTTON FOR TABLET & MOBILE -->
+      <ion-menu-button side="end" menu="admin-menu" color="dark" class="header-right-menu-btn"></ion-menu-button>
+
+      <ion-popover
+        #adminProfilePopover
+        [isOpen]="showProfileMenu"
+        [event]="profilePopoverEvent"
+        (didDismiss)="showProfileMenu = false"
+        side="bottom"
+        alignment="end"
+        class="header-profile-popover"
+      >
+        <ng-template>
           <div class="profile-popover-content">
+            <!-- PROFILE SECTION: SHOW LOGGED IN USER NAME NOT EMAIL -->
             <div class="popover-user-header">
               <div class="user-avatar-large">{{ adminInitials }}</div>
-              <div>
+              <div class="user-info-text">
                 <div class="user-name">{{ adminName }}</div>
-                <div class="user-email">{{ adminEmail }}</div>
+                <span class="role-badge-small">Admin Account</span>
               </div>
             </div>
+
+            <!-- IONIC DROPDOWN MENU ITEMS -->
             <ion-list lines="none" class="popover-menu-list">
-              <ion-item routerLink="/admin/account-setting" (click)="showProfileMenu = false" [button]="true">
-                <ion-icon class="ion-margin-end" name="person-circle-outline"></ion-icon>
-                Account Settings
+              <ion-item (click)="adminProfilePopover.dismiss(); goToProfile()" [button]="true" class="dropdown-popover-item">
+                <ion-icon name="person-outline" slot="start" class="menu-item-icon"></ion-icon>
+                <ion-label>My Profile</ion-label>
               </ion-item>
-              <ion-item routerLink="/admin/academic" (click)="showProfileMenu = false" [button]="true">
-                <ion-icon class="ion-margin-end" name="settings-outline"></ion-icon>
-                System Setup
+              <ion-item (click)="adminProfilePopover.dismiss(); openNotifications()" [button]="true" class="dropdown-popover-item">
+                <ion-icon name="notifications-outline" slot="start" class="menu-item-icon"></ion-icon>
+                <ion-label>Notification</ion-label>
               </ion-item>
-              <ion-item (click)="openLanguageModal()" [button]="true" class="lang-pop-item">
-                <ion-icon class="ion-margin-end" name="globe-outline"></ion-icon>
-                Change Language
+              <ion-item (click)="adminProfilePopover.dismiss(); goToSettings()" [button]="true" class="dropdown-popover-item">
+                <ion-icon name="settings-outline" slot="start" class="menu-item-icon"></ion-icon>
+                <ion-label>Setting</ion-label>
+              </ion-item>
+              <ion-item (click)="adminProfilePopover.dismiss(); openLanguageModal()" [button]="true" class="dropdown-popover-item lang-pop-item">
+                <ion-icon name="globe-outline" slot="start" class="menu-item-icon"></ion-icon>
+                <ion-label>Change Language</ion-label>
                 <ion-badge slot="end" color="warning" class="active-lang-badge">{{ selectedLanguage.code | uppercase }}</ion-badge>
               </ion-item>
-              <ion-item (click)="logout()" [button]="true" lines="none" class="logout-pop-item">
-                <ion-icon class="ion-margin-end" name="log-out-outline"></ion-icon>
-                Logout
+              <ion-item (click)="adminProfilePopover.dismiss(); logout()" [button]="true" lines="none" class="dropdown-popover-item logout-pop-item">
+                <ion-icon name="log-out-outline" slot="start" color="danger" class="menu-item-icon"></ion-icon>
+                <ion-label color="danger">Logout</ion-label>
               </ion-item>
             </ion-list>
           </div>
-        </div>
-      </div>
+        </ng-template>
+      </ion-popover>
 
     </ion-buttons>
   </ion-toolbar>

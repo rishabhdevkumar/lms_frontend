@@ -143,9 +143,9 @@
     .ionic-floating-input {
       --border-radius: 12px;
       --border-color: #cbd5e1;
-      --border-color-focused: #d97706;
-      --highlight-color-focused: #d97706;
-      --background: #f8fafc;
+      --border-color-focused: #2563eb;
+      --highlight-color-focused: #2563eb;
+      --background: #ffffff;
       --padding-start: 12px;
       --color: #0f172a;
       --placeholder-color: #94a3b8;
@@ -161,11 +161,12 @@
       }
 
       &.ion-focused {
+        --border-color: #2563eb;
         --background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
         
         .input-ion-icon {
-          color: #d97706;
+          color: #2563eb;
         }
       }
 

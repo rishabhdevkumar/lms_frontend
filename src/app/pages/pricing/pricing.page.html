@@ -1,0 +1,121 @@
+<ion-content [fullscreen]="true" class="pricing-page-content">
+
+  <app-navbar></app-navbar>
+
+  <!-- HERO SECTION -->
+  <section class="pricing-hero-banner">
+    <div class="hero-container">
+      <div class="hero-badge">💎 Predictable & Transparent Pricing</div>
+      <h1 class="hero-title">
+        Simple Plans for <span class="gradient-text">Unstoppable Growth</span>
+      </h1>
+      <p class="hero-subtext">
+        Choose the plan that fits your learning journey. Upgrade, downgrade, or cancel anytime.
+      </p>
+
+      <!-- MONTHLY / ANNUAL TOGGLE -->
+      <div class="billing-toggle-card">
+        <span class="toggle-label" [class.active]="!isAnnual">Monthly Billing</span>
+        
+        <div class="switch-box" (click)="toggleBilling()">
+          <div class="switch-pill" [class.annual]="isAnnual"></div>
+        </div>
+
+        <span class="toggle-label" [class.active]="isAnnual">
+          Annual Billing 
+          <span class="discount-badge">SAVE 25% OFF</span>
+        </span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PRICING TIERS GRID -->
+  <section class="pricing-tiers-section">
+    <div class="tiers-container">
+      
+      <div class="pricing-grid">
+        <div 
+          class="plan-card" 
+          *ngFor="let plan of plans" 
+          [class.popular]="plan.isPopular"
+        >
+          <div class="popular-ribbon" *ngIf="plan.isPopular">
+            <span>MOST POPULAR</span>
+          </div>
+
+          <div class="plan-header">
+            <span class="badge-tag" [style.backgroundColor]="plan.badgeColor">{{ plan.badge }}</span>
+            <h3 class="plan-name">{{ plan.name }}</h3>
+            <p class="plan-desc">{{ plan.description }}</p>
+          </div>
+
+          <div class="price-container">
+            <div class="price-figure">
+              <span class="currency">$</span>
+              <span class="amount">{{ isAnnual ? plan.annualMonthlyPrice : plan.monthlyPrice }}</span>
+              <span class="period">/ month</span>
+            </div>
+            <div class="billing-note" *ngIf="isAnnual && plan.annualMonthlyPrice > 0">
+              Billed annually (${{ plan.annualMonthlyPrice * 12 }}/year)
+            </div>
+            <div class="billing-note" *ngIf="!isAnnual && plan.monthlyPrice > 0">
+              Billed monthly ($ {{ plan.monthlyPrice }}/mo)
+            </div>
+            <div class="billing-note" *ngIf="plan.monthlyPrice === 0">
+              Free forever, no credit card required
+            </div>
+          </div>
+
+          <div class="features-list">
+            <div class="feature-item" *ngFor="let feature of plan.features">
+              <span class="check-icon">✓</span>
+              <span class="feature-text">{{ feature }}</span>
+            </div>
+          </div>
+
+          <div class="card-action-footer">
+            <button 
+              class="btn-select-plan" 
+              [class.btn-popular]="plan.isPopular"
+              (click)="selectPlan(plan)"
+            >
+              {{ plan.buttonText }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ SECTION -->
+  <section class="faq-section">
+    <div class="faq-container">
+      <div class="faq-header">
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about LearnSphere plans and billing</p>
+      </div>
+
+      <div class="faq-accordion-list">
+        <div class="faq-item" *ngFor="let faq of faqs" [class.open]="faq.open" (click)="toggleFaq(faq)">
+          <div class="faq-question-row">
+            <span class="faq-question">{{ faq.q }}</span>
+            <span class="faq-toggle-icon">{{ faq.open ? '−' : '＋' }}</span>
+          </div>
+          <div class="faq-answer-body" *ngIf="faq.open">
+            <p>{{ faq.a }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-float" *ngIf="showToast">
+    <span class="toast-icon">💳</span>
+    <span class="toast-text">{{ toastMessage }}</span>
+  </div>
+
+</ion-content>

@@ -17,22 +17,22 @@
 
     <!-- DESKTOP NAV LINKS -->
     <nav class="desktop-nav-links">
-      <a routerLink="/home" class="nav-item" [class.active]="activeTab === 'Home'" (click)="setActiveTab('Home')">
+      <a routerLink="/home" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Home')">
         Home
       </a>
-      <a routerLink="/home" class="nav-item" [class.active]="activeTab === 'Courses'" (click)="setActiveTab('Courses')">
+      <a routerLink="/courses" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Courses')">
         Courses
       </a>
-      <a routerLink="/home" class="nav-item" [class.active]="activeTab === 'Live Classes'" (click)="setActiveTab('Live Classes')">
+      <a routerLink="/live-classes" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Live Classes')">
         Live Classes
       </a>
-      <a routerLink="/home" class="nav-item" [class.active]="activeTab === 'Practice Tests'" (click)="setActiveTab('Practice Tests')">
+      <a routerLink="/courses" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Practice Tests')">
         Practice Tests
       </a>
-      <a routerLink="/home" class="nav-item" [class.active]="activeTab === 'Pricing / Plans'" (click)="setActiveTab('Pricing / Plans')">
+      <a routerLink="/pricing" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Pricing / Plans')">
         Pricing / Plans
       </a>
-      <a routerLink="/home" class="nav-item" [class.active]="activeTab === 'Contact Us'" (click)="setActiveTab('Contact Us')">
+      <a routerLink="/home" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Contact Us')">
         Contact Us
       </a>
     </nav>
@@ -60,36 +60,63 @@
         </button>
       </ng-container>
 
-      <!-- LOGGED IN STATE: USER BADGE & DASHBOARD BUTTON -->
+      <!-- LOGGED IN STATE: USER BADGE & IONIC DROPDOWN MENU -->
       <ng-container *ngIf="isLoggedIn && currentUser">
-        <button class="dashboard-btn" (click)="goToDashboard()">
-          <span>📊 Dashboard</span>
-        </button>
-
         <div class="user-profile-wrapper">
-          <button class="user-avatar-btn" (click)="toggleUserDropdown()" title="User Profile">
+          <button class="user-avatar-btn" (click)="toggleUserDropdown($event)" title="User Profile">
             <div class="avatar-circle">
-              {{ currentUser.name.charAt(0) | uppercase }}
+              {{ userInitials }}
             </div>
-            <span class="user-name-text">{{ currentUser.name }}</span>
-            <span class="role-pill" [ngClass]="userRole">{{ userRole | uppercase }}</span>
+            <span class="user-name-text">{{ getUserDisplayName() }}</span>
+            <span class="role-pill" [ngClass]="userRole || ''">{{ (userRole || '') | uppercase }}</span>
             <span class="dropdown-chevron">▼</span>
           </button>
 
-          <div class="user-dropdown-menu" *ngIf="isUserDropdownOpen">
-            <div class="dropdown-user-header">
-              <div class="header-name">{{ currentUser.name }}</div>
-              <div class="header-email">{{ currentUser.email }}</div>
-              <span class="role-badge-small">{{ userRole | titlecase }} Account</span>
-            </div>
-            <hr class="dropdown-divider" />
-            <button class="dropdown-item" (click)="goToDashboard()">
-              <span>🚀 My Dashboard</span>
-            </button>
-            <button class="dropdown-item logout-item" (click)="logout()">
-              <span>🚪 Sign Out</span>
-            </button>
-          </div>
+          <!-- IONIC POPOVER DROPDOWN MENU -->
+          <ion-popover
+            #userPopover
+            [isOpen]="isUserDropdownOpen"
+            [event]="userPopoverEvent"
+            (didDismiss)="isUserDropdownOpen = false"
+            side="bottom"
+            alignment="end"
+            class="header-profile-popover"
+          >
+            <ng-template>
+              <div class="profile-popover-content">
+                <!-- PROFILE SECTION: SHOW LOGGED IN USER NAME NOT EMAIL -->
+                <div class="popover-user-header">
+                  <div class="user-avatar-large">
+                    {{ userInitials }}
+                  </div>
+                  <div class="user-info-text">
+                    <div class="user-name">{{ getUserDisplayName() }}</div>
+                    <span class="role-badge-small">{{ (userRole || '') | titlecase }} Account</span>
+                  </div>
+                </div>
+
+                <!-- IONIC DROPDOWN MENU ITEMS -->
+                <ion-list lines="none" class="popover-menu-list">
+                  <ion-item (click)="userPopover.dismiss(); goToProfile()" [button]="true" class="dropdown-popover-item">
+                    <ion-icon name="person-outline" slot="start" class="menu-item-icon"></ion-icon>
+                    <ion-label>My Profile</ion-label>
+                  </ion-item>
+                  <ion-item (click)="userPopover.dismiss(); openNotifications()" [button]="true" class="dropdown-popover-item">
+                    <ion-icon name="notifications-outline" slot="start" class="menu-item-icon"></ion-icon>
+                    <ion-label>Notification</ion-label>
+                  </ion-item>
+                  <ion-item (click)="userPopover.dismiss(); goToSettings()" [button]="true" class="dropdown-popover-item">
+                    <ion-icon name="settings-outline" slot="start" class="menu-item-icon"></ion-icon>
+                    <ion-label>Setting</ion-label>
+                  </ion-item>
+                  <ion-item (click)="userPopover.dismiss(); logout()" [button]="true" lines="none" class="dropdown-popover-item logout-pop-item">
+                    <ion-icon name="log-out-outline" slot="start" color="danger" class="menu-item-icon"></ion-icon>
+                    <ion-label color="danger">Logout</ion-label>
+                  </ion-item>
+                </ion-list>
+              </div>
+            </ng-template>
+          </ion-popover>
         </div>
       </ng-container>
 
@@ -115,12 +142,12 @@
 
       <!-- NAVIGATION LINKS LIST -->
       <div class="mobile-nav-links">
-        <a routerLink="/home" class="mobile-nav-item" [class.active]="activeTab === 'Home'" (click)="setActiveTab('Home')">Home</a>
-        <a routerLink="/home" class="mobile-nav-item" [class.active]="activeTab === 'Courses'" (click)="setActiveTab('Courses')">Courses</a>
-        <a routerLink="/home" class="mobile-nav-item" [class.active]="activeTab === 'Live Classes'" (click)="setActiveTab('Live Classes')">Live Classes</a>
-        <a routerLink="/home" class="mobile-nav-item" [class.active]="activeTab === 'Practice Tests'" (click)="setActiveTab('Practice Tests')">Practice Tests</a>
-        <a routerLink="/home" class="mobile-nav-item" [class.active]="activeTab === 'Pricing / Plans'" (click)="setActiveTab('Pricing / Plans')">Pricing / Plans</a>
-        <a routerLink="/home" class="mobile-nav-item" [class.active]="activeTab === 'Contact Us'" (click)="setActiveTab('Contact Us')">Contact Us</a>
+        <a routerLink="/home" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Home')">Home</a>
+        <a routerLink="/courses" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Courses')">Courses</a>
+        <a routerLink="/live-classes" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Live Classes')">Live Classes</a>
+        <a routerLink="/courses" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Practice Tests')">Practice Tests</a>
+        <a routerLink="/pricing" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Pricing / Plans')">Pricing / Plans</a>
+        <a routerLink="/home" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Contact Us')">Contact Us</a>
       </div>
 
       <!-- CONTROL BUTTONS GRID -->
@@ -133,11 +160,22 @@
 
         <ng-container *ngIf="isLoggedIn && currentUser">
           <div class="mobile-user-card">
-            <div class="mobile-user-name">👤 {{ currentUser.name }}</div>
-            <div class="mobile-user-role">Role: {{ userRole | uppercase }}</div>
+            <div class="mobile-user-avatar">
+              {{ userInitials }}
+            </div>
+            <div class="mobile-user-info">
+              <div class="mobile-user-name">{{ getUserDisplayName() }}</div>
+              <div class="mobile-user-role">{{ (userRole || '') | titlecase }} Account</div>
+            </div>
           </div>
-          <button class="mobile-dashboard-btn" (click)="goToDashboard()">
-            Go to My Dashboard
+          <button class="mobile-control-item-btn" (click)="goToProfile()">
+            👤 My Profile
+          </button>
+          <button class="mobile-control-item-btn" (click)="openNotifications()">
+            🔔 Notification
+          </button>
+          <button class="mobile-control-item-btn" (click)="goToSettings()">
+            ⚙️ Setting
           </button>
           <button class="mobile-logout-btn" (click)="logout()">
             Sign Out

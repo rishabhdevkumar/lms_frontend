@@ -23,20 +23,398 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-.split-pane-visible>.split-pane-side {
-  flex-grow: 24;
-  min-width: 230px !important;
-  max-width: 260px !important;
-  width: 240px !important;
-  border-right: 1px solid #1e3a29;
+/* Responsive ion-menu rules */
+ion-menu {
+  --width: 240px !important;
+  --min-width: 230px !important;
+  --max-width: 260px !important;
+  --background: #ffffff !important;
 }
 
-.split-pane-visible>.split-pane-main {
-  flex-grow: 72;
+@media (min-width: 1024px) {
+  .split-pane-visible > .split-pane-side {
+    flex-grow: 24;
+    min-width: 230px !important;
+    max-width: 260px !important;
+    width: 240px !important;
+    border-right: 1px solid #e2e8f0 !important;
+  }
+
+  .split-pane-visible > .split-pane-main {
+    flex-grow: 72;
+  }
 }
 
 ion-modal {
   --width: 800px !important;
   --height: 700px !important;
 }
-
+
+ion-input[fill="outline"],
+ion-select[fill="outline"],
+ion-textarea[fill="outline"],
+.ionic-floating-input {
+  --border-color: #cbd5e1;
+  --border-color-focused: #2563eb !important;
+  --border-color-hover: #94a3b8;
+  --highlight-color-focused: #2563eb !important;
+  --border-radius: 12px;
+  --border-width: 1.5px;
+  --color: #0f172a;
+  --placeholder-color: #94a3b8;
+  --placeholder-opacity: 0.75;
+  --background: #ffffff;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 2px;
+  --padding-bottom: 6px;
+  min-height: 48px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-input[fill="outline"]::part(container),
+ion-select[fill="outline"]::part(container) {
+  min-height: 48px;
+  align-items: center;
+}
+
+ion-input[fill="outline"]::part(native) {
+  padding-top: 2px;
+  padding-bottom: 4px;
+}
+
+/* ONLY Currently Focused Input gets Blue Border & Glow */
+ion-input[fill="outline"].ion-focused,
+ion-input[fill="outline"]:focus-within,
+ion-input[fill="outline"]:focus,
+ion-select[fill="outline"].ion-focused,
+ion-select[fill="outline"]:focus-within,
+ion-textarea[fill="outline"].ion-focused,
+ion-textarea[fill="outline"]:focus-within,
+.ionic-floating-input.ion-focused,
+.ionic-floating-input:focus-within {
+  --border-color: #2563eb !important;
+  --border-color-focused: #2563eb !important;
+  --border-color-hover: #2563eb !important;
+  --highlight-color-focused: #2563eb !important;
+  --border-width: 2px !important;
+  --background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14) !important;
+  border-radius: 12px;
+}
+
+/* Ionic 8 Shadow DOM Part overrides for 100% border & label color match */
+ion-input[fill="outline"].ion-focused::part(container),
+ion-input[fill="outline"]:focus-within::part(container),
+ion-select[fill="outline"].ion-focused::part(container),
+ion-select[fill="outline"]:focus-within::part(container),
+ion-textarea[fill="outline"].ion-focused::part(container),
+ion-textarea[fill="outline"]:focus-within::part(container) {
+  border-color: #2563eb !important;
+  border-width: 2px !important;
+}
+
+ion-input[fill="outline"].ion-focused::part(label),
+ion-input[fill="outline"]:focus-within::part(label),
+ion-select[fill="outline"].ion-focused::part(label),
+ion-select[fill="outline"]:focus-within::part(label),
+ion-textarea[fill="outline"].ion-focused::part(label),
+ion-textarea[fill="outline"]:focus-within::part(label) {
+  color: #2563eb !important;
+}
+
+/* Default icon color */
+ion-input[fill="outline"] .input-ion-icon,
+ion-input[fill="outline"] ion-icon[slot="start"] {
+  color: #64748b;
+  font-size: 1.15rem;
+  margin-right: 8px;
+  align-self: center;
+  margin-top: 4px;
+  transition: color 0.2s ease;
+}
+
+/* ONLY Currently Focused Input gets Blue Icon */
+ion-input[fill="outline"].ion-focused .input-ion-icon,
+ion-input[fill="outline"]:focus-within .input-ion-icon,
+ion-input[fill="outline"].ion-focused ion-icon[slot="start"],
+ion-input[fill="outline"]:focus-within ion-icon[slot="start"],
+.ionic-floating-input.ion-focused .input-ion-icon,
+.ionic-floating-input:focus-within .input-ion-icon {
+  color: #2563eb !important;
+}
+
+/* 2. REUSABLE FLOATING LABEL INPUT CONTAINER (.floating-field) FOR STANDARD HTML INPUTS */
+.floating-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+  width: 100%;
+
+  .floating-input,
+  .floating-select,
+  .floating-textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #0f172a;
+    background-color: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+    &:hover {
+      border-color: #94a3b8;
+    }
+
+    &:focus,
+    &:not(:placeholder-shown),
+    &:valid {
+      border-color: #2563eb;
+      border-width: 1.8px;
+    }
+
+    &:focus {
+      border-width: 2px;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+      background-color: #ffffff;
+    }
+
+    &::placeholder {
+      color: transparent;
+    }
+
+    &:focus::placeholder {
+      color: #94a3b8;
+    }
+  }
+
+  .floating-label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #ffffff;
+    padding: 0 6px;
+    color: #64748b;
+    font-size: 0.88rem;
+    font-weight: 500;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+    border-radius: 4px;
+    line-height: 1;
+    z-index: 2;
+  }
+
+  /* When input has focus or value is not empty -> float label onto outline border notch */
+  .floating-input:focus~.floating-label,
+  .floating-input:not(:placeholder-shown)~.floating-label,
+  .floating-select:focus~.floating-label,
+  .floating-select:valid~.floating-label,
+  .floating-textarea:focus~.floating-label,
+  .floating-textarea:not(:placeholder-shown)~.floating-label {
+    top: 0;
+    transform: translateY(-50%) scale(0.85);
+    transform-origin: left top;
+    color: #2563eb;
+    font-weight: 700;
+    background-color: #ffffff;
+  }
+
+  /* Left Icon inside floating input */
+  &.has-icon {
+
+    .floating-input,
+    .floating-select {
+      padding-left: 2.6rem;
+    }
+
+    .field-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      font-size: 1.15rem;
+      pointer-events: none;
+      transition: color 0.2s ease;
+      z-index: 3;
+    }
+
+    .floating-label {
+      left: 2.5rem;
+    }
+
+    .floating-input:focus~.field-icon,
+    .floating-select:focus~.field-icon {
+      color: #2563eb;
+    }
+
+    .floating-input:focus~.floating-label,
+    .floating-input:not(:placeholder-shown)~.floating-label {
+      left: 14px;
+    }
+  }
+
+  /* Error state */
+  &.has-error {
+
+    .floating-input,
+    .floating-select {
+      border-color: #ef4444 !important;
+
+      &:focus {
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;
+      }
+    }
+
+    .floating-label {
+      color: #ef4444 !important;
+    }
+  }
+
+  .field-error-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #ef4444;
+    margin-top: 0.3rem;
+    margin-left: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
+
+/* 3. GLOBAL ENHANCEMENT FOR Standard Form Control Inputs (.modal-form-input, .modal-form-select, .form-control) */
+.modal-form-input,
+.modal-form-select,
+.modal-input {
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.92rem !important;
+  font-weight: 500 !important;
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  &:hover {
+    border-color: #94a3b8 !important;
+  }
+
+  &:focus {
+    border-color: #2563eb !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14) !important;
+    outline: none !important;
+  }
+}
+
+.staff-search-input,
+.academic-search-input,
+.student-search-input,
+.batches-search-input {
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 9999px !important;
+  padding: 0.65rem 1rem 0.65rem 2.85rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  &:hover {
+    border-color: #94a3b8 !important;
+  }
+
+  &:focus {
+    border-color: #2563eb !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14) !important;
+    outline: none !important;
+  }
+}
+
+/* 4. UNIFIED SYSTEM-WIDE MODAL HEADER & ACTION BUTTONS */
+.modal-header-banner {
+  background-color: #0f1c14 !important;
+  color: #ffffff !important;
+  padding: 1.15rem 1.35rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  position: relative !important;
+  border-bottom: 3.5px solid #d97706 !important;
+  box-shadow: 0 4px 18px rgba(15, 28, 20, 0.35) !important;
+
+  .modal-title-white,
+  .modal-title,
+  h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    margin: 0 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .modal-sub-white,
+  .modal-sub-text {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.78rem !important;
+    color: #cbd5e1 !important;
+    margin: 0.2rem 0 0 0 !important;
+  }
+
+  .modal-close-icon {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 0.9rem !important;
+    transition: all 0.2s ease !important;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.45) !important;
+      border-color: rgba(239, 68, 68, 0.6) !important;
+      transform: rotate(90deg) !important;
+    }
+  }
+}
+
+.btn-modal-primary,
+.btn-modal-primary.btn-amber {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  padding: 0.6rem 1.25rem !important;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45) !important;
+    transform: translateY(-1px) !important;
+  }
+}

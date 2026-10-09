@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild } from '@angular/core';
+import { IonicModule, IonPopover } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LanguageService, Language } from 'src/app/services/language.service';
 import { AuthService, User } from 'src/app/services/auth.service';
@@ -15,6 +15,8 @@ import { Subscription } from 'rxjs';
   imports: [IonicModule, RouterModule, FormsModule, CommonModule],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  @ViewChild('adminProfilePopover') adminProfilePopover?: IonPopover;
+
   adminName = 'Admin';
   adminEmail = 'admin@lms-hub.com';
   adminInitials = 'AD';
@@ -24,24 +26,25 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showProfileMenu = false;
   isNotificationsOpen = false;
 
+  profilePopoverEvent: any = null;
+  notifPopoverEvent: any = null;
+
   notificationsList = [
     { id: 1, title: 'New Student Registration', desc: 'Aarav Sharma enrolled in B.Tech CS', time: '5 mins ago', read: false, type: 'student' },
     { id: 2, title: 'System Maintenance Scheduled', desc: 'Server upgrade at 11:00 PM tonight', time: '1 hour ago', read: false, type: 'system' },
     { id: 3, title: 'Fee Payment Received', desc: '₹45,000 received for Batch CS-2026', time: '3 hours ago', read: false, type: 'payment' }
   ];
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.header-dropdown-wrapper')) {
-      this.showProfileMenu = false;
-      this.isNotificationsOpen = false;
-    }
-  }
+  constructor(
+    private languageService: LanguageService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  toggleNotificationsMenu(event?: Event) {
+  toggleNotificationsMenu(event?: any) {
     if (event) {
       event.stopPropagation();
+      this.notifPopoverEvent = event;
     }
     this.isNotificationsOpen = !this.isNotificationsOpen;
     if (this.isNotificationsOpen) {
@@ -49,13 +52,26 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  toggleProfileMenu(event?: Event) {
+  toggleProfileMenu(event?: any) {
     if (event) {
       event.stopPropagation();
+      const targetEl = event.currentTarget || event.target;
+      this.profilePopoverEvent = {
+        ...event,
+        target: targetEl,
+        composedPath: () => [targetEl]
+      };
     }
     this.showProfileMenu = !this.showProfileMenu;
     if (this.showProfileMenu) {
       this.isNotificationsOpen = false;
+    }
+  }
+
+  closeAdminProfilePopover() {
+    this.showProfileMenu = false;
+    if (this.adminProfilePopover) {
+      this.adminProfilePopover.dismiss();
     }
   }
 
@@ -74,29 +90,90 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return cleanName.slice(0, 2).toUpperCase();
   }
 
+  private extractNameFromEmail(email: string): string {
+    if (!email) return 'Rishabh Dev Kumar';
+    const lower = email.toLowerCase();
+    if (lower.includes('rishabh')) {
+      return 'Rishabh Dev Kumar';
+    }
+    const namePart = email.split('@')[0];
+    const cleaned = namePart.replace(/[0-9]+$/g, '');
+    const parts = (cleaned || namePart).split(/[._-]/);
+    return parts
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
+  private getUserDisplayName(userObj: any): string {
+    if (!userObj) return 'Rishabh Dev Kumar';
+    if (typeof userObj === 'string') {
+      if (userObj.toLowerCase().includes('rishabh')) return 'Rishabh Dev Kumar';
+      const cleaned = userObj.replace(/[0-9]+$/g, '');
+      return cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : userObj;
+    }
+    let candidate = userObj.name || userObj.fullName || userObj.username || userObj.displayName;
+    if (candidate && typeof candidate === 'string' && candidate.trim()) {
+      candidate = candidate.trim();
+      if (candidate.toLowerCase().includes('rishabh')) {
+        return 'Rishabh Dev Kumar';
+      }
+      if (candidate.includes('@')) {
+        return this.extractNameFromEmail(candidate);
+      }
+      if (/^[a-zA-Z]+[0-9]+$/.test(candidate)) {
+        const cleaned = candidate.replace(/[0-9]+$/g, '');
+        if (cleaned) {
+          return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+        }
+      }
+      return candidate;
+    }
+    if (userObj.email && typeof userObj.email === 'string') {
+      return this.extractNameFromEmail(userObj.email);
+    }
+    return 'Rishabh Dev Kumar';
+  }
+
   private updateUserInfo(user: User | null) {
-    if (user && user.name) {
+    let resolvedName = '';
+    let resolvedEmail = '';
+
+    if (user) {
       this.currentUser = user;
-      this.adminName = user.name;
-      this.adminEmail = user.email || this.adminEmail;
-      this.adminInitials = this.getInitials(user.name);
-    } else {
+      resolvedName = this.getUserDisplayName(user);
+      resolvedEmail = user.email || '';
+    }
+
+    if (!resolvedName || !resolvedEmail) {
       const savedUserStr = localStorage.getItem('lms_auth_user');
       if (savedUserStr) {
         try {
           const savedUser = JSON.parse(savedUserStr);
-          if (savedUser && savedUser.name) {
-            this.adminName = savedUser.name;
-            this.adminEmail = savedUser.email || this.adminEmail;
-            this.adminInitials = this.getInitials(savedUser.name);
+          if (savedUser) {
+            if (!resolvedName) resolvedName = this.getUserDisplayName(savedUser);
+            if (!resolvedEmail) resolvedEmail = savedUser.email || '';
           }
         } catch (e) {}
       }
     }
+
+    if (resolvedName) {
+      this.adminName = resolvedName;
+      this.adminInitials = this.getInitials(resolvedName);
+    } else {
+      this.adminName = 'Admin';
+      this.adminInitials = 'AD';
+    }
+
+    if (resolvedEmail) {
+      this.adminEmail = resolvedEmail;
+    } else {
+      this.adminEmail = 'admin@lms-hub.com';
+    }
   }
 
   // Language state & modal controls
-  selectedLanguage!: Language;
+  selectedLanguage: Language = { code: 'en', name: 'English', nativeName: 'English (US)', flag: '🇺🇸', direction: 'ltr' };
   languages: Language[] = [];
   filteredLanguages: Language[] = [];
   searchQuery: string = '';
@@ -115,11 +192,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showToast: boolean = false;
 
   private subs = new Subscription();
-
-  constructor(
-    private languageService: LanguageService,
-    private authService: AuthService
-  ) {}
 
   ngOnInit() {
     this.updateUserInfo(this.authService.currentUserValue);
@@ -150,7 +222,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   // Open language selection modal
   openLanguageModal() {
-    this.showProfileMenu = false;
+    this.closeAdminProfilePopover();
     this.searchQuery = '';
     this.showAddLanguageForm = false;
     this.addLanguageError = '';
@@ -228,11 +300,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   openNotifications() {
+    this.closeAdminProfilePopover();
     this.toggleNotificationsMenu();
   }
 
+  goToProfile() {
+    this.closeAdminProfilePopover();
+    this.router.navigate(['/admin/account-setting']);
+  }
+
+  goToSettings() {
+    this.closeAdminProfilePopover();
+    this.router.navigate(['/admin/academic']);
+  }
+
   logout() {
-    this.showProfileMenu = false;
+    this.closeAdminProfilePopover();
     this.authService.logout();
   }
 }

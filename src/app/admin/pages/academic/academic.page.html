@@ -34,7 +34,7 @@
     <!-- MAIN ACADEMIC CARD CONTAINER -->
     <div class="academic-main-card">
       
-      <!-- CARD HEADER WITH ACTION BUTTON -->
+      <!-- CARD HEADER & ACTIONS (TITLE ON TOP, SEARCH BAR + ADD BUTTON JUST BELOW) -->
       <div class="academic-card-header">
         <div class="title-group">
           <h2 class="management-title">
@@ -43,20 +43,23 @@
           <span class="count-badge">{{ getFilteredItems().length }} Total {{ activeTab | titlecase }}s</span>
         </div>
         
-        <button class="btn-add-new-amber" (click)="openAddModal()">
-          <span>+</span> Add New {{ activeTab | titlecase }}
-        </button>
-      </div>
+        <div class="header-actions-subrow">
+          <!-- 1. COMPACT SEARCH INPUT BAR (FIRST) -->
+          <div class="search-input-wrapper">
+            <span class="search-icon-inside">🔍</span>
+            <input 
+              type="text" 
+              [(ngModel)]="searchText" 
+              placeholder="Search {{ activeTab }}s..." 
+              class="academic-search-input" 
+            />
+          </div>
 
-      <!-- SEARCH INPUT BAR -->
-      <div class="search-input-wrapper">
-        <span class="search-icon-inside">🔍</span>
-        <input 
-          type="text" 
-          [(ngModel)]="searchText" 
-          placeholder="Search {{ activeTab }}s by name, code, or keyword..." 
-          class="academic-search-input" 
-        />
+          <!-- 2. ADD BUTTON (SECOND) -->
+          <button class="btn-add-new-amber" (click)="openAddModal()">
+            <span>+</span> Add New {{ activeTab | titlecase }}
+          </button>
+        </div>
       </div>
 
       <!-- DATA TABLE (SESSION TAB) -->
@@ -277,65 +280,75 @@
         
         <!-- SESSION FIELDS -->
         <ng-container *ngIf="activeTab === 'session'">
-          <div class="form-group">
-            <label class="form-label">Session Name</label>
-            <input type="text" [(ngModel)]="formData.sessionName" placeholder="e.g. 2026-2027" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['sessionName']">
+            <input type="text" [(ngModel)]="formData.sessionName" id="acad_session" placeholder=" " class="floating-input" />
+            <label for="acad_session" class="floating-label">Session Name *</label>
+            <span class="field-error-text" *ngIf="formErrors['sessionName']">⚠️ {{ formErrors['sessionName'] }}</span>
           </div>
-          <div class="form-group">
-            <label class="form-label">Short Name</label>
-            <input type="text" [(ngModel)]="formData.shortName" placeholder="e.g. AY26" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['shortName']">
+            <input type="text" [(ngModel)]="formData.shortName" id="acad_short" placeholder=" " class="floating-input" />
+            <label for="acad_short" class="floating-label">Short Name *</label>
+            <span class="field-error-text" *ngIf="formErrors['shortName']">⚠️ {{ formErrors['shortName'] }}</span>
           </div>
         </ng-container>
 
         <!-- COURSE FIELDS -->
         <ng-container *ngIf="activeTab === 'course'">
-          <div class="form-group">
-            <label class="form-label">Course Name</label>
-            <input type="text" [(ngModel)]="formData.courseName" placeholder="e.g. Software Engineering" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['courseName']">
+            <input type="text" [(ngModel)]="formData.courseName" id="acad_course" placeholder=" " class="floating-input" />
+            <label for="acad_course" class="floating-label">Course Name *</label>
+            <span class="field-error-text" *ngIf="formErrors['courseName']">⚠️ {{ formErrors['courseName'] }}</span>
           </div>
-          <div class="form-group">
-            <label class="form-label">Course Short Name</label>
-            <input type="text" [(ngModel)]="formData.shortName" placeholder="e.g. SE" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['shortName']">
+            <input type="text" [(ngModel)]="formData.shortName" id="acad_cshort" placeholder=" " class="floating-input" />
+            <label for="acad_cshort" class="floating-label">Course Short Name *</label>
+            <span class="field-error-text" *ngIf="formErrors['shortName']">⚠️ {{ formErrors['shortName'] }}</span>
           </div>
         </ng-container>
 
         <!-- SEMESTER FIELDS -->
         <ng-container *ngIf="activeTab === 'semester'">
-          <div class="form-group">
-            <label class="form-label">Semester Name</label>
-            <input type="text" [(ngModel)]="formData.semesterName" placeholder="e.g. Semester 5" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['semesterName']">
+            <input type="text" [(ngModel)]="formData.semesterName" id="acad_sem" placeholder=" " class="floating-input" />
+            <label for="acad_sem" class="floating-label">Semester Name *</label>
+            <span class="field-error-text" *ngIf="formErrors['semesterName']">⚠️ {{ formErrors['semesterName'] }}</span>
           </div>
         </ng-container>
 
         <!-- SYLLABUS FIELDS -->
         <ng-container *ngIf="activeTab === 'syllabus'">
-          <div class="form-group">
-            <label class="form-label">Syllabus Title</label>
-            <input type="text" [(ngModel)]="formData.syllabusTitle" placeholder="e.g. AICTE 2026 Curriculum" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['syllabusTitle']">
+            <input type="text" [(ngModel)]="formData.syllabusTitle" id="acad_syl" placeholder=" " class="floating-input" />
+            <label for="acad_syl" class="floating-label">Syllabus Title *</label>
+            <span class="field-error-text" *ngIf="formErrors['syllabusTitle']">⚠️ {{ formErrors['syllabusTitle'] }}</span>
           </div>
         </ng-container>
 
         <!-- SUBJECT FIELDS -->
         <ng-container *ngIf="activeTab === 'subject'">
-          <div class="form-group">
-            <label class="form-label">Subject Name</label>
-            <input type="text" [(ngModel)]="formData.subjectName" placeholder="e.g. Machine Learning" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['subjectName']">
+            <input type="text" [(ngModel)]="formData.subjectName" id="acad_sub" placeholder=" " class="floating-input" />
+            <label for="acad_sub" class="floating-label">Subject Name *</label>
+            <span class="field-error-text" *ngIf="formErrors['subjectName']">⚠️ {{ formErrors['subjectName'] }}</span>
           </div>
-          <div class="form-group">
-            <label class="form-label">Subject Code</label>
-            <input type="text" [(ngModel)]="formData.subjectCode" placeholder="e.g. CS401" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['subjectCode']">
+            <input type="text" [(ngModel)]="formData.subjectCode" id="acad_subcode" placeholder=" " class="floating-input" />
+            <label for="acad_subcode" class="floating-label">Subject Code *</label>
+            <span class="field-error-text" *ngIf="formErrors['subjectCode']">⚠️ {{ formErrors['subjectCode'] }}</span>
           </div>
         </ng-container>
 
         <!-- CHAPTER FIELDS -->
         <ng-container *ngIf="activeTab === 'chapter'">
-          <div class="form-group">
-            <label class="form-label">Chapter No</label>
-            <input type="text" [(ngModel)]="formData.chapterNo" placeholder="e.g. Chapter 3" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['chapterNo']">
+            <input type="text" [(ngModel)]="formData.chapterNo" id="acad_chapno" placeholder=" " class="floating-input" />
+            <label for="acad_chapno" class="floating-label">Chapter No *</label>
+            <span class="field-error-text" *ngIf="formErrors['chapterNo']">⚠️ {{ formErrors['chapterNo'] }}</span>
           </div>
-          <div class="form-group">
-            <label class="form-label">Chapter Title</label>
-            <input type="text" [(ngModel)]="formData.chapterName" placeholder="e.g. Neural Networks & Deep Learning" class="modal-form-input" />
+          <div class="floating-field" [class.has-error]="!!formErrors['chapterName']">
+            <input type="text" [(ngModel)]="formData.chapterName" id="acad_chaptitle" placeholder=" " class="floating-input" />
+            <label for="acad_chaptitle" class="floating-label">Chapter Title *</label>
+            <span class="field-error-text" *ngIf="formErrors['chapterName']">⚠️ {{ formErrors['chapterName'] }}</span>
           </div>
         </ng-container>
 

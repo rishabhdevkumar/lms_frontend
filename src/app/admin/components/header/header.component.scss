@@ -1,14 +1,64 @@
 :host {
   display: block;
+  position: relative;
+  z-index: 1000;
+  overflow: visible !important;
 }
 
 .admin-top-header {
   border-bottom: 1px solid #e2e8f0;
+  overflow: visible !important;
+  contain: none !important;
 
   .admin-toolbar {
     --background: #ffffff;
     --border-style: none;
+    --overflow: visible;
+    overflow: visible !important;
+    contain: none !important;
     padding: 0.35rem 0.85rem;
+  }
+}
+
+.mobile-header-brand {
+  display: flex;
+  align-items: center;
+
+  @media (min-width: 1024px) {
+    display: none !important;
+  }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    cursor: pointer;
+
+    .logo-badge {
+      width: 2.1rem;
+      height: 2.1rem;
+      border-radius: 0.55rem;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+
+      .logo-icon {
+        width: 1.15rem;
+        height: 1.15rem;
+      }
+    }
+
+    .brand-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #2563eb;
+    }
   }
 }
 
@@ -16,10 +66,26 @@
   display: flex;
   align-items: center;
   gap: 0.85rem;
+  overflow: visible !important;
+  contain: none !important;
+}
+
+.header-right-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --color: #0f172a;
+  font-size: 1.35rem;
+  margin-left: 0.25rem;
+
+  @media (min-width: 1024px) {
+    display: none !important;
+  }
 }
 
 .header-dropdown-wrapper {
   position: relative;
+  overflow: visible !important;
 }
 
 .header-dropdown-card {
@@ -823,5 +889,115 @@ ion-modal.custom-language-modal {
   }
   to {
     opacity: 1;
+  }
+}
+
+ion-popover.header-profile-popover,
+ion-popover.header-notif-popover {
+  --offset-y: 14px !important;
+  --margin-top: 14px !important;
+  --border-radius: 0.85rem;
+  --box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+  &::part(content) {
+    border-radius: 0.85rem;
+    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    margin-top: 14px !important;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+  }
+}
+
+ion-popover.header-profile-popover {
+  --width: 250px;
+  --max-width: 260px;
+  --offset-x: -20px !important;
+}
+
+ion-popover.header-notif-popover {
+  --width: 320px;
+  --max-width: 340px;
+}
+
+.profile-popover-content {
+  padding: 0.75rem;
+
+  .popover-user-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 0.4rem 0.75rem 0.4rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 0.5rem;
+
+    .user-avatar-large {
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(217, 119, 6, 0.25);
+    }
+
+    .user-info-text {
+      display: flex;
+      flex-direction: column;
+
+      .user-name {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 800;
+        font-size: 0.92rem;
+        color: #0f172a;
+        line-height: 1.2;
+      }
+
+      .role-badge-small {
+        margin-top: 0.2rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #d97706;
+      }
+    }
+  }
+
+  .popover-menu-list {
+    background: transparent;
+    padding: 0;
+
+    .dropdown-popover-item {
+      --padding-start: 0.5rem;
+      --padding-end: 0.5rem;
+      --min-height: 2.6rem;
+      --border-radius: 0.5rem;
+      --background-hover: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 0.2rem;
+      cursor: pointer;
+
+      .menu-item-icon {
+        font-size: 1.15rem;
+        margin-right: 0.6rem;
+        color: #475569;
+      }
+
+      &.logout-pop-item {
+        margin-top: 0.3rem;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 0.3rem;
+        .menu-item-icon {
+          color: #dc2626;
+        }
+      }
+    }
   }
 }
