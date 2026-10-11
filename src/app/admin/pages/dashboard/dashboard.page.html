@@ -1,5 +1,3 @@
-<app-header></app-header>
-
 <ion-content [fullscreen]="true" class="admin-dashboard-content">
   
   <div class="dashboard-wrapper">
@@ -7,13 +5,7 @@
     <!-- WELCOME HEADER BANNER -->
     <div class="welcome-header-banner">
       <div class="welcome-text">
-        <h1 class="page-title">Welcome back, {{ adminName }} 👋</h1>
-        <p class="page-subtitle">Here is the real-time summary of your institute's learning ecosystem today.</p>
-      </div>
-
-      <div class="session-badge">
-        <span class="badge-icon">📅</span>
-        <span>Academic Session 2026</span>
+        <h1 class="page-title">Welcome, {{ adminName }}</h1>
       </div>
     </div>
 
@@ -21,7 +13,7 @@
     <div class="metrics-grid">
       
       <!-- Stat 1: Students -->
-      <div class="stat-card amber-border">
+      <div class="stat-card">
         <div class="stat-card-top">
           <div class="stat-icon-box amber-bg">👥</div>
           <div class="trend-badge green-trend">+12% 📈</div>
@@ -31,7 +23,7 @@
       </div>
 
       <!-- Stat 2: Faculty -->
-      <div class="stat-card green-border">
+      <div class="stat-card">
         <div class="stat-card-top">
           <div class="stat-icon-box green-bg">🎓</div>
           <div class="status-chip active-chip">Active</div>
@@ -41,7 +33,7 @@
       </div>
 
       <!-- Stat 3: Published Courses -->
-      <div class="stat-card purple-border">
+      <div class="stat-card">
         <div class="stat-card-top">
           <div class="stat-icon-box purple-bg">📚</div>
           <div class="status-chip count-chip">84 Active</div>
@@ -51,7 +43,7 @@
       </div>
 
       <!-- Stat 4: Revenue -->
-      <div class="stat-card teal-border">
+      <div class="stat-card">
         <div class="stat-card-top">
           <div class="stat-icon-box teal-bg">💰</div>
           <div class="trend-badge green-trend">+18% 📈</div>

@@ -1,259 +1,791 @@
-<ion-header class="admin-top-header">
-  <ion-toolbar class="admin-toolbar">
+<ion-header class="ultima-top-header">
+  <ion-toolbar class="ultima-toolbar">
     
-    <!-- LEFT SIDE BRAND LOGO FOR TABLET & MOBILE VIEW -->
-    <div slot="start" class="mobile-header-brand">
-      <a class="brand-logo" routerLink="/admin/dashboard">
-        <div class="logo-badge">
-          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+    <!-- LEFT SECTION: LOGO BOX -->
+    <div slot="start" class="header-left-group">
+      
+      <!-- LOGO BOX -->
+      <a class="ultima-logo-box" routerLink="/admin/dashboard">
+        <div class="logo-polygon-badge">
+          <svg class="polygon-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 2L2 10V22L16 30L30 22V10L16 2Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M16 8L8 12.5V20L16 24.5L24 20V12.5L16 8Z" fill="currentColor" opacity="0.3"/>
+            <path d="M16 12L11 15V18.5L16 21L21 18.5V15L16 12Z" fill="currentColor"/>
           </svg>
         </div>
-        <span class="brand-name">EduDesk LMS</span>
+        <span class="brand-title">LearnSphere</span>
       </a>
+
     </div>
 
-    <!-- RIGHT SIDE ACTIONS (NOTIFICATION, PROFILE, TOP RIGHT HAMBURGER MENU) -->
-    <ion-buttons slot="end" class="header-actions-group">
+    <!-- DESKTOP RIGHT SECTION (VISIBILITY: DESKTOP ONLY >= 1024px) -->
+    <ion-buttons slot="end" class="header-right-group desktop-only-actions">
 
-      <!-- NOTIFICATION BELL WRAPPER & DROPDOWN -->
-      <button class="header-action-btn notification-wrapper" (click)="toggleNotificationsMenu($event)" title="Notifications">
-        <span class="bell-icon">🔔</span>
-        <span class="notify-badge" *ngIf="notificationsCount > 0">{{ notificationsCount }}</span>
+      <!-- 1. SEARCH ICON BUTTON -->
+      <button class="header-icon-btn" (click)="toggleSearchOverlay()" title="Search">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
       </button>
 
-      <ion-popover
-        [isOpen]="isNotificationsOpen"
-        [event]="notifPopoverEvent"
-        (didDismiss)="isNotificationsOpen = false"
-        side="bottom"
-        alignment="end"
-        class="header-notif-popover"
-      >
-        <ng-template>
-          <div class="popover-notif-header">
-            <h4>Notifications</h4>
-            <button class="btn-clear-notif" (click)="markAllNotificationsRead()" *ngIf="notificationsCount > 0">Mark Read</button>
-          </div>
-          <div class="popover-notif-body">
-            <div class="notif-item-row" *ngFor="let item of notificationsList" [class.unread]="!item.read">
-              <div class="notif-icon-circle">
-                <span *ngIf="item.type === 'student'">👤</span>
-                <span *ngIf="item.type === 'system'">⚙️</span>
-                <span *ngIf="item.type === 'payment'">💳</span>
-              </div>
-              <div class="notif-details">
-                <div class="notif-title-text">{{ item.title }}</div>
-                <div class="notif-desc-text">{{ item.desc }}</div>
-                <div class="notif-time-stamp">{{ item.time }}</div>
-              </div>
-            </div>
-          </div>
-        </ng-template>
-      </ion-popover>
-
-      <!-- PROFILE USER WRAPPER & DROPDOWN -->
-      <button class="profile-avatar-btn" (click)="toggleProfileMenu($event)" title="Admin Profile">
-        <div class="avatar-box">{{ adminInitials }}</div>
-        <span class="admin-name">{{ adminName }}</span>
-        <span class="dropdown-icon">▼</span>
+      <!-- 2. QUICK SETTINGS GEAR ICON BUTTON WITH TWO CURVED ARCS ( ⚙️ ) -->
+      <button class="header-icon-btn gear-ring-btn" (click)="toggleSettingsDrawer()" title="Settings Customizer">
+        <div class="ring-outline">
+          <svg class="h-icon gear-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
       </button>
 
-      <!-- TOP RIGHT HAMBURGER MENU BUTTON FOR TABLET & MOBILE -->
-      <ion-menu-button side="end" menu="admin-menu" color="dark" class="header-right-menu-btn"></ion-menu-button>
+      <!-- 3. NOTIFICATION BELL ICON BUTTON -->
+      <button class="header-icon-btn bell-btn" (click)="toggleNotificationsMenu($event)" title="Notifications">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span class="orange-dot-badge" *ngIf="notificationsCount > 0"></span>
+      </button>
 
-      <ion-popover
-        #adminProfilePopover
-        [isOpen]="showProfileMenu"
-        [event]="profilePopoverEvent"
-        (didDismiss)="showProfileMenu = false"
-        side="bottom"
-        alignment="end"
-        class="header-profile-popover"
-      >
-        <ng-template>
-          <div class="profile-popover-content">
-            <!-- PROFILE SECTION: SHOW LOGGED IN USER NAME NOT EMAIL -->
-            <div class="popover-user-header">
-              <div class="user-avatar-large">{{ adminInitials }}</div>
-              <div class="user-info-text">
-                <div class="user-name">{{ adminName }}</div>
-                <span class="role-badge-small">Admin Account</span>
-              </div>
-            </div>
+      <!-- 4. FOUR SQUARE APPS GRID ICON BUTTON -->
+      <button class="header-icon-btn apps-btn" (click)="toggleAppsMenu($event)" title="Modules & Apps">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+        </svg>
+      </button>
 
-            <!-- IONIC DROPDOWN MENU ITEMS -->
-            <ion-list lines="none" class="popover-menu-list">
-              <ion-item (click)="adminProfilePopover.dismiss(); goToProfile()" [button]="true" class="dropdown-popover-item">
-                <ion-icon name="person-outline" slot="start" class="menu-item-icon"></ion-icon>
-                <ion-label>My Profile</ion-label>
-              </ion-item>
-              <ion-item (click)="adminProfilePopover.dismiss(); openNotifications()" [button]="true" class="dropdown-popover-item">
-                <ion-icon name="notifications-outline" slot="start" class="menu-item-icon"></ion-icon>
-                <ion-label>Notification</ion-label>
-              </ion-item>
-              <ion-item (click)="adminProfilePopover.dismiss(); goToSettings()" [button]="true" class="dropdown-popover-item">
-                <ion-icon name="settings-outline" slot="start" class="menu-item-icon"></ion-icon>
-                <ion-label>Setting</ion-label>
-              </ion-item>
-              <ion-item (click)="adminProfilePopover.dismiss(); openLanguageModal()" [button]="true" class="dropdown-popover-item lang-pop-item">
-                <ion-icon name="globe-outline" slot="start" class="menu-item-icon"></ion-icon>
-                <ion-label>Change Language</ion-label>
-                <ion-badge slot="end" color="warning" class="active-lang-badge">{{ selectedLanguage.code | uppercase }}</ion-badge>
-              </ion-item>
-              <ion-item (click)="adminProfilePopover.dismiss(); logout()" [button]="true" lines="none" class="dropdown-popover-item logout-pop-item">
-                <ion-icon name="log-out-outline" slot="start" color="danger" class="menu-item-icon"></ion-icon>
-                <ion-label color="danger">Logout</ion-label>
-              </ion-item>
-            </ion-list>
-          </div>
-        </ng-template>
-      </ion-popover>
+      <!-- 5. USER PROFILE AVATAR BUTTON -->
+      <button class="ultima-profile-btn" (click)="toggleProfileMenu($event)" title="Admin Account">
+        <div class="avatar-circle-img">
+          {{ adminInitials }}
+        </div>
+      </button>
 
     </ion-buttons>
+
+    <!-- MOBILE & TABLET RIGHT SECTION (VISIBILITY: MOBILE/TAB ONLY < 1024px) -->
+    <ion-buttons slot="end" class="header-right-group mobile-only-actions">
+      
+      <!-- 1. RINGED GEAR BUTTON WITH TWO CURVED ARCS ( ⚙️ ) -->
+      <button class="header-icon-btn gear-ring-btn" (click)="toggleSettingsDrawer()" title="Settings Customizer">
+        <div class="ring-outline">
+          <svg class="h-icon gear-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+      </button>
+
+      <!-- 2. THREE DOTS KEBAB BUTTON (NO BACKGROUND CIRCLE) -->
+      <button class="kebab-transparent-btn" (click)="toggleMobileSubBar()" title="More Actions">
+        <span class="kebab-dots">⋮</span>
+      </button>
+
+      <!-- 3. HAMBURGER MENU ICON BUTTON (THREE LINES ICON ON RIGHT SIDE) -->
+      <button class="sidebar-menu-btn" (click)="toggleSidebar()" title="Open Sidebar Menu" aria-label="Open Sidebar Menu">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+    </ion-buttons>
+
   </ion-toolbar>
+
+  <!-- SECONDARY MOBILE & TABLET ACTION TOOLBAR STRIP (TOGGLED BY THREE DOTS BUTTON) -->
+  <div class="mobile-sub-toolbar-strip" *ngIf="isMobileSubBarOpen">
+    <div class="mobile-sub-actions-row">
+      
+      <!-- Search Button -->
+      <button class="sub-action-btn" (click)="toggleSearchOverlay()" title="Search">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+
+      <!-- Notification Bell -->
+      <button class="sub-action-btn" (click)="toggleNotificationsMenu($event)" title="Notifications">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span class="orange-dot-badge" *ngIf="notificationsCount > 0"></span>
+      </button>
+
+      <!-- Apps Grid (4 Square Box) -->
+      <button class="sub-action-btn" (click)="toggleAppsMenu($event)" title="Modules & Apps">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+        </svg>
+      </button>
+
+      <!-- Profile Avatar -->
+      <button class="sub-profile-btn" (click)="toggleProfileMenu($event)" title="Profile">
+        <div class="avatar-circle-img">
+          {{ adminInitials }}
+        </div>
+      </button>
+
+      <!-- Close Arrow Button -->
+      <button class="sub-action-btn" (click)="toggleMobileSubBar()" title="Close Actions">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- NOTIFICATION DROPDOWN POPOVER -->
+  <ion-popover
+    [isOpen]="isNotificationsOpen"
+    [event]="notifPopoverEvent"
+    (didDismiss)="isNotificationsOpen = false"
+    side="bottom"
+    alignment="end"
+    class="ultima-notif-popover"
+  >
+    <ng-template>
+      <div class="popover-notif-container">
+        <div class="notif-header-title">
+          You have <strong>{{ notificationsList.length }}</strong> new notifications
+        </div>
+        
+        <div class="notif-items-list">
+          <div class="notif-item-card" *ngFor="let notif of notificationsList" [class.unread]="!notif.read">
+            <div class="notif-avatar-circle" [ngClass]="notif.avatarBg">
+              {{ notif.userAvatar }}
+            </div>
+            <div class="notif-content-box">
+              <div class="notif-user-row">
+                <span class="user-name">{{ notif.userName }}</span>
+                <span class="time-ago">{{ notif.timeAgo }}</span>
+              </div>
+              <div class="notif-message-text">{{ notif.message }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="notif-footer-row">
+          <button class="btn-mark-read" (click)="markAllNotificationsRead()">Mark all as read</button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-popover>
+
+  <!-- APPS GRID POPOVER CARD -->
+  <ion-popover
+    [isOpen]="isAppsOpen"
+    [event]="appsPopoverEvent"
+    (didDismiss)="isAppsOpen = false"
+    side="bottom"
+    alignment="end"
+    class="ultima-apps-popover"
+  >
+    <ng-template>
+      <div class="popover-apps-container">
+        <div class="ultima-apps-grid">
+          
+          <div class="app-tile" (click)="openLocationModal()">
+            <div class="app-icon-circle bg-blue">
+              <ion-icon name="location-outline" class="tile-ion-icon"></ion-icon>
+            </div>
+            <span class="app-tile-label">Locations</span>
+          </div>
+
+          <div class="app-tile" (click)="isAppsOpen = false; openLanguageModal()">
+            <div class="app-icon-circle bg-green">
+              <ion-icon name="language-outline" class="tile-ion-icon"></ion-icon>
+            </div>
+            <span class="app-tile-label">Language</span>
+          </div>
+
+          <div class="app-tile" (click)="isAppsOpen = false; toggleSettingsDrawer('profile')">
+            <div class="app-icon-circle bg-purple">
+              <ion-icon name="color-palette-outline" class="tile-ion-icon"></ion-icon>
+            </div>
+            <span class="app-tile-label">Appearance</span>
+          </div>
+
+          <div class="app-tile" (click)="isAppsOpen = false; router.navigate(['/admin/dashboard'])">
+            <div class="app-icon-circle bg-amber">
+              <svg class="tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22v-5"></path>
+                <path d="M9 8V2"></path>
+                <path d="M15 2v6"></path>
+                <path d="M18 8v5a6 6 0 0 1-12 0V8z"></path>
+              </svg>
+            </div>
+            <span class="app-tile-label">Integrations</span>
+          </div>
+
+          <div class="app-tile" (click)="isAppsOpen = false; toggleSettingsDrawer('maintenance')">
+            <div class="app-icon-circle bg-cyan">
+              <svg class="tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="8" ry="3"></ellipse>
+                <path d="M4 5v6a8 3 0 0 0 16 0V5"></path>
+                <path d="M4 11v6a8 3 0 0 0 12 2.6"></path>
+                <path d="M21 16a3.5 3.5 0 1 1-3.5-3.5"></path>
+                <polyline points="21 13 21 16 18 16"></polyline>
+              </svg>
+            </div>
+            <span class="app-tile-label">Backup</span>
+          </div>
+
+          <div class="app-tile" (click)="isAppsOpen = false; toggleSettingsDrawer('password')">
+            <div class="app-icon-circle bg-navy">
+              <ion-icon name="shield-checkmark-outline" class="tile-ion-icon"></ion-icon>
+            </div>
+            <span class="app-tile-label">Security</span>
+          </div>
+
+        </div>
+      </div>
+    </ng-template>
+  </ion-popover>
+
+  <!-- PROFILE SETTINGS DROPDOWN -->
+  <ion-popover
+    #adminProfilePopover
+    [isOpen]="showProfileMenu"
+    [event]="profilePopoverEvent"
+    (didDismiss)="showProfileMenu = false"
+    side="bottom"
+    alignment="end"
+    class="ultima-profile-popover"
+  >
+    <ng-template>
+      <div class="profile-menu-container">
+        <ul class="ultima-dropdown-menu">
+          
+          <li (click)="closeAdminProfilePopover(); goToSettings()">
+            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Settings</span>
+          </li>
+
+          <li (click)="openTermsModal()">
+            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Terms of Usage</span>
+          </li>
+
+          <li (click)="openSupportModal()">
+            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+            <span>Support</span>
+          </li>
+
+          <li (click)="logout()" class="logout-menu-item">
+            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+              <line x1="12" y1="2" x2="12" y2="12"></line>
+            </svg>
+            <span>Logout</span>
+          </li>
+
+        </ul>
+      </div>
+    </ng-template>
+  </ion-popover>
+
 </ion-header>
 
-<!-- SUCCESS TOAST NOTIFICATION -->
-<div class="toast-alert-float" *ngIf="showToast">
-  <span class="toast-icon">🌐</span>
-  <span class="toast-text">{{ toastMessage }}</span>
+<!-- TOP EXPANDABLE INLINE SEARCH BAR -->
+<div class="ultima-search-bar-strip" *ngIf="isSearchOpen">
+  <div class="search-inner-wrapper">
+    <svg class="search-lens-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <input
+      type="text"
+      [(ngModel)]="headerSearchQuery"
+      (input)="filterSearchResults()"
+      placeholder="Search..."
+      class="inline-search-input"
+      autoFocus
+    />
+    <button class="close-inline-search-btn" (click)="toggleSearchOverlay()">✕</button>
+  </div>
+
+  <div class="inline-search-results-dropdown" *ngIf="headerSearchQuery.trim()">
+    <div
+      class="search-res-item"
+      *ngFor="let item of filteredSearchResults"
+      (click)="navigateToSearchResult(item.route)"
+    >
+      <ion-icon [name]="item.icon"></ion-icon>
+      <span class="res-name">{{ item.title }}</span>
+      <span class="res-cat">{{ item.category }}</span>
+    </div>
+    <div class="no-res-msg" *ngIf="filteredSearchResults.length === 0">
+      No matching results found
+    </div>
+  </div>
 </div>
 
-<!-- ==================================================================== -->
-<!-- CHANGE LANGUAGE MODAL -->
-<!-- ==================================================================== -->
-<ion-modal [isOpen]="isLanguageModalOpen" (didDismiss)="closeLanguageModal()" class="custom-language-modal">
-  <ng-template>
-    <div class="lang-modal-container">
+<!-- RIGHT SIDE ACCOUNT & SYSTEM SETTINGS DRAWER PANEL -->
+<div class="settings-drawer-backdrop" *ngIf="isSettingsDrawerOpen" (click)="closeSettingsDrawer()">
+  <div class="settings-drawer-panel" (click)="$event.stopPropagation()">
+    
+    <!-- DRAWER TOP BAR -->
+    <div class="drawer-header-row">
+      <div class="drawer-title-group">
+        <h3 class="drawer-title">Account Settings</h3>
+      </div>
+      <button class="drawer-close-btn" (click)="closeSettingsDrawer()" title="Close Settings">✕</button>
+    </div>
+
+    <!-- DRAWER BODY SCROLLABLE -->
+    <div class="drawer-body-content">
       
-      <!-- MODAL HEADER -->
-      <div class="lang-modal-header">
-        <div class="modal-title-group">
-          <div class="header-icon-box">
-            🌐
+      <!-- TOP ADMIN PROFILE CARD (LIGHT THEME) -->
+      <div class="drawer-hero-card">
+        <div class="hero-left-profile">
+          <div class="admin-avatar-badge" (click)="photoInput.click()" title="Click to upload profile photo">
+            <img *ngIf="adminAvatarUrl" [src]="adminAvatarUrl" alt="Admin Photo" class="avatar-preview-img" />
+            <span *ngIf="!adminAvatarUrl">{{ adminInitials }}</span>
           </div>
-          <div>
-            <h3 class="modal-title">Select System Language</h3>
-            <p class="modal-subtitle">Choose your preferred language for the LMS administration workspace</p>
+          <div class="admin-meta">
+            <h2 class="admin-name">{{ adminName }}</h2>
+            <span class="admin-email">{{ adminEmail }}</span>
           </div>
         </div>
-        <button class="modal-close-btn" (click)="closeLanguageModal()" title="Close Modal">✕</button>
-      </div>
 
-      <!-- ACTIVE LANGUAGE STATUS BANNER -->
-      <div class="active-lang-banner">
-        <span class="banner-label">Active Language:</span>
-        <span class="banner-value">
-          <span class="flag-icon">{{ selectedLanguage.flag }}</span> 
-          <strong>{{ selectedLanguage.name }}</strong> 
-          <span class="native-name">({{ selectedLanguage.nativeName }})</span>
-        </span>
-      </div>
-
-      <!-- SEARCH BAR & ADD ACTION ROW -->
-      <div class="lang-search-row">
-        <div class="search-input-wrapper">
-          <span class="search-icon">🔍</span>
-          <input 
-            type="text" 
-            [(ngModel)]="searchQuery" 
-            (input)="filterLanguages()" 
-            placeholder="Search language by name or code (e.g. English, Hindi, es)..." 
-            class="search-input"
-          />
-          <button *ngIf="searchQuery" class="clear-search-btn" (click)="searchQuery=''; filterLanguages()">✕</button>
+        <!-- RIGHT SIDE PENCIL ICON BUTTON FOR UPDATE PHOTO -->
+        <div class="hero-edit-photo-action">
+          <button class="btn-pencil-edit" (click)="photoInput.click()" title="Update Profile Photo">
+            <svg class="pencil-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+          </button>
+          <input #photoInput type="file" accept="image/*" (change)="onProfilePhotoUpload($event)" style="display: none;" />
         </div>
+      </div>
 
-        <button class="btn-toggle-add" (click)="toggleAddLanguageForm()" [class.active]="showAddLanguageForm">
-          <span class="plus-icon">{{ showAddLanguageForm ? '✕' : '➕' }}</span>
-          <span>{{ showAddLanguageForm ? 'Cancel' : 'Add Language' }}</span>
+      <!-- HORIZONTAL TAB NAVIGATION PILLS -->
+      <div class="drawer-pills-container">
+        <button class="pill-tab-btn" [class.active]="activeTab === 'profile'" (click)="selectTab('profile')">
+          <ion-icon name="person-outline" class="tab-ion-icon"></ion-icon> Personal Details
+        </button>
+
+        <button class="pill-tab-btn" [class.active]="activeTab === 'password'" (click)="selectTab('password')">
+          <ion-icon name="lock-closed-outline" class="tab-ion-icon"></ion-icon> Change Password
+        </button>
+
+        <button class="pill-tab-btn" [class.active]="activeTab === 'maintenance'" (click)="selectTab('maintenance')">
+          <ion-icon name="construct-outline" class="tab-ion-icon"></ion-icon> Software Maintenance
         </button>
       </div>
 
-      <!-- INLINE ADD CUSTOM LANGUAGE FORM -->
-      <div class="add-language-card" *ngIf="showAddLanguageForm">
-        <div class="add-card-header">
-          <h4>➕ Add New Custom Language</h4>
-          <p>Register a new language option in the system list</p>
+      <!-- IN-DRAWER TOAST ALERT -->
+      <div class="toast-alert-success" *ngIf="showDrawerToast">
+        {{ drawerToastMessage }}
+      </div>
+
+      <!-- ==================================================================== -->
+      <!-- 1. PERSONAL DETAILS (READ-ONLY) -->
+      <!-- ==================================================================== -->
+      <div class="setting-card-section" *ngIf="activeTab === 'profile'">
+        <div class="section-header">
+          <h3 class="section-title">Personal Details</h3>
         </div>
 
-        <div class="add-form-grid">
-          <div class="form-group">
-            <label>Language Name (English)</label>
-            <input type="text" [(ngModel)]="newLangName" placeholder="e.g. Spanish" class="modal-input" />
+        <div class="settings-form-grid">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <div class="detail-value-text">{{ adminName }}</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <div class="detail-value-text">{{ adminEmail }}</div>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Native Name</label>
-            <input type="text" [(ngModel)]="newLangNative" placeholder="e.g. Español" class="modal-input" />
-          </div>
-          <div class="form-group">
-            <label>ISO Code</label>
-            <input type="text" [(ngModel)]="newLangCode" placeholder="e.g. es" class="modal-input" />
-          </div>
-          <div class="form-group">
-            <label>Flag Emoji / Icon</label>
-            <input type="text" [(ngModel)]="newLangFlag" placeholder="e.g. 🇪🇸" class="modal-input" />
-          </div>
-        </div>
 
-        <div class="form-error-msg" *ngIf="addLanguageError">
-          ⚠️ {{ addLanguageError }}
-        </div>
-
-        <div class="add-card-actions">
-          <button class="btn-submit-lang" (click)="submitAddLanguage()">Save Language</button>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <div class="detail-value-text">{{ adminPhone }}</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <div class="detail-value-text">{{ adminRole }}</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- LANGUAGES LIST GRID -->
-      <div class="lang-modal-body">
-        
-        <div class="languages-grid" *ngIf="filteredLanguages.length > 0">
-          <div 
-            *ngFor="let lang of filteredLanguages" 
-            class="language-card" 
-            [class.selected]="lang.code === selectedLanguage.code"
-            (click)="selectLanguage(lang)"
-          >
-            <div class="lang-card-left">
-              <span class="lang-flag-large">{{ lang.flag }}</span>
-              <div class="lang-info">
-                <div class="lang-primary-name">
-                  {{ lang.nativeName }}
-                  <span class="lang-code-pill">{{ lang.code | uppercase }}</span>
+      <!-- ==================================================================== -->
+      <!-- 2. CHANGE PASSWORD SECTION -->
+      <!-- ==================================================================== -->
+      <div class="setting-card-section" *ngIf="activeTab === 'password'">
+        <div class="section-header">
+          <h3 class="section-title">Change Password</h3>
+        </div>
+
+        <div class="settings-form-grid">
+          <div class="field-group">
+            <ion-input
+              label="Current Password"
+              labelPlacement="floating"
+              fill="outline"
+              type="password"
+              [(ngModel)]="settingsService.passwordData.currentPassword"
+              class="ionic-floating-input"
+            >
+              <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+            </ion-input>
+          </div>
+
+          <div class="form-row-2">
+            <div class="field-group">
+              <ion-input
+                label="New Password"
+                labelPlacement="floating"
+                fill="outline"
+                type="password"
+                [(ngModel)]="settingsService.passwordData.newPassword"
+                class="ionic-floating-input"
+              >
+                <ion-icon slot="start" name="key-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+              </ion-input>
+            </div>
+            <div class="field-group">
+              <ion-input
+                label="Confirm New Password"
+                labelPlacement="floating"
+                fill="outline"
+                type="password"
+                [(ngModel)]="settingsService.passwordData.confirmPassword"
+                class="ionic-floating-input"
+              >
+                <ion-icon slot="start" name="shield-checkmark-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+              </ion-input>
+            </div>
+          </div>
+
+          <div class="checkbox-row-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="settingsService.passwordData.enable2FA" />
+              <span>Require Two-Factor Authentication (2FA) for next login</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="settingsService.passwordData.logoutOtherDevices" />
+              <span>Log out from all other active sessions & devices</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-card-footer">
+          <button class="btn-save-settings" (click)="updatePassword()">
+            Update Password
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================================================================== -->
+      <!-- 3. SOFTWARE MAINTENANCE & OPERATIONS -->
+      <!-- ==================================================================== -->
+      <div class="setting-card-section" *ngIf="activeTab === 'maintenance'">
+        <div class="section-header">
+          <h3 class="section-title">Software Maintenance</h3>
+        </div>
+
+        <div class="settings-form-grid">
+          <!-- MAINTENANCE TOGGLE BOX -->
+          <div class="maint-card-box">
+            <div class="maint-info">
+              <h4 class="maint-title">System Maintenance Mode</h4>
+              <p class="maint-sub">Enabling this puts the LMS app under scheduled maintenance. Only Admins can access.</p>
+            </div>
+
+            <ion-toggle
+              [(ngModel)]="settingsService.maintenanceData.maintenanceMode"
+              (ionChange)="toggleMaintenanceMode()"
+              color="danger"
+              class="maint-ion-toggle"
+            >
+            </ion-toggle>
+          </div>
+
+          <div class="form-group" *ngIf="settingsService.maintenanceData.maintenanceMode">
+            <label class="form-label">Maintenance Banner Notice Message</label>
+            <input type="text" [(ngModel)]="settingsService.maintenanceData.maintenanceMessage" class="modal-form-input" />
+          </div>
+
+          <!-- DATABASE BACKUP & CACHE OPERATIONS -->
+          <div class="ops-grid-cards">
+            <div class="op-action-card">
+              <div class="op-card-top">
+                <div class="op-icon-pill op-pill-blue">
+                  <ion-icon name="server-outline"></ion-icon>
                 </div>
-                <div class="lang-secondary-name">{{ lang.name }}</div>
+                <div class="op-card-info">
+                  <h5 class="op-name">Database Snapshot Backup</h5>
+                  <span class="op-meta">Size: {{ settingsService.maintenanceData.dbSize }} • Last: {{ settingsService.maintenanceData.lastBackupTime }}</span>
+                </div>
+              </div>
+              <button class="btn-op-action" (click)="triggerBackup()">
+                <ion-icon name="cloud-download-outline"></ion-icon>
+                <span>Create Instant Backup</span>
+              </button>
+            </div>
+
+            <div class="op-action-card">
+              <div class="op-card-top">
+                <div class="op-icon-pill op-pill-red">
+                  <ion-icon name="flash-outline"></ion-icon>
+                </div>
+                <div class="op-card-info">
+                  <h5 class="op-name">System Cache & Temp Storage</h5>
+                  <span class="op-meta">Active Cache: {{ settingsService.maintenanceData.cacheSize }}</span>
+                </div>
+              </div>
+              <button class="btn-op-action btn-red" (click)="clearCache()">
+                <ion-icon name="trash-outline"></ion-icon>
+                <span>Clear System Cache</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SOFTWARE VERSION & AUTO BACKUP PREFS -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Installed LMS Software Version</label>
+              <div class="static-value-box">
+                <ion-icon name="shield-checkmark-outline" class="box-icon"></ion-icon>
+                <span>{{ settingsService.maintenanceData.softwareVersion }}</span>
               </div>
             </div>
-
-            <div class="lang-card-right">
-              <span class="selected-check-badge" *ngIf="lang.code === selectedLanguage?.code">
-                ✓ Active
-              </span>
-              <span class="select-hover-hint" *ngIf="lang.code !== selectedLanguage?.code">
-                Select
-              </span>
+            <div class="form-group">
+              <label class="form-label">System Audit Log Retention</label>
+              <div class="select-wrapper-box">
+                <select [(ngModel)]="settingsService.maintenanceData.logRetentionDays" class="custom-form-select">
+                  <option value="15 Days">15 Days</option>
+                  <option value="30 Days">30 Days</option>
+                  <option value="90 Days">90 Days</option>
+                </select>
+                <ion-icon name="chevron-down-outline" class="select-arrow"></ion-icon>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- NO RESULTS FOUND -->
-        <div class="empty-search-state" *ngIf="filteredLanguages.length === 0">
-          <div class="empty-icon">🌐</div>
-          <h5>No languages match "{{ searchQuery }}"</h5>
-          <p>Try searching with another term or click "Add Language" to register a new one.</p>
-        </div>
-
-      </div>
-
-      <!-- MODAL FOOTER -->
-      <div class="lang-modal-footer">
-        <span class="footer-count">Total Added Languages: <strong>{{ languages.length }}</strong></span>
-        <button class="btn-close-modal" (click)="closeLanguageModal()">Done</button>
       </div>
 
     </div>
-  </ng-template>
-</ion-modal>
+
+  </div>
+</div>
+
+<!-- TERMS OF USAGE MODAL -->
+<div class="custom-info-modal-backdrop" *ngIf="isTermsModalOpen" (click)="closeTermsModal()">
+  <div class="custom-info-modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header-banner">
+      <h3>Terms of Usage</h3>
+      <button class="modal-close-icon" (click)="closeTermsModal()">✕</button>
+    </div>
+    <div class="modal-info-body">
+      <h4>EduDesk LMS & Ultima System Agreement</h4>
+      <p>Welcome to EduDesk LMS Administration Portal. By accessing and operating this dashboard, you agree to comply with system security protocols, student data confidentiality rules, and role-based access controls.</p>
+      <ul>
+        <li>Keep administrative login credentials secure and confidential.</li>
+        <li>Student personal details and fee records must strictly be accessed for authorized academic purposes.</li>
+        <li>All system audits and database changes are logged in real-time.</li>
+      </ul>
+    </div>
+    <div class="modal-footer-actions">
+      <button class="btn-modal-primary" (click)="closeTermsModal()">I Understand</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPORT & HELP MODAL -->
+<div class="custom-info-modal-backdrop" *ngIf="isSupportModalOpen" (click)="closeSupportModal()">
+  <div class="custom-info-modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header-banner">
+      <h3>Technical Support & Helpdesk</h3>
+      <button class="modal-close-icon" (click)="closeSupportModal()">✕</button>
+    </div>
+    <div class="modal-info-body">
+      <h4>Need Assistance with EduDesk LMS?</h4>
+      <p>Our dedicated technical team is available to assist you 24/7 with server maintenance, student database sync, and feature updates.</p>
+      <div class="support-contact-grid">
+        <div class="support-card">
+          <span class="s-icon">✉️</span>
+          <strong>Email Support</strong>
+          <span>support@lms-edu.com</span>
+        </div>
+        <div class="support-card">
+          <span class="s-icon">📞</span>
+          <strong>Help Line</strong>
+          <span>+91 1800-123-4567</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer-actions">
+      <button class="btn-modal-primary" (click)="closeSupportModal()">Close Support</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATIONS MANAGEMENT MODAL -->
+<div class="custom-info-modal-backdrop" *ngIf="isLocationModalOpen" (click)="closeLocationModal()">
+  <div class="custom-info-modal-card location-modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header-banner">
+      <div class="modal-title-with-icon">
+        <ion-icon name="location-outline" class="modal-head-icon"></ion-icon>
+        <div>
+          <h3>Campus & Branch Locations</h3>
+          <span class="modal-subhead">Add country, state, city & pincode for campus centers</span>
+        </div>
+      </div>
+      <button class="modal-close-icon" (click)="closeLocationModal()">✕</button>
+    </div>
+
+    <div class="modal-info-body location-modal-body">
+      <!-- ADD LOCATION FORM BOX -->
+      <div class="location-add-box">
+        <div class="loc-box-header">
+          <ion-icon name="add-circle-outline"></ion-icon>
+          <span>Add New Location</span>
+        </div>
+
+        <div class="loc-form-grid">
+          <div class="loc-row-2">
+            <ion-input
+              label="Country"
+              labelPlacement="floating"
+              fill="outline"
+              type="text"
+              [(ngModel)]="newLocationCountry"
+              class="ionic-floating-input"
+            >
+              <ion-icon slot="start" name="globe-outline" class="input-ion-icon"></ion-icon>
+            </ion-input>
+
+            <ion-input
+              label="State"
+              labelPlacement="floating"
+              fill="outline"
+              type="text"
+              [(ngModel)]="newLocationState"
+              placeholder="e.g. Maharashtra"
+              class="ionic-floating-input"
+            >
+              <ion-icon slot="start" name="map-outline" class="input-ion-icon"></ion-icon>
+            </ion-input>
+          </div>
+
+          <div class="loc-row-2">
+            <ion-input
+              label="City"
+              labelPlacement="floating"
+              fill="outline"
+              type="text"
+              [(ngModel)]="newLocationCity"
+              placeholder="e.g. Mumbai"
+              class="ionic-floating-input"
+            >
+              <ion-icon slot="start" name="business-outline" class="input-ion-icon"></ion-icon>
+            </ion-input>
+
+            <ion-input
+              label="Pincode / ZIP"
+              labelPlacement="floating"
+              fill="outline"
+              type="text"
+              [(ngModel)]="newLocationPincode"
+              placeholder="e.g. 400001"
+              class="ionic-floating-input"
+            >
+              <ion-icon slot="start" name="navigate-circle-outline" class="input-ion-icon"></ion-icon>
+            </ion-input>
+          </div>
+
+          <div class="loc-error-msg" *ngIf="locationFormError">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span>{{ locationFormError }}</span>
+          </div>
+
+          <div class="loc-btn-wrap">
+            <button class="btn-add-loc" (click)="addLocation()">
+              <ion-icon name="add-outline"></ion-icon>
+              <span>Save Location</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAVED LOCATIONS LIST -->
+      <div class="saved-locations-header">
+        <span>Configured Locations ({{ locationsList.length }})</span>
+      </div>
+
+      <div class="locations-scroll-list">
+        <div class="location-card-item" *ngFor="let loc of locationsList">
+          <div class="loc-item-left">
+            <div class="loc-pin-icon" [class.primary]="loc.isPrimary">
+              <ion-icon name="location"></ion-icon>
+            </div>
+            <div class="loc-details">
+              <div class="loc-title-row">
+                <span class="loc-city-state">{{ loc.city }}, {{ loc.state }}</span>
+                <span class="primary-badge" *ngIf="loc.isPrimary">Primary Branch</span>
+              </div>
+              <div class="loc-meta-row">
+                <span class="loc-country">{{ loc.country }}</span>
+                <span class="dot-sep">•</span>
+                <span class="loc-pin">PIN: {{ loc.pincode }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="loc-item-actions">
+            <button
+              class="btn-make-primary"
+              *ngIf="!loc.isPrimary"
+              (click)="setPrimaryLocation(loc.id)"
+              title="Set as primary branch"
+            >
+              Set Primary
+            </button>
+            <button class="btn-del-loc" (click)="deleteLocation(loc.id)" title="Remove location">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="no-locations-msg" *ngIf="locationsList.length === 0">
+          <ion-icon name="location-outline"></ion-icon>
+          <p>No branch locations added yet. Use the form above to add one.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer-actions">
+      <button class="btn-modal-primary" (click)="closeLocationModal()">Done</button>
+    </div>
+  </div>
+</div>

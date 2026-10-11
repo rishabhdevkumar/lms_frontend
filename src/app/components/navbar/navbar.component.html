@@ -3,7 +3,7 @@
   <div class="navbar-container">
 
     <!-- BRAND LOGO BADGE -->
-    <a class="brand-logo" routerLink="/home" (click)="setActiveTab('Home')">
+    <a class="brand-logo" routerLink="/home" (click)="onHomeClick()">
       <div class="logo-badge">
         <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
@@ -17,22 +17,22 @@
 
     <!-- DESKTOP NAV LINKS -->
     <nav class="desktop-nav-links">
-      <a routerLink="/home" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Home')">
+      <a routerLink="/home" [class.active]="activeTab === 'Home'" class="nav-item" (click)="onHomeClick()">
         Home
       </a>
-      <a routerLink="/courses" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Courses')">
+      <a routerLink="/courses" [class.active]="activeTab === 'Courses'" class="nav-item" (click)="setActiveTab('Courses')">
         Courses
       </a>
-      <a routerLink="/live-classes" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Live Classes')">
+      <a routerLink="/live-classes" [class.active]="activeTab === 'Live Classes'" class="nav-item" (click)="setActiveTab('Live Classes')">
         Live Classes
       </a>
-      <a routerLink="/courses" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Practice Tests')">
+      <a routerLink="/courses" [class.active]="activeTab === 'Practice Tests'" class="nav-item" (click)="setActiveTab('Practice Tests')">
         Practice Tests
       </a>
-      <a routerLink="/pricing" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Pricing / Plans')">
+      <a routerLink="/pricing" [class.active]="activeTab === 'Pricing / Plans'" class="nav-item" (click)="setActiveTab('Pricing / Plans')">
         Pricing / Plans
       </a>
-      <a routerLink="/home" routerLinkActive="active" class="nav-item" (click)="setActiveTab('Contact Us')">
+      <a (click)="scrollToContact($event)" [class.active]="activeTab === 'Contact Us'" class="nav-item">
         Contact Us
       </a>
     </nav>
@@ -142,12 +142,12 @@
 
       <!-- NAVIGATION LINKS LIST -->
       <div class="mobile-nav-links">
-        <a routerLink="/home" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Home')">Home</a>
-        <a routerLink="/courses" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Courses')">Courses</a>
-        <a routerLink="/live-classes" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Live Classes')">Live Classes</a>
-        <a routerLink="/courses" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Practice Tests')">Practice Tests</a>
-        <a routerLink="/pricing" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Pricing / Plans')">Pricing / Plans</a>
-        <a routerLink="/home" routerLinkActive="active" class="mobile-nav-item" (click)="setActiveTab('Contact Us')">Contact Us</a>
+        <a routerLink="/home" [class.active]="activeTab === 'Home'" class="mobile-nav-item" (click)="onHomeClick()">Home</a>
+        <a routerLink="/courses" [class.active]="activeTab === 'Courses'" class="mobile-nav-item" (click)="setActiveTab('Courses')">Courses</a>
+        <a routerLink="/live-classes" [class.active]="activeTab === 'Live Classes'" class="mobile-nav-item" (click)="setActiveTab('Live Classes')">Live Classes</a>
+        <a routerLink="/courses" [class.active]="activeTab === 'Practice Tests'" class="mobile-nav-item" (click)="setActiveTab('Practice Tests')">Practice Tests</a>
+        <a routerLink="/pricing" [class.active]="activeTab === 'Pricing / Plans'" class="mobile-nav-item" (click)="setActiveTab('Pricing / Plans')">Pricing / Plans</a>
+        <a (click)="scrollToContact($event)" [class.active]="activeTab === 'Contact Us'" class="mobile-nav-item">Contact Us</a>
       </div>
 
       <!-- CONTROL BUTTONS GRID -->

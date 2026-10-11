@@ -18,6 +18,7 @@ export interface User {
   email: string;
   role: UserRole;
   rollNo?: string;
+  phone?: string;
   token?: string;
 }
 
@@ -116,15 +117,40 @@ export class AuthService {
     const basePath = this.getBasePath();
     const loginPayload = { email, username: email, password, role };
 
-    const loginObs$ = this.httpClient.post(`${basePath}/users/login`, loginPayload).pipe(
-      catchError(() => this.httpClient.post(`${basePath}/users/authenticate`, loginPayload)),
-      catchError(() => this.httpClient.post(`${basePath}/user/login`, loginPayload))
+    const loginObs$ = this.httpClient.post(`${basePath}/users/authenticate`, loginPayload).pipe(
+      catchError((err: any) => {
+        // If 404 (endpoint path not found), try /users/login or /user/login
+        if (err?.status === 404) {
+          return this.httpClient.post(`${basePath}/users/login`, loginPayload).pipe(
+            catchError((err2: any) => {
+              if (err2?.status === 404) {
+                return this.httpClient.post(`${basePath}/user/login`, loginPayload);
+              }
+              return throwError(() => err2);
+            })
+          );
+        }
+        // If 400, 401, 403, 500, etc., propagate the actual error
+        return throwError(() => err);
+      })
     );
 
     return loginObs$.pipe(
       map((res: any) => {
-        const token = res?.token || res?.accessToken || res?.data?.token || 'jwt-' + role + '-token-' + Date.now();
+        // 1. Strict validation: check if backend returned failure (e.g., { ok: false, msg: 'Wrong password' })
+        if (!res || res.ok === false || res.ok === 0 || res.success === false) {
+          const failureMsg = res?.msg || res?.message || 'Invalid email or password.';
+          return { success: false, message: failureMsg };
+        }
+
         const resUser = this.unwrapUserData(res) || {};
+        const token = res?.token || res?.accessToken || res?.data?.token || resUser?.token;
+        if (!token) {
+          return {
+            success: false,
+            message: res?.msg || 'Authentication failed: No access token received from server.'
+          };
+        }
 
         const rawRole = String(
           resUser?.role || 
@@ -143,47 +169,31 @@ export class AuthService {
         } else if (rawRole === 'student' || rawRole.includes('student')) {
           finalRole = 'student';
         } else {
-          // If email is rishabh1234@gmail.com or contains admin, treat as admin
-          if (email.toLowerCase().includes('admin') || email.toLowerCase() === 'rishabh1234@gmail.com') {
-            finalRole = 'admin';
-          } else {
-            finalRole = role || 'student';
-          }
+          finalRole = role || 'student';
         }
 
         const user: User = {
-          id: resUser?.id || resUser?._id || (finalRole.slice(0, 3).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000)),
+          id: resUser?.id || resUser?._id || 'usr-' + Date.now(),
           name: resUser?.name || resUser?.fullName || resUser?.username || this.extractNameFromEmail(email),
           email: resUser?.email || email,
           role: finalRole,
           rollNo: resUser?.rollNo || resUser?.roll_no,
+          phone: resUser?.phone || resUser?.phoneNumber || resUser?.phone_number || resUser?.mobile || '',
           token: token,
         };
         this.setCurrentUser(user);
-        return { success: true, message: `Signed in successfully as ${this.capitalize(user.role)}`, user };
+        return { success: true, message: res?.msg || `Signed in successfully as ${this.capitalize(user.role)}`, user };
       }),
       catchError((err: any) => {
-        if (err?.status && err.status >= 400 && err.status < 500 && err.status !== 404) {
-          return throwError(() => err);
-        }
-
-        console.warn('Backend API server unreachable, defaulting to demo authentication session:', err?.message || err);
-        const fallbackRole: UserRole = (email.toLowerCase().includes('admin') || email.toLowerCase() === 'rishabh1234@gmail.com')
-          ? 'admin' 
-          : (email.toLowerCase().includes('faculty') ? 'faculty' : (role || 'student'));
-
-        const demoUser: User = {
-          id: (fallbackRole.slice(0, 3).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000)),
-          name: this.extractNameFromEmail(email),
-          email: email,
-          role: fallbackRole,
-          token: 'demo-jwt-token-' + fallbackRole + '-' + Date.now(),
-        };
-        this.setCurrentUser(demoUser);
+        const errorMsg =
+          err?.error?.msg ||
+          err?.error?.message ||
+          err?.statusText ||
+          err?.message ||
+          'Authentication failed. Please verify your email and password.';
         return of({
-          success: true,
-          message: `Signed in as ${this.capitalize(fallbackRole)} (Active Session)`,
-          user: demoUser
+          success: false,
+          message: Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg
         });
       })
     );
@@ -233,8 +243,13 @@ export class AuthService {
           finalRole = 'admin';
         }
 
+        if (!res || res.ok === false || res.ok === 0 || res.success === false) {
+          const failureMsg = res?.msg || res?.message || 'Registration failed.';
+          return { success: false, message: failureMsg };
+        }
+
         const user: User = {
-          id: resUser?.id || resUser?._id || (finalRole.slice(0, 3).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000)),
+          id: resUser?.id || resUser?._id || 'usr-' + Date.now(),
           name: resUser?.name || resUser?.fullName || fullName,
           email: resUser?.email || email,
           role: finalRole,
@@ -245,19 +260,15 @@ export class AuthService {
         return { success: true, message: `Account registered successfully as ${this.capitalize(user.role)}`, user };
       }),
       catchError((err: any) => {
-        console.warn('Backend stored procedure error, setting active session for created user:', err?.message || err);
-        const registeredUser: User = {
-          id: (signupRole.slice(0, 3).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000)),
-          name: fullName,
-          email: email,
-          role: signupRole,
-          token: 'jwt-user-token-' + signupRole + '-' + Date.now(),
-        };
-        this.setCurrentUser(registeredUser);
+        const errorMsg =
+          err?.error?.msg ||
+          err?.error?.message ||
+          err?.statusText ||
+          err?.message ||
+          'Registration failed. Please check your inputs or connection.';
         return of({
-          success: true,
-          message: `Account registered successfully as ${this.capitalize(signupRole)}`,
-          user: registeredUser
+          success: false,
+          message: Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg
         });
       })
     );

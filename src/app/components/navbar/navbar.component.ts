@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { IonicModule, IonPopover } from '@ionic/angular';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 import { AuthService, User, UserRole } from '../../services/auth.service';
-import { Subscription } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -62,6 +62,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
         this.userRole = role;
       })
     );
+
+    // Sync active tab with current router URL
+    this.updateActiveTabFromUrl(this.router.url);
+
+    this.subs.add(
+      this.router.events.pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+      ).subscribe((event: NavigationEnd) => {
+        this.updateActiveTabFromUrl(event.urlAfterRedirects || event.url);
+      })
+    );
   }
 
   ngOnDestroy() {
@@ -71,6 +82,58 @@ export class NavbarComponent implements OnInit, OnDestroy {
   setActiveTab(tabName: string) {
     this.activeTab = tabName;
     this.closeMobileMenu();
+  }
+
+  onHomeClick() {
+    this.setActiveTab('Home');
+    const content = document.querySelector('ion-content');
+    if (content && typeof (content as any).scrollToTop === 'function') {
+      (content as any).scrollToTop(400);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  scrollToContact(event?: Event) {
+    if (event) {
+      event.preventDefault();
+    }
+    this.setActiveTab('Contact Us');
+    this.closeMobileMenu();
+
+    if (!this.router.url.includes('/home') && this.router.url !== '/') {
+      this.router.navigate(['/home']).then(() => {
+        setTimeout(() => {
+          this.scrollToFooter();
+        }, 150);
+      });
+    } else {
+      this.scrollToFooter();
+    }
+  }
+
+  private scrollToFooter() {
+    const footer = document.getElementById('contact-footer') || document.querySelector('app-footer');
+    if (footer) {
+      footer.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  private updateActiveTabFromUrl(url: string) {
+    if (!url) return;
+    if (url.includes('/courses')) {
+      if (this.activeTab !== 'Practice Tests') {
+        this.activeTab = 'Courses';
+      }
+    } else if (url.includes('/live-classes')) {
+      this.activeTab = 'Live Classes';
+    } else if (url.includes('/pricing')) {
+      this.activeTab = 'Pricing / Plans';
+    } else if (url.includes('/home') || url === '/' || url === '') {
+      if (this.activeTab !== 'Contact Us') {
+        this.activeTab = 'Home';
+      }
+    }
   }
 
   toggleMobileMenu() {

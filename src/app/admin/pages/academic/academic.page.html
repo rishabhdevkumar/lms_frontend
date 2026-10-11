@@ -1,5 +1,3 @@
-<app-header></app-header>
-
 <ion-content [fullscreen]="true" class="academic-page-content">
   
   <div class="academic-wrapper">
@@ -294,6 +292,13 @@
 
         <!-- COURSE FIELDS -->
         <ng-container *ngIf="activeTab === 'course'">
+          <div class="floating-field">
+            <select [(ngModel)]="formData.session_id" id="acad_session_id" class="floating-input">
+              <option value="" disabled>-- Select Session --</option>
+              <option *ngFor="let s of sessionsList" [value]="s.id">{{ s.sessionName }}</option>
+            </select>
+            <label for="acad_session_id" class="floating-label select-label">Select Session *</label>
+          </div>
           <div class="floating-field" [class.has-error]="!!formErrors['courseName']">
             <input type="text" [(ngModel)]="formData.courseName" id="acad_course" placeholder=" " class="floating-input" />
             <label for="acad_course" class="floating-label">Course Name *</label>
@@ -308,15 +313,40 @@
 
         <!-- SEMESTER FIELDS -->
         <ng-container *ngIf="activeTab === 'semester'">
+          <div class="floating-field">
+            <select [(ngModel)]="formData.course_id" id="acad_course_id" class="floating-input">
+              <option value="" disabled>-- Select Course --</option>
+              <option *ngFor="let c of coursesList" [value]="c.id">{{ c.courseName }}</option>
+            </select>
+            <label for="acad_course_id" class="floating-label select-label">Select Course *</label>
+          </div>
           <div class="floating-field" [class.has-error]="!!formErrors['semesterName']">
             <input type="text" [(ngModel)]="formData.semesterName" id="acad_sem" placeholder=" " class="floating-input" />
             <label for="acad_sem" class="floating-label">Semester Name *</label>
             <span class="field-error-text" *ngIf="formErrors['semesterName']">⚠️ {{ formErrors['semesterName'] }}</span>
           </div>
+          <div class="floating-field">
+            <input type="text" [(ngModel)]="formData.shortName" id="acad_ssemshort" placeholder=" " class="floating-input" />
+            <label for="acad_ssemshort" class="floating-label">Short Code (e.g. SEM-1)</label>
+          </div>
         </ng-container>
 
         <!-- SYLLABUS FIELDS -->
         <ng-container *ngIf="activeTab === 'syllabus'">
+          <div class="floating-field">
+            <select [(ngModel)]="formData.course_id" id="acad_syl_course" class="floating-input">
+              <option value="" disabled>-- Select Course --</option>
+              <option *ngFor="let c of coursesList" [value]="c.id">{{ c.courseName }}</option>
+            </select>
+            <label for="acad_syl_course" class="floating-label select-label">Select Course *</label>
+          </div>
+          <div class="floating-field">
+            <select [(ngModel)]="formData.semester_id" id="acad_syl_sem" class="floating-input">
+              <option value="" disabled>-- Select Semester --</option>
+              <option *ngFor="let s of semestersList" [value]="s.id">{{ s.semesterName }} ({{ s.course }})</option>
+            </select>
+            <label for="acad_syl_sem" class="floating-label select-label">Select Semester *</label>
+          </div>
           <div class="floating-field" [class.has-error]="!!formErrors['syllabusTitle']">
             <input type="text" [(ngModel)]="formData.syllabusTitle" id="acad_syl" placeholder=" " class="floating-input" />
             <label for="acad_syl" class="floating-label">Syllabus Title *</label>
@@ -326,6 +356,20 @@
 
         <!-- SUBJECT FIELDS -->
         <ng-container *ngIf="activeTab === 'subject'">
+          <div class="floating-field">
+            <select [(ngModel)]="formData.course_id" id="acad_sub_course" class="floating-input">
+              <option value="" disabled>-- Select Course --</option>
+              <option *ngFor="let c of coursesList" [value]="c.id">{{ c.courseName }}</option>
+            </select>
+            <label for="acad_sub_course" class="floating-label select-label">Select Course *</label>
+          </div>
+          <div class="floating-field">
+            <select [(ngModel)]="formData.semester_id" id="acad_sub_sem" class="floating-input">
+              <option value="" disabled>-- Select Semester --</option>
+              <option *ngFor="let s of semestersList" [value]="s.id">{{ s.semesterName }} ({{ s.course }})</option>
+            </select>
+            <label for="acad_sub_sem" class="floating-label select-label">Select Semester *</label>
+          </div>
           <div class="floating-field" [class.has-error]="!!formErrors['subjectName']">
             <input type="text" [(ngModel)]="formData.subjectName" id="acad_sub" placeholder=" " class="floating-input" />
             <label for="acad_sub" class="floating-label">Subject Name *</label>
@@ -340,6 +384,13 @@
 
         <!-- CHAPTER FIELDS -->
         <ng-container *ngIf="activeTab === 'chapter'">
+          <div class="floating-field">
+            <select [(ngModel)]="formData.subject_id" id="acad_chap_subject" class="floating-input">
+              <option value="" disabled>-- Select Subject --</option>
+              <option *ngFor="let s of subjectsList" [value]="s.id">{{ s.subjectName }} ({{ s.subjectCode }})</option>
+            </select>
+            <label for="acad_chap_subject" class="floating-label select-label">Select Subject *</label>
+          </div>
           <div class="floating-field" [class.has-error]="!!formErrors['chapterNo']">
             <input type="text" [(ngModel)]="formData.chapterNo" id="acad_chapno" placeholder=" " class="floating-input" />
             <label for="acad_chapno" class="floating-label">Chapter No *</label>
