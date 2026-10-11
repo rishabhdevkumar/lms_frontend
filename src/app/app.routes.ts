@@ -47,10 +47,8 @@ export const routes: Routes = [
       },
       {
         path: 'account-setting',
-        loadComponent: () =>
-          import('./admin/pages/account-setting/account-setting.page').then(
-            (m) => m.AccountSettingPage,
-          ),
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
       },
       {
         path: 'academic',

@@ -1,13 +1,45 @@
 :host {
   display: block;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.admin-layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #f8fafc;
+}
+
+app-header {
+  flex-shrink: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
+.admin-layout-body {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 70px);
+  overflow: hidden;
+}
+
+ion-split-pane {
+  height: 100%;
+  --border: none;
 }
 
 ion-menu {
-  --width: 240px !important;
-  --min-width: 230px !important;
+  --width: 250px !important;
+  --min-width: 240px !important;
   --max-width: 260px !important;
   --background: #ffffff !important;
   border-right: 1px solid #e2e8f0 !important;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
 }
 
 .sidebar-content {
@@ -15,139 +47,112 @@ ion-menu {
   background-color: #ffffff !important;
 }
 
-/* BRAND HEADER IN SIDEBAR */
-.sidebar-brand-header {
-  background-color: #ffffff;
-  padding: 1.2rem 1rem 1.1rem 1.25rem;
-  border-bottom: 1px solid #f1f5f9;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* MENU CATEGORIES WRAPPER */
+.menu-categories-wrapper {
+  padding: 0.85rem 0.65rem 1.5rem 0.65rem;
 
-  .brand-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    text-decoration: none;
-
-    .logo-badge {
-      width: 2.3rem;
-      height: 2.3rem;
-      border-radius: 0.65rem;
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
-
-      .logo-icon {
-        width: 1.25rem;
-        height: 1.25rem;
-      }
-    }
-
-    .brand-text-group {
-      display: flex;
-      flex-direction: column;
-
-      .brand-name {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 1.2rem;
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        color: #2563eb;
-      }
-    }
-  }
-
-  .close-sidebar-btn {
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
-    color: #64748b;
-    width: 2.2rem;
-    height: 2.2rem;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-    z-index: 100 !important;
-    pointer-events: auto !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-    ion-icon {
-      font-size: 1.3rem;
-      pointer-events: none !important;
-    }
-
-    &:hover {
-      background: #fee2e2;
-      border-color: #fca5a5;
-      color: #ef4444;
-      transform: rotate(90deg);
-    }
-  }
-}
-
-/* SIDEBAR MENU LIST & ITEMS */
-.sidebar-menu {
-  background: transparent !important;
-  padding: 0.85rem 0.65rem;
-
-  ion-item {
-    --background: transparent;
-    --color: #64748b;
-    --padding-start: 0.85rem;
-    --inner-padding-end: 0.85rem;
-    margin: 0.25rem 0;
-    border-radius: 0.6rem;
+  .category-heading {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: #475569;
+    padding: 0.65rem 0.85rem 0.35rem 0.85rem;
+    margin-bottom: 0.15rem;
+    text-transform: uppercase;
+  }
 
-    ion-label {
-      white-space: nowrap !important;
-      letter-spacing: -0.01em;
-    }
+  .sidebar-menu-list {
+    background: transparent !important;
+    padding: 0;
 
-    ion-icon {
-      color: #94a3b8;
-      font-size: 1.25rem;
-      margin-right: 0.85rem !important;
-      margin-inline-end: 0.85rem !important;
-      transition: color 0.2s ease;
-    }
+    ion-item {
+      --background: transparent;
+      --color: #1e293b;
+      --padding-start: 0.85rem;
+      --inner-padding-end: 0.85rem;
+      --min-height: 44px;
+      --detail-icon-display: none !important;
+      --detail-icon-opacity: 0 !important;
+      --detail-icon-font-size: 0px !important;
+      margin: 0.25rem 0;
+      border-radius: 0.5rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      cursor: pointer;
 
-    &:hover {
-      --background: #f8fafc;
-      --color: #0f172a;
+      &::part(native) {
+        gap: 0.75rem;
+        border-radius: 0.5rem;
+      }
+
+      &::part(detail-icon),
+      .item-detail-icon {
+        display: none !important;
+        opacity: 0 !important;
+        width: 0 !important;
+      }
+
+      ion-label {
+        white-space: nowrap !important;
+        letter-spacing: 0.02em;
+        text-transform: uppercase !important;
+        font-weight: 700;
+        margin-left: 0.5rem !important;
+        margin-inline-start: 0.5rem !important;
+      }
 
       ion-icon {
-        color: #2563eb;
+        color: #475569;
+        font-size: 1.25rem;
+        margin-right: 0.75rem !important;
+        margin-inline-end: 0.75rem !important;
+        flex-shrink: 0;
+        transition: color 0.15s ease;
+      }
+
+      &:hover {
+        --background: #f1f5f9;
+        --color: #0f172a;
+
+        &::part(native) {
+          background-color: #f1f5f9;
+        }
+
+        ion-icon {
+          color: #2563eb;
+        }
+      }
+
+      &.active-menu,
+      &.active-menu::part(native) {
+        --background: #eff6ff !important;
+        --background-focused: #eff6ff !important;
+        --background-hover: #eff6ff !important;
+        --color: #1d4ed8 !important;
+        background-color: #eff6ff !important;
+        color: #1d4ed8 !important;
+        font-weight: 800 !important;
+        box-shadow: none !important;
+
+        ion-label {
+          color: #1d4ed8 !important;
+          font-weight: 800 !important;
+        }
+
+        ion-icon {
+          color: #2563eb !important;
+        }
       }
     }
   }
 }
 
-/* ACTIVE MENU ITEM HIGHLIGHT (CRISP LIGHT BLUE + ROYAL BLUE) */
-.active-menu {
-  --background: #eff6ff !important;
-  --color: #2563eb !important;
-  font-weight: 700 !important;
-
-  ion-icon {
-    color: #2563eb !important;
-  }
-}
-
-/* LOGOUT ITEM STYLING */
+/* LOGOUT ITEM */
 .logout-item {
-  margin-top: 2rem !important;
+  margin-top: 0.5rem !important;
 
   ion-icon {
     color: #ef4444 !important;
@@ -163,9 +168,70 @@ ion-menu {
   }
 }
 
-@media (min-width: 1024px) {
-  .close-sidebar-btn {
-    display: none !important;
+/* BOTTOM USER PROFILE FOOTER CARD (MATCHING ULTIMA SIDEBAR BOTTOM SCREENSHOT) */
+.sidebar-profile-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  .footer-avatar {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: #30419b;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .footer-user-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .user-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+
+    .user-role {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.74rem;
+      color: #64748b;
+    }
+  }
+
+  .footer-expand-arrow {
+    font-size: 0.95rem;
+    color: #64748b;
+    font-weight: 700;
+  }
+
+  &:hover {
+    background-color: #f8fafc;
+
+    .footer-expand-arrow {
+      color: #2563eb;
+    }
   }
 }
 
+.main-page-container {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #f8fafc;
+}

@@ -101,6 +101,7 @@
     align-items: center;
     gap: 0.35rem;
     white-space: nowrap;
+    cursor: pointer;
 
     /* UNDERLINE LINE CREATED ON HOVER AND ACTIVE */
     &::after {
