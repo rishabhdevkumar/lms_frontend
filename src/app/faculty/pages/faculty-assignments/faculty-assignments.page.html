@@ -1,173 +1,389 @@
-<app-faculty-header pageTitle="Assignments & Grading"></app-faculty-header>
+<ion-content class="ion-padding assignments-page-content">
+  <div class="assignments-container">
 
-<ion-content class="ion-padding">
-  <ion-grid>
-    <!-- TOP ACTIONS & FILTERS ROW -->
-    <ion-row class="ion-align-items-center ion-margin-bottom">
-      <ion-col size="12" size-md="4">
-        <ion-item class="filter-item">
-          <ion-label position="stacked">Filter by Course</ion-label>
-          <ion-select [(ngModel)]="selectedCourseFilter">
-            <ion-select-option value="all">All Courses</ion-select-option>
-            <ion-select-option value="CS-402">CS-402: Web Engineering</ion-select-option>
-            <ion-select-option value="CS-501">CS-501: Microservices</ion-select-option>
-            <ion-select-option value="DS-302">DS-302: Data Analytics</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-col>
+    <!-- PAGE HEADER -->
+    <header class="page-header-card">
+      <div class="header-left">
+        <h1 class="page-title">Assignments & Submissions Queue</h1>
+      </div>
 
-      <ion-col size="12" size-md="4">
-        <ion-item class="filter-item">
-          <ion-label position="stacked">Submission Status</ion-label>
-          <ion-select [(ngModel)]="selectedStatusFilter">
-            <ion-select-option value="all">All Statuses</ion-select-option>
-            <ion-select-option value="pending">Pending Grading (18)</ion-select-option>
-            <ion-select-option value="graded">Graded</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-col>
+      <div class="header-actions">
+        <button type="button" class="btn-create-assignment" (click)="openCreateAssignmentModal()">
+          <ion-icon name="add-circle-outline"></ion-icon>
+          <span>Create New Assignment</span>
+        </button>
+      </div>
+    </header>
 
-      <ion-col size="12" size-md="4" class="ion-text-end">
-        <ion-button color="tertiary" (click)="openCreateAssignmentModal()">
-          <ion-icon name="add-circle-outline" slot="start"></ion-icon>
-          Create New Assignment
-        </ion-button>
-      </ion-col>
-    </ion-row>
+    <!-- KPI STAT OVERVIEW CARDS (3 CARDS) -->
+    <section class="stats-overview-grid">
+      <!-- Total Submissions -->
+      <div class="stat-card stat-total">
+        <div class="stat-icon-wrapper total-icon">
+          <ion-icon name="folder-open-outline"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Submissions</span>
+          <div class="stat-value">{{ totalSubmissionsCount }}</div>
+          <span class="stat-sub">Across All Active Courses</span>
+        </div>
+      </div>
 
-    <!-- SUBMISSIONS LIST TABLE / CARDS -->
-    <ion-row>
-      <ion-col size="12">
-        <ion-card class="submissions-card">
-          <ion-card-header>
-            <ion-card-title>Student Submissions Queue</ion-card-title>
-          </ion-card-header>
+      <!-- Pending Grading -->
+      <div class="stat-card stat-pending">
+        <div class="stat-icon-wrapper pending-icon">
+          <ion-icon name="hourglass-outline"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Pending Review</span>
+          <div class="stat-value text-pending">{{ pendingSubmissionsCount }}</div>
+          <span class="stat-sub">Requires Faculty Grading</span>
+        </div>
+      </div>
 
-          <ion-card-content>
-            <div class="responsive-sub-queue">
-              <div *ngFor="let sub of filteredSubmissions" class="sub-queue-card">
-                <div class="sub-card-top">
-                  <div class="student-info">
-                    <ion-avatar class="student-avatar">
-                      <ion-icon name="person" color="tertiary" size="large"></ion-icon>
-                    </ion-avatar>
-                    <div>
-                      <h3><b>{{ sub.studentName }}</b> <span class="roll-tag">({{ sub.rollNo }})</span></h3>
-                      <p class="course-code-line"><b>{{ sub.courseCode }}:</b> {{ sub.assignmentTitle }}</p>
-                    </div>
-                  </div>
-                  <ion-badge [color]="sub.status === 'Pending' ? 'danger' : 'success'">{{ sub.status }}</ion-badge>
+      <!-- Graded -->
+      <div class="stat-card stat-graded">
+        <div class="stat-icon-wrapper graded-icon">
+          <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Evaluated & Graded</span>
+          <div class="stat-value text-graded">{{ gradedSubmissionsCount }}</div>
+          <span class="stat-sub">Feedback Published</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER & SEARCH TOOLBAR -->
+    <section class="filter-panel-card">
+      <div class="filter-grid">
+        <!-- Course Filter -->
+        <div class="filter-field">
+          <label class="field-label" for="course-filter">
+            <ion-icon name="book-outline"></ion-icon>
+            <span>Course Module</span>
+          </label>
+          <div class="custom-select-wrapper">
+            <select id="course-filter" class="custom-select-input" [(ngModel)]="selectedCourseFilter">
+              <option value="all">All Courses</option>
+              <option *ngFor="let c of courses" [value]="c.code">{{ c.name }}</option>
+            </select>
+            <ion-icon name="chevron-down-outline" class="select-chevron"></ion-icon>
+          </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="filter-field">
+          <label class="field-label" for="status-filter">
+            <ion-icon name="filter-outline"></ion-icon>
+            <span>Submission Status</span>
+          </label>
+          <div class="custom-select-wrapper">
+            <select id="status-filter" class="custom-select-input" [(ngModel)]="selectedStatusFilter">
+              <option value="all">All Statuses ({{ totalSubmissionsCount }})</option>
+              <option value="pending">Pending Grading ({{ pendingSubmissionsCount }})</option>
+              <option value="graded">Graded ({{ gradedSubmissionsCount }})</option>
+            </select>
+            <ion-icon name="chevron-down-outline" class="select-chevron"></ion-icon>
+          </div>
+        </div>
+
+        <!-- Real-Time Search -->
+        <div class="filter-field">
+          <label class="field-label" for="search-input">
+            <ion-icon name="search-outline"></ion-icon>
+            <span>Search Submissions</span>
+          </label>
+          <div class="custom-input-wrapper">
+            <input 
+              id="search-input" 
+              type="text" 
+              class="custom-search-input" 
+              [(ngModel)]="searchQuery" 
+              placeholder="Search by student, roll no, or title..." />
+            <button 
+              *ngIf="searchQuery" 
+              type="button" 
+              class="clear-input-btn" 
+              (click)="searchQuery = ''"
+              title="Clear search">
+              <ion-icon name="close-circle"></ion-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBMISSIONS QUEUE CONTAINER -->
+    <section class="queue-card-container">
+      <div class="queue-header-bar">
+        <h2 class="queue-title">Student Submissions Queue</h2>
+        <span class="queue-count-badge">{{ filteredSubmissions.length }} Submissions</span>
+      </div>
+
+      <div class="queue-list">
+        <!-- Submission Card -->
+        <div 
+          *ngFor="let sub of filteredSubmissions" 
+          class="submission-card-item"
+          [ngClass]="'status-' + sub.status.toLowerCase()">
+          
+          <!-- Left Status Indicator Strip -->
+          <div class="status-indicator-strip"></div>
+
+          <div class="submission-content-wrapper">
+            <!-- Student & Assignment Header -->
+            <div class="submission-main-col">
+              <div class="student-avatar-badge">
+                <span class="avatar-initials">{{ getInitials(sub.studentName) }}</span>
+              </div>
+
+              <div class="submission-info">
+                <div class="student-heading-row">
+                  <h3 class="student-name">{{ sub.studentName }}</h3>
+                  <span class="roll-mono-tag">{{ sub.rollNo }}</span>
+                  <span class="course-code-pill">{{ sub.courseCode }}</span>
                 </div>
 
-                <div class="sub-card-details">
-                  <p class="attachment-line">
-                    <ion-icon name="document-attach-outline"></ion-icon> Attachment: <a class="file-link">{{ sub.fileAttached }}</a>
-                  </p>
-                  <p class="submitted-time"><ion-icon name="time-outline"></ion-icon> Submitted: {{ sub.submittedDate }}</p>
+                <h4 class="assignment-title-text">{{ sub.assignmentTitle }}</h4>
 
-                  <div *ngIf="sub.status === 'Graded'" class="graded-score-box ion-margin-top">
-                    <span>Score: <b>{{ sub.score }} / {{ sub.maxScore }}</b></span>
-                    <p class="feedback-text">"{{ sub.feedback }}"</p>
+                <div class="submission-metadata-row">
+                  <!-- Attachment Chip -->
+                  <div class="attachment-chip" (click)="downloadFile(sub.fileAttached)" [title]="'Download ' + sub.fileAttached">
+                    <ion-icon name="document-attach-outline"></ion-icon>
+                    <span class="file-name">{{ sub.fileAttached }}</span>
+                    <span class="file-ext-tag">{{ getFileExtension(sub.fileAttached) }}</span>
+                  </div>
+
+                  <!-- Submitted Timestamp -->
+                  <div class="submitted-timestamp">
+                    <ion-icon name="time-outline"></ion-icon>
+                    <span>Submitted: {{ sub.submittedDate }}</span>
                   </div>
                 </div>
 
-                <div class="sub-card-footer ion-margin-top">
-                  <ion-button size="small" [color]="sub.status === 'Pending' ? 'tertiary' : 'medium'" fill="solid" (click)="openGradeModal(sub)">
-                    {{ sub.status === 'Pending' ? 'Grade & Review' : 'Edit Grade' }}
-                  </ion-button>
+                <!-- Graded Feedback Box (if already graded) -->
+                <div *ngIf="sub.status === 'Graded'" class="graded-result-box">
+                  <div class="score-pill">
+                    <ion-icon name="ribbon-outline"></ion-icon>
+                    <span>Score: <strong>{{ sub.score }} / {{ sub.maxScore }}</strong></span>
+                  </div>
+                  <p *ngIf="sub.feedback" class="feedback-text">"{{ sub.feedback }}"</p>
                 </div>
               </div>
             </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+
+            <!-- Right Actions & Status Badge -->
+            <div class="submission-action-col">
+              <span class="status-badge-pill" [ngClass]="'status-' + sub.status.toLowerCase()">
+                <span class="status-pulse-dot"></span>
+                {{ sub.status }}
+              </span>
+
+              <button 
+                type="button" 
+                class="btn-evaluate"
+                [ngClass]="sub.status === 'Pending' ? 'btn-pending-action' : 'btn-graded-action'"
+                (click)="openGradeModal(sub)">
+                <ion-icon [name]="sub.status === 'Pending' ? 'checkmark-circle-outline' : 'create-outline'"></ion-icon>
+                <span>{{ sub.status === 'Pending' ? 'Grade & Review' : 'Edit Evaluation' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredSubmissions.length === 0" class="queue-empty-state">
+          <div class="empty-icon-circle">
+            <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+          </div>
+          <h4>No Submissions Found</h4>
+          <p>No student submissions match your selected filter or search keyword.</p>
+          <button type="button" class="btn-reset-filters" (click)="selectedCourseFilter = 'all'; selectedStatusFilter = 'all'; searchQuery = ''">
+            <ion-icon name="refresh-outline"></ion-icon>
+            <span>Reset Filters</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
 </ion-content>
 
-<!-- GRADE SUBMISSION MODAL -->
-<ion-modal [isOpen]="isGradeModalOpen" (didDismiss)="closeGradeModal()">
+<!-- EVALUATE SUBMISSION MODAL -->
+<ion-modal [isOpen]="isGradeModalOpen" (didDismiss)="closeGradeModal()" class="custom-grade-modal">
   <ng-template>
-    <ion-header>
-      <ion-toolbar color="tertiary">
-        <ion-title>Evaluate Submission - {{ selectedSubmission?.studentName }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="closeGradeModal()">Cancel</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content class="ion-padding">
-      <div class="modal-sub-details" *ngIf="selectedSubmission">
-        <h4><b>{{ selectedSubmission.assignmentTitle }}</b></h4>
-        <p><b>Course:</b> {{ selectedSubmission.courseCode }} • <b>Submitted:</b> {{ selectedSubmission.submittedDate }}</p>
-        <ion-chip color="tertiary" outline>
-          <ion-icon name="download-outline"></ion-icon>
-          Download Attachment: {{ selectedSubmission.fileAttached }}
-        </ion-chip>
+    <div class="modal-card-wrapper">
+      <div class="modal-card-header">
+        <div class="modal-title-left">
+          <div class="modal-header-icon grade">
+            <ion-icon name="create-outline"></ion-icon>
+          </div>
+          <div>
+            <h3 class="modal-heading">Evaluate Submission</h3>
+            <p class="modal-subheading">{{ selectedSubmission?.studentName }} ({{ selectedSubmission?.rollNo }})</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-icon-btn" (click)="closeGradeModal()" title="Close">
+          <ion-icon name="close"></ion-icon>
+        </button>
       </div>
 
-      <ion-list lines="full" class="ion-margin-top">
-        <ion-item>
-          <ion-label position="stacked">Grade / Marks (Max: {{ selectedSubmission?.maxScore }})</ion-label>
-          <ion-input type="number" [(ngModel)]="gradeInputScore" placeholder="Enter score e.g. 85"></ion-input>
-        </ion-item>
+      <div class="modal-card-body">
+        <div class="modal-sub-details" *ngIf="selectedSubmission">
+          <div class="modal-info-card">
+            <h4>{{ selectedSubmission.assignmentTitle }}</h4>
+            <div class="modal-info-meta">
+              <span><strong>Course:</strong> {{ selectedSubmission.courseCode }}</span>
+              <span><strong>Submitted:</strong> {{ selectedSubmission.submittedDate }}</span>
+            </div>
+            <div class="modal-attachment-row">
+              <button type="button" class="modal-download-btn" (click)="downloadFile(selectedSubmission.fileAttached)">
+                <ion-icon name="download-outline"></ion-icon>
+                <span>Download Attachment: {{ selectedSubmission.fileAttached }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
-        <ion-item>
-          <ion-label position="stacked">Faculty Feedback & Comments</ion-label>
-          <ion-textarea [(ngModel)]="gradeFeedback" rows="4" placeholder="Provide constructive feedback for the student..."></ion-textarea>
-        </ion-item>
-      </ion-list>
+        <div class="modal-form-fields">
+          <div class="form-group">
+            <label class="form-label" for="grade-input">
+              <ion-icon name="ribbon-outline"></ion-icon>
+              <span>Grade Score (Out of {{ selectedSubmission?.maxScore }})</span>
+            </label>
+            <input 
+              id="grade-input" 
+              type="number" 
+              class="modal-text-input" 
+              [(ngModel)]="gradeInputScore" 
+              placeholder="e.g. 85" 
+              min="0" 
+              [max]="selectedSubmission?.maxScore || 100" />
+          </div>
 
-      <ion-button expand="block" color="tertiary" class="ion-margin-top" (click)="submitGrade()">
-        Publish Grade & Feedback
-      </ion-button>
-    </ion-content>
+          <div class="form-group">
+            <label class="form-label" for="feedback-input">
+              <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+              <span>Faculty Feedback & Comments</span>
+            </label>
+            <textarea 
+              id="feedback-input" 
+              class="modal-textarea-input" 
+              [(ngModel)]="gradeFeedback" 
+              rows="3" 
+              placeholder="Provide constructive feedback for the student..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeGradeModal()">Cancel</button>
+          <button type="button" class="btn-modal-submit" (click)="submitGrade()">
+            <ion-icon name="save-outline"></ion-icon>
+            <span>Publish Grade</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </ng-template>
 </ion-modal>
 
 <!-- CREATE NEW ASSIGNMENT MODAL -->
-<ion-modal [isOpen]="isCreateAssignmentModalOpen" (didDismiss)="closeCreateAssignmentModal()">
+<ion-modal [isOpen]="isCreateAssignmentModalOpen" (didDismiss)="closeCreateAssignmentModal()" class="custom-create-modal">
   <ng-template>
-    <ion-header>
-      <ion-toolbar color="tertiary">
-        <ion-title>Create New Assignment</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="closeCreateAssignmentModal()">Cancel</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    <div class="modal-card-wrapper">
+      <div class="modal-card-header">
+        <div class="modal-title-left">
+          <div class="modal-header-icon assignment">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </div>
+          <div>
+            <h3 class="modal-heading">Create New Assignment</h3>
+            <p class="modal-subheading">Publish coursework tasks for enrolled students</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-icon-btn" (click)="closeCreateAssignmentModal()" title="Close">
+          <ion-icon name="close"></ion-icon>
+        </button>
+      </div>
 
-    <ion-content class="ion-padding">
-      <ion-list lines="full">
-        <ion-item>
-          <ion-label position="stacked">Select Course</ion-label>
-          <ion-select [(ngModel)]="newAssignment.course">
-            <ion-select-option value="CS-402">CS-402: Web Engineering</ion-select-option>
-            <ion-select-option value="CS-501">CS-501: Microservices</ion-select-option>
-            <ion-select-option value="DS-302">DS-302: Data Analytics</ion-select-option>
-          </ion-select>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked">Assignment Title</ion-label>
-          <ion-input [(ngModel)]="newAssignment.title" placeholder="e.g. Lab 5: REST API Integration"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked">Description & Guidelines</ion-label>
-          <ion-textarea [(ngModel)]="newAssignment.description" rows="4" placeholder="Provide assignment instructions..."></ion-textarea>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked">Due Date</ion-label>
-          <ion-input type="date" [(ngModel)]="newAssignment.dueDate"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked">Maximum Marks</ion-label>
-          <ion-input type="number" [(ngModel)]="newAssignment.maxMarks"></ion-input>
-        </ion-item>
-      </ion-list>
-      <ion-button expand="block" color="tertiary" class="ion-margin-top" (click)="submitCreateAssignment()">
-        Post Assignment to Students
-      </ion-button>
-    </ion-content>
+      <div class="modal-card-body">
+        <div class="modal-form-fields">
+          <div class="form-group">
+            <label class="form-label" for="new-course-select">
+              <ion-icon name="book-outline"></ion-icon>
+              <span>Select Course</span>
+            </label>
+            <div class="custom-select-wrapper">
+              <select id="new-course-select" class="modal-text-input" [(ngModel)]="newAssignment.course">
+                <option *ngFor="let c of courses" [value]="c.code">{{ c.name }}</option>
+              </select>
+              <ion-icon name="chevron-down-outline" class="select-chevron"></ion-icon>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-title-input">
+              <ion-icon name="create-outline"></ion-icon>
+              <span>Assignment Title</span>
+            </label>
+            <input 
+              id="new-title-input" 
+              type="text" 
+              class="modal-text-input" 
+              [(ngModel)]="newAssignment.title" 
+              placeholder="e.g. Lab 5: Angular Routing & Guards" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label" for="new-due-date">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span>Due Date</span>
+              </label>
+              <input 
+                id="new-due-date" 
+                type="date" 
+                class="modal-text-input" 
+                [(ngModel)]="newAssignment.dueDate" />
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-label" for="new-max-score">
+                <ion-icon name="ribbon-outline"></ion-icon>
+                <span>Max Marks</span>
+              </label>
+              <input 
+                id="new-max-score" 
+                type="number" 
+                class="modal-text-input" 
+                [(ngModel)]="newAssignment.maxMarks" 
+                placeholder="100" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-desc-input">
+              <ion-icon name="reader-outline"></ion-icon>
+              <span>Instructions / Description</span>
+            </label>
+            <textarea 
+              id="new-desc-input" 
+              class="modal-textarea-input" 
+              [(ngModel)]="newAssignment.description" 
+              rows="3" 
+              placeholder="Detailed instructions for student submission..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeCreateAssignmentModal()">Cancel</button>
+          <button type="button" class="btn-modal-submit" (click)="submitCreateAssignment()">
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+            <span>Publish Assignment</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </ng-template>
 </ion-modal>

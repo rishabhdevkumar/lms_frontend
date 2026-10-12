@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from '../../components/header/header.component';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-account-setting',
@@ -83,27 +84,32 @@ export class AccountSettingPage implements OnInit {
   triggerToast(msg: string) {
     this.toastMessage = msg;
     this.showSavedToast = true;
+    toast.success(msg);
     setTimeout(() => {
       this.showSavedToast = false;
     }, 3500);
   }
 
   saveProfile() {
-    this.triggerToast('✅ Admin profile details updated successfully!');
+    this.triggerToast('Admin profile details updated successfully!');
   }
 
   sendOtp() {
     if (!this.emailData.newEmail) {
-      alert('Please enter a valid new email address!');
+      toast.error('Invalid Email', {
+        description: 'Please enter a valid new email address!'
+      });
       return;
     }
     this.emailData.otpSent = true;
-    this.triggerToast('📧 OTP Verification Code sent to ' + this.emailData.newEmail);
+    this.triggerToast('OTP Verification Code sent to ' + this.emailData.newEmail);
   }
 
   updateEmail() {
     if (this.emailData.newEmail !== this.emailData.confirmNewEmail) {
-      alert('New email and confirmation email do not match!');
+      toast.error('Email Mismatch', {
+        description: 'New email and confirmation email do not match!'
+      });
       return;
     }
     this.adminProfile.email = this.emailData.newEmail;
@@ -111,22 +117,26 @@ export class AccountSettingPage implements OnInit {
     this.emailData.newEmail = '';
     this.emailData.confirmNewEmail = '';
     this.emailData.otpSent = false;
-    this.triggerToast('✅ Primary Admin Email updated successfully!');
+    this.triggerToast('Primary Admin Email updated successfully!');
   }
 
   updatePassword() {
     if (!this.passwordData.currentPassword || !this.passwordData.newPassword) {
-      alert('Please fill out all password fields!');
+      toast.error('Required Fields Missing', {
+        description: 'Please fill out all password fields!'
+      });
       return;
     }
     if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
-      alert('New password and confirmation password do not match!');
+      toast.error('Password Mismatch', {
+        description: 'New password and confirmation password do not match!'
+      });
       return;
     }
     this.passwordData.currentPassword = '';
     this.passwordData.newPassword = '';
     this.passwordData.confirmPassword = '';
-    this.triggerToast('🔒 Password changed successfully! Security token renewed.');
+    this.triggerToast('Password changed successfully! Security token renewed.');
   }
 
   triggerBackup() {

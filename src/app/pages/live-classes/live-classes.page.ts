@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { AuthService } from '../../services/auth.service';
+import { toast } from 'ngx-sonner';
 
 export interface LiveSession {
   id: number;
@@ -130,19 +131,26 @@ export class LiveClassesPage implements OnInit {
 
   joinLiveStream(session: LiveSession) {
     if (this.authService.isLoggedInValue) {
-      this.triggerToast(`Joining live interactive room for "${session.title}"...`);
+      toast.success('Joining Live Session', {
+        description: `Connecting to interactive room for "${session.title}"...`
+      });
     } else {
-      this.triggerToast(`Please sign in to join the live session "${session.title}".`);
+      toast.info('Sign In Required', {
+        description: `Please sign in to join the live session "${session.title}".`
+      });
     }
   }
 
   reserveSeat(session: LiveSession) {
-    this.triggerToast(`Seat reserved for "${session.title}"! Calendar invite sent.`);
+    toast.success('Seat Reserved', {
+      description: `Seat reserved for "${session.title}"! Calendar invite sent.`
+    });
   }
 
   triggerToast(msg: string) {
     this.toastMessage = msg;
     this.showToast = true;
+    toast.info(msg);
     setTimeout(() => {
       this.showToast = false;
     }, 3500);

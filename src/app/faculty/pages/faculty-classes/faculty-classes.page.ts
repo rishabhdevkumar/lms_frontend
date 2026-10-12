@@ -2,14 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { FacultyHeaderComponent } from '../../components/faculty-header/faculty-header.component';
-
+import { toast } from 'ngx-sonner';
 @Component({
   selector: 'app-faculty-classes',
   templateUrl: './faculty-classes.page.html',
   styleUrls: ['./faculty-classes.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, FacultyHeaderComponent]
+  imports: [IonicModule, CommonModule, FormsModule]
 })
 export class FacultyClassesPage implements OnInit {
   selectedSegment: string = 'schedule';
@@ -62,6 +61,18 @@ export class FacultyClassesPage implements OnInit {
     }
   ];
 
+  courseSearchQuery: string = '';
+  selectedDayFilter: string = 'all';
+
+  filterDays = [
+    { label: 'All Days', value: 'all' },
+    { label: 'Monday', value: 'monday' },
+    { label: 'Tuesday', value: 'tuesday' },
+    { label: 'Wednesday', value: 'wednesday' },
+    { label: 'Thursday', value: 'thursday' },
+    { label: 'Friday', value: 'friday' }
+  ];
+
   weeklyTimetable = [
     { day: 'Monday', time: '09:00 AM - 10:30 AM', course: 'CS-402', title: 'Advanced Web Engineering', room: 'Lab 304' },
     { day: 'Monday', time: '02:00 PM - 03:30 PM', course: 'DS-302', title: 'Data Analytics & Visualization', room: 'Lab 102' },
@@ -82,6 +93,63 @@ export class FacultyClassesPage implements OnInit {
 
   ngOnInit() {}
 
+  get filteredTimetable() {
+    if (this.selectedDayFilter === 'all') {
+      return this.weeklyTimetable;
+    }
+    return this.weeklyTimetable.filter(
+      (item) => item.day.toLowerCase() === this.selectedDayFilter.toLowerCase()
+    );
+  }
+
+  getCountForDay(dayValue: string): number {
+    if (dayValue === 'all') {
+      return this.weeklyTimetable.length;
+    }
+    return this.weeklyTimetable.filter(
+      (item) => item.day.toLowerCase() === dayValue.toLowerCase()
+    ).length;
+  }
+
+  getDayClass(day: string): string {
+    return 'day-' + day.toLowerCase();
+  }
+
+  startVirtualClass(item: any) {
+    toast.info(`Starting Virtual Class: ${item.course}`, {
+      description: `${item.title} • Venue: ${item.room} • ${item.time}`
+    });
+  }
+
+  get filteredAssignedCourses() {
+    if (!this.courseSearchQuery || !this.courseSearchQuery.trim()) {
+      return this.assignedCourses;
+    }
+    const q = this.courseSearchQuery.toLowerCase().trim();
+    return this.assignedCourses.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.code.toLowerCase().includes(q) ||
+        c.department.toLowerCase().includes(q)
+    );
+  }
+
+  getCourseThemeClass(code: string): string {
+    const map: { [key: string]: string } = {
+      'CS-402': 'theme-royal-blue',
+      'CS-501': 'theme-cyan-blue',
+      'DS-302': 'theme-emerald-green',
+      'SE-601': 'theme-violet-purple'
+    };
+    return map[code] || 'theme-royal-blue';
+  }
+
+  getProgressBadgeClass(progress: number): string {
+    if (progress >= 75) return 'progress-high';
+    if (progress >= 45) return 'progress-mid';
+    return 'progress-low';
+  }
+
   openAddNoteModal(course: any) {
     this.selectedCourseForNote = course;
     this.classNoteText = '';
@@ -95,7 +163,9 @@ export class FacultyClassesPage implements OnInit {
 
   submitClassNote() {
     if (!this.classNoteText) return;
-    alert(`Announcement posted for ${this.selectedCourseForNote.code}!`);
+    toast.success(`Announcement Broadcasted`, {
+      description: `Announcement posted for ${this.selectedCourseForNote.code} to enrolled students.`
+    });
     this.closeAddNoteModal();
   }
 }

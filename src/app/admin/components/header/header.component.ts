@@ -7,6 +7,7 @@ import { LanguageService, Language } from 'src/app/services/language.service';
 import { AuthService, User } from 'src/app/services/auth.service';
 import { AdminSettingsService, SettingsTab } from 'src/app/services/admin-settings.service';
 import { Subscription } from 'rxjs';
+import { toast } from 'ngx-sonner';
 
 export interface UltimaNotification {
   id: number;
@@ -375,6 +376,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   triggerDrawerToast(msg: string) {
     this.drawerToastMessage = msg;
     this.showDrawerToast = true;
+    toast.success(msg);
     setTimeout(() => {
       this.showDrawerToast = false;
     }, 3500);
@@ -389,7 +391,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.settingsService.adminProfile.email) {
       this.adminEmail = this.settingsService.adminProfile.email;
     }
-    this.triggerDrawerToast('✅ Admin profile details updated successfully!');
+    this.triggerDrawerToast('Admin profile details updated successfully!');
   }
 
   onProfilePhotoUpload(event: Event) {
@@ -402,7 +404,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         try {
           localStorage.setItem('lms_admin_avatar', this.adminAvatarUrl as string);
         } catch (err) {}
-        this.triggerDrawerToast('📷 Profile photo updated successfully!');
+        this.triggerDrawerToast('Profile photo updated successfully!');
       };
       reader.readAsDataURL(file);
     }
@@ -410,16 +412,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   sendOtp() {
     if (!this.settingsService.emailData.newEmail) {
-      alert('Please enter a valid new email address!');
+      toast.error('Invalid Email', {
+        description: 'Please enter a valid new email address!'
+      });
       return;
     }
     this.settingsService.emailData.otpSent = true;
-    this.triggerDrawerToast('📧 OTP Verification Code sent to ' + this.settingsService.emailData.newEmail);
+    this.triggerDrawerToast('OTP Verification Code sent to ' + this.settingsService.emailData.newEmail);
   }
 
   updateEmail() {
     if (this.settingsService.emailData.newEmail !== this.settingsService.emailData.confirmNewEmail) {
-      alert('New email and confirmation email do not match!');
+      toast.error('Email Mismatch', {
+        description: 'New email and confirmation email do not match!'
+      });
       return;
     }
     this.settingsService.adminProfile.email = this.settingsService.emailData.newEmail;
@@ -428,22 +434,26 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.settingsService.emailData.confirmNewEmail = '';
     this.settingsService.emailData.otpSent = false;
     this.settingsService.saveProfile();
-    this.triggerDrawerToast('✅ Primary Admin Email updated successfully!');
+    this.triggerDrawerToast('Primary Admin Email updated successfully!');
   }
 
   updatePassword() {
     if (!this.settingsService.passwordData.currentPassword || !this.settingsService.passwordData.newPassword) {
-      alert('Please fill out all password fields!');
+      toast.error('Required Fields Missing', {
+        description: 'Please fill out all password fields!'
+      });
       return;
     }
     if (this.settingsService.passwordData.newPassword !== this.settingsService.passwordData.confirmPassword) {
-      alert('New password and confirmation password do not match!');
+      toast.error('Password Mismatch', {
+        description: 'New password and confirmation password do not match!'
+      });
       return;
     }
     this.settingsService.passwordData.currentPassword = '';
     this.settingsService.passwordData.newPassword = '';
     this.settingsService.passwordData.confirmPassword = '';
-    this.triggerDrawerToast('🔒 Password changed successfully! Security token renewed.');
+    this.triggerDrawerToast('Password changed successfully! Security token renewed.');
   }
 
   triggerBackup() {

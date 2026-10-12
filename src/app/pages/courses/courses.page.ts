@@ -5,6 +5,7 @@ import { RouterModule, Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { AuthService } from '../../services/auth.service';
+import { toast } from 'ngx-sonner';
 
 export interface Course {
   id: number;
@@ -201,18 +202,23 @@ export class CoursesPage implements OnInit {
 
   enrollCourse(course: Course) {
     if (this.authService.isLoggedInValue) {
-      this.triggerToast(`Successfully enrolled in "${course.title}"! Redirecting to student portal...`);
+      toast.success('Enrollment Successful', {
+        description: `Successfully enrolled in "${course.title}"! Redirecting to student portal...`
+      });
       setTimeout(() => {
         this.authService.navigateToDashboard();
       }, 1500);
     } else {
-      this.triggerToast(`Please sign in to enroll in "${course.title}".`);
+      toast.info('Sign In Required', {
+        description: `Please sign in to enroll in "${course.title}".`
+      });
     }
   }
 
   triggerToast(msg: string) {
     this.toastMessage = msg;
     this.showToast = true;
+    toast.info(msg);
     setTimeout(() => {
       this.showToast = false;
     }, 3500);

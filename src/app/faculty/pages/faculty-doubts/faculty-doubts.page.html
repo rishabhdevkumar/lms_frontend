@@ -1,92 +1,311 @@
-<app-faculty-header pageTitle="Student Doubts & Q&A Forum"></app-faculty-header>
+<ion-content class="doubts-page-content">
+  <div class="doubts-layout-container">
 
-<ion-content class="ion-padding">
-  <ion-grid>
-    <!-- FILTER SEGMENT -->
-    <ion-row class="ion-align-items-center ion-margin-bottom">
-      <ion-col size="12" size-md="6">
-        <ion-segment [(ngModel)]="selectedStatus" color="tertiary">
-          <ion-segment-button value="unresolved">
+    <!-- PAGE HEADER -->
+    <header class="doubts-header-card">
+      <div class="header-left">
+        <div class="header-icon-badge">
+          <ion-icon name="chatbubbles-outline"></ion-icon>
+        </div>
+        <div>
+          <h1 class="header-title">Student Doubts & Discussion Forum</h1>
+          <p class="header-subtitle">Resolve student queries, provide academic guidance, and review forum discussions</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="status-summary-pill" [class.has-pending]="unresolvedCount > 0">
+          <span class="pulse-indicator"></span>
+          <span><strong>{{ unresolvedCount }}</strong> Unresolved Queries</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- KPI STATS SUMMARY ROW -->
+    <section class="kpi-overview-grid">
+      <!-- Unresolved -->
+      <div class="kpi-stat-card card-unresolved" (click)="selectedStatus = 'unresolved'">
+        <div class="kpi-card-header">
+          <span class="kpi-label">Pending Doubts</span>
+          <div class="kpi-icon-bubble unresolved">
             <ion-icon name="help-circle-outline"></ion-icon>
-            <ion-label>Unresolved (2)</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="resolved">
-            <ion-icon name="checkmark-circle-outline"></ion-icon>
-            <ion-label>Resolved</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="all">
-            <ion-icon name="list-outline"></ion-icon>
-            <ion-label>All Forum</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-      </ion-col>
-    </ion-row>
-
-    <!-- DOUBTS LIST -->
-    <ion-row>
-      <ion-col size="12" *ngFor="let d of filteredDoubts">
-        <ion-card class="doubt-card">
-          <ion-card-header>
-            <div class="doubt-top">
-              <ion-badge color="tertiary">{{ d.courseCode }}</ion-badge>
-              <ion-badge [color]="d.status === 'Unresolved' ? 'danger' : 'success'">{{ d.status }}</ion-badge>
-            </div>
-            <ion-card-title class="ion-margin-top">{{ d.questionTitle }}</ion-card-title>
-            <ion-card-subtitle>
-              Asked by <b>{{ d.studentName }}</b> &nbsp;•&nbsp; {{ d.askedDate }}
-            </ion-card-subtitle>
-          </ion-card-header>
-
-          <ion-card-content>
-            <p class="doubt-body">{{ d.questionBody }}</p>
-
-            <div *ngIf="d.status === 'Resolved'" class="reply-box ion-margin-top">
-              <p><b><ion-icon name="chatbox-ellipses-outline"></ion-icon> Faculty Answer:</b></p>
-              <p class="reply-text">{{ d.reply }}</p>
-            </div>
-
-            <div class="ion-margin-top ion-text-end">
-              <ion-button size="small" color="tertiary" (click)="openReplyModal(d)">
-                <ion-icon name="chatbubble-ellipses-outline" slot="start"></ion-icon>
-                {{ d.status === 'Unresolved' ? 'Answer Question' : 'Edit Response' }}
-              </ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-</ion-content>
-
-<!-- ANSWER DOUBT MODAL -->
-<ion-modal [isOpen]="isReplyModalOpen" (didDismiss)="closeReplyModal()">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar color="tertiary">
-        <ion-title>Answer Student Question</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="closeReplyModal()">Cancel</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content class="ion-padding">
-      <div *ngIf="selectedDoubt" class="modal-doubt-header">
-        <h4><b>{{ selectedDoubt.questionTitle }}</b></h4>
-        <p><b>Asked by:</b> {{ selectedDoubt.studentName }} ({{ selectedDoubt.courseCode }})</p>
-        <p class="modal-body-text">"{{ selectedDoubt.questionBody }}"</p>
+          </div>
+        </div>
+        <div class="kpi-stat-value">{{ unresolvedCount }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-subtext">Awaiting your response</span>
+          <span class="kpi-badge badge-warning" *ngIf="unresolvedCount > 0">Action Required</span>
+          <span class="kpi-badge badge-success" *ngIf="unresolvedCount === 0">All Clear</span>
+        </div>
       </div>
 
-      <ion-list lines="full" class="ion-margin-top">
-        <ion-item>
-          <ion-label position="stacked">Your Faculty Response</ion-label>
-          <ion-textarea [(ngModel)]="replyText" rows="6" placeholder="Provide a detailed solution or answer for the student..."></ion-textarea>
-        </ion-item>
-      </ion-list>
+      <!-- Resolved -->
+      <div class="kpi-stat-card card-resolved" (click)="selectedStatus = 'resolved'">
+        <div class="kpi-card-header">
+          <span class="kpi-label">Resolved Doubts</span>
+          <div class="kpi-icon-bubble resolved">
+            <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+          </div>
+        </div>
+        <div class="kpi-stat-value">{{ resolvedCount }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-subtext">Successfully answered</span>
+          <span class="kpi-badge badge-success">Completed</span>
+        </div>
+      </div>
 
-      <ion-button expand="block" color="tertiary" class="ion-margin-top" (click)="submitReply()">
-        Publish Answer to Forum
-      </ion-button>
-    </ion-content>
+      <!-- Total Queries -->
+      <div class="kpi-stat-card card-total" (click)="selectedStatus = 'all'">
+        <div class="kpi-card-header">
+          <span class="kpi-label">Total Questions</span>
+          <div class="kpi-icon-bubble total">
+            <ion-icon name="chatbox-ellipses-outline"></ion-icon>
+          </div>
+        </div>
+        <div class="kpi-stat-value">{{ totalCount }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-subtext">Across assigned courses</span>
+          <span class="kpi-badge badge-info">100% Tracked</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER & SEARCH TOOLBAR -->
+    <section class="filter-panel-card">
+      <!-- Segmented Status Tabs -->
+      <div class="status-tab-group">
+        <button 
+          type="button" 
+          class="tab-btn" 
+          [class.active]="selectedStatus === 'unresolved'"
+          (click)="selectedStatus = 'unresolved'">
+          <ion-icon name="help-circle-outline"></ion-icon>
+          <span>Unresolved</span>
+          <span class="tab-count-tag warning">{{ unresolvedCount }}</span>
+        </button>
+
+        <button 
+          type="button" 
+          class="tab-btn" 
+          [class.active]="selectedStatus === 'resolved'"
+          (click)="selectedStatus = 'resolved'">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>Resolved</span>
+          <span class="tab-count-tag success">{{ resolvedCount }}</span>
+        </button>
+
+        <button 
+          type="button" 
+          class="tab-btn" 
+          [class.active]="selectedStatus === 'all'"
+          (click)="selectedStatus = 'all'">
+          <ion-icon name="list-outline"></ion-icon>
+          <span>All Forum</span>
+          <span class="tab-count-tag neutral">{{ totalCount }}</span>
+        </button>
+      </div>
+
+      <!-- Course & Search Bar -->
+      <div class="filter-controls-right">
+        <!-- Course Selector -->
+        <div class="select-field-box">
+          <ion-icon name="book-outline" class="field-icon"></ion-icon>
+          <select [(ngModel)]="selectedCourse" class="custom-course-select">
+            <option *ngFor="let c of courses" [value]="c.code">{{ c.name }}</option>
+          </select>
+          <ion-icon name="chevron-down-outline" class="dropdown-chevron"></ion-icon>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-input-box">
+          <ion-icon name="search-outline" class="search-icon"></ion-icon>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            placeholder="Search questions or students..." 
+            class="search-input" />
+          <button 
+            *ngIf="searchQuery" 
+            type="button" 
+            class="btn-clear-search" 
+            (click)="searchQuery = ''">
+            <ion-icon name="close-circle"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOUBTS FEED SECTION -->
+    <section class="doubts-feed-section">
+      <div class="feed-header-row">
+        <h2 class="feed-title">
+          <span>Active Questions & Answers</span>
+          <span class="feed-count-tag">Showing {{ filteredDoubts.length }} of {{ totalCount }}</span>
+        </h2>
+      </div>
+
+      <!-- Doubts List -->
+      <div class="doubts-list-container">
+        <div 
+          *ngFor="let d of filteredDoubts" 
+          class="doubt-feed-card"
+          [class.is-resolved]="d.status === 'Resolved'">
+          
+          <!-- Card Header -->
+          <div class="doubt-card-top-bar">
+            <!-- Student Avatar & Metadata -->
+            <div class="student-meta-group">
+              <div class="student-avatar-circle" [class.resolved-avatar]="d.status === 'Resolved'">
+                <span>{{ getInitials(d.studentName) }}</span>
+              </div>
+              <div class="student-meta-text">
+                <div class="student-name-row">
+                  <h4 class="student-name">{{ d.studentName }}</h4>
+                  <span class="course-badge-pill">{{ d.courseCode }}</span>
+                </div>
+                <div class="time-meta-row">
+                  <ion-icon name="time-outline"></ion-icon>
+                  <span>Asked {{ d.askedDate }}</span>
+                  <span class="meta-dot">•</span>
+                  <span class="doubt-id-tag">#{{ d.id }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Status Pill -->
+            <div class="status-badge-container">
+              <span 
+                class="status-pill" 
+                [ngClass]="d.status === 'Unresolved' ? 'status-unresolved' : 'status-resolved'">
+                <span class="status-pulse-dot"></span>
+                <span>{{ d.status }}</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Card Content -->
+          <div class="doubt-card-body">
+            <h3 class="question-heading">{{ d.questionTitle }}</h3>
+            <p class="question-body-text">{{ d.questionBody }}</p>
+
+            <!-- Faculty Answer Block (When Resolved) -->
+            <div *ngIf="d.status === 'Resolved'" class="faculty-response-box">
+              <div class="response-header">
+                <div class="faculty-tag">
+                  <ion-icon name="shield-checkmark"></ion-icon>
+                  <span>Faculty Response</span>
+                </div>
+                <span class="verified-label">Answered by Course Instructor</span>
+              </div>
+              <p class="response-text">{{ d.reply }}</p>
+            </div>
+          </div>
+
+          <!-- Card Footer Actions -->
+          <div class="doubt-card-footer">
+            <div class="footer-meta-left">
+              <span *ngIf="d.status === 'Unresolved'" class="unanswered-notice">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                <span>Student awaiting your clarification</span>
+              </span>
+              <span *ngIf="d.status === 'Resolved'" class="answered-notice">
+                <ion-icon name="checkmark-done-outline"></ion-icon>
+                <span>Visible to enrolled students in forum</span>
+              </span>
+            </div>
+
+            <div class="footer-action-right">
+              <button 
+                type="button" 
+                class="btn-reply-action"
+                [ngClass]="d.status === 'Unresolved' ? 'btn-primary-answer' : 'btn-secondary-edit'"
+                (click)="openReplyModal(d)">
+                <ion-icon [name]="d.status === 'Unresolved' ? 'chatbubble-ellipses' : 'create-outline'"></ion-icon>
+                <span>{{ d.status === 'Unresolved' ? 'Answer Question' : 'Edit Response' }}</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredDoubts.length === 0" class="empty-state-card">
+          <div class="empty-icon-circle">
+            <ion-icon name="chatbubbles-outline"></ion-icon>
+          </div>
+          <h3>No Questions Found</h3>
+          <p>There are no questions matching your current filter criteria or search keyword.</p>
+          <button type="button" class="btn-reset-filters" (click)="resetFilters()">
+            <ion-icon name="refresh-outline"></ion-icon>
+            <span>Reset All Filters</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</ion-content>
+
+<!-- ANSWER / EDIT RESPONSE MODAL -->
+<ion-modal [isOpen]="isReplyModalOpen" (didDismiss)="closeReplyModal()" class="custom-doubt-reply-modal">
+  <ng-template>
+    <div class="modal-card-wrapper">
+      <!-- Modal Header -->
+      <div class="modal-card-header">
+        <div class="modal-title-left">
+          <div class="modal-header-icon doubt">
+            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+          </div>
+          <div>
+            <h3 class="modal-heading">{{ selectedDoubt?.status === 'Resolved' ? 'Edit Faculty Response' : 'Answer Student Question' }}</h3>
+            <p class="modal-subheading">{{ selectedDoubt?.studentName }} • {{ selectedDoubt?.courseCode }}</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-icon-btn" (click)="closeReplyModal()" title="Close">
+          <ion-icon name="close"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-card-body">
+        <!-- Question Recap Box -->
+        <div *ngIf="selectedDoubt" class="modal-question-recap">
+          <div class="recap-header">
+            <ion-icon name="help-circle-outline"></ion-icon>
+            <span>Question Overview</span>
+          </div>
+          <h4 class="recap-title">{{ selectedDoubt.questionTitle }}</h4>
+          <p class="recap-body">"{{ selectedDoubt.questionBody }}"</p>
+        </div>
+
+        <!-- Form Field -->
+        <div class="modal-form-fields">
+          <div class="form-group">
+            <label class="form-label" for="faculty-reply-textarea">
+              <ion-icon name="create-outline"></ion-icon>
+              <span>Your Explanation / Solution</span>
+            </label>
+            <textarea 
+              id="faculty-reply-textarea" 
+              class="modal-textarea-input" 
+              [(ngModel)]="replyText" 
+              rows="5" 
+              placeholder="Provide a clear, thorough explanation or guidance for the student..."></textarea>
+            <span class="field-hint">
+              <ion-icon name="bulb-outline"></ion-icon>
+              <span>Tip: Include direct steps, code snippets, or reference links to assist the student.</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Modal Actions Footer -->
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeReplyModal()">Cancel</button>
+          <button type="button" class="btn-modal-submit" (click)="submitReply()">
+            <ion-icon name="paper-plane-outline"></ion-icon>
+            <span>{{ selectedDoubt?.status === 'Resolved' ? 'Update Answer' : 'Publish Answer to Forum' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </ng-template>
 </ion-modal>

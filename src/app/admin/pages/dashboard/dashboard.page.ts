@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from '../../components/header/header.component';
+import { toast } from 'ngx-sonner';
 import { AuthService, User } from 'src/app/services/auth.service';
 import { Subscription } from 'rxjs';
 
@@ -223,7 +224,9 @@ export class DashboardPage implements OnInit, OnDestroy {
   }
 
   submitAddFaculty() {
-    alert(`Faculty Member "${this.newFaculty.name}" has been registered successfully!`);
+    toast.success('Faculty Registered', {
+      description: `Faculty Member "${this.newFaculty.name}" has been registered successfully.`
+    });
     this.newFaculty = { name: '', email: '', phone: '', department: 'Computer Science & Engineering', designation: 'Assistant Professor' };
     this.closeAddFacultyModal();
   }
@@ -238,7 +241,9 @@ export class DashboardPage implements OnInit, OnDestroy {
   }
 
   submitAddCourse() {
-    alert(`New Course "${this.newCourse.title}" (${this.newCourse.code}) created successfully!`);
+    toast.success('Course Created', {
+      description: `New Course "${this.newCourse.title}" (${this.newCourse.code}) created successfully.`
+    });
     this.newCourse = { title: '', code: '', department: 'Computer Science & Engineering', credits: 4, instructor: 'Dr. Sarah Jenkins' };
     this.closeAddCourseModal();
   }

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from '../../components/header/header.component';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-reports',
@@ -35,7 +36,9 @@ export class ReportsPage implements OnInit {
     this.downloadingState[key] = true;
     setTimeout(() => {
       this.downloadingState[key] = false;
-      alert(`"${title}" downloaded successfully!`);
+      toast.success('Report Downloaded', {
+        description: `"${title}" has been downloaded successfully.`
+      });
     }, 1200);
   }
 

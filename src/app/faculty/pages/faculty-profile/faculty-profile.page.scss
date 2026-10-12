@@ -1,5 +1,16 @@
 :host {
   display: block;
+  height: 100%;
+  width: 100%;
+}
+
+ion-content {
+  --background: #f8fafc;
+}
+
+ion-grid {
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 .profile-summary-card {

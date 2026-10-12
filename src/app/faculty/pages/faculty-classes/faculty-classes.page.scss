@@ -1,101 +1,927 @@
 :host {
   display: block;
+  height: 100%;
+  width: 100%;
 }
 
-.schedule-card {
+ion-content {
+  --background: #f8fafc;
+}
+
+ion-grid {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   WEEKLY TIMETABLE - COMPACT 4-COLUMN CARDS WITH VIBRANT DAY THEMES
+   ========================================================================== */
+.timetable-section {
+  margin-top: 0.25rem;
+}
+
+.timetable-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+  padding: 0.45rem 0.75rem;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+
+  .filter-pills {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    overflow-x: auto;
+    padding: 2px;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .filter-pill-btn {
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.74rem;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding: 0.3rem 0.65rem;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+
+    .pill-count {
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 0.66rem;
+      padding: 1px 5px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    &:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+
+    &.active {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      color: #1d4ed8;
+      font-weight: 700;
+      box-shadow: 0 1px 4px rgba(37, 99, 235, 0.12);
+
+      .pill-count {
+        background: #dbeafe;
+        color: #1e40af;
+        font-weight: 800;
+      }
+    }
+  }
+
+  .timetable-summary-badge {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #2563eb;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #eff6ff;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #bfdbfe;
+    font-family: 'JetBrains Mono', monospace;
+
+    ion-icon {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+.timetable-grid {
+  margin: -0.35rem;
+
+  ion-col {
+    padding: 0.35rem;
+    display: flex;
+  }
+}
+
+.tt-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  position: relative;
+  overflow: hidden;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+    border-color: #cbd5e1;
   }
 
-  .schedule-top {
+  // DISTINCT COLOR ACCENTS PER DAY (Badges & Light Action Buttons)
+  &.day-monday {
+    .tt-day-badge {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .tt-start-btn {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+
+      ion-icon {
+        color: #2563eb;
+      }
+
+      &:hover {
+        background: #dbeafe;
+        color: #1e40af;
+        border-color: #93c5fd;
+      }
+    }
+  }
+
+  &.day-tuesday {
+    .tt-day-badge {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .tt-start-btn {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #047857;
+
+      ion-icon {
+        color: #059669;
+      }
+
+      &:hover {
+        background: #d1fae5;
+        color: #065f46;
+        border-color: #6ee7b7;
+      }
+    }
+  }
+
+  &.day-wednesday {
+    .tt-day-badge {
+      background: #f5f3ff;
+      color: #6d28d9;
+      border: 1px solid #ddd6fe;
+    }
+
+    .tt-start-btn {
+      background: #f5f3ff;
+      border: 1px solid #ddd6fe;
+      color: #6d28d9;
+
+      ion-icon {
+        color: #7c3aed;
+      }
+
+      &:hover {
+        background: #ede9fe;
+        color: #5b21b6;
+        border-color: #c4b5fd;
+      }
+    }
+  }
+
+  &.day-thursday {
+    .tt-day-badge {
+      background: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .tt-start-btn {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #b45309;
+
+      ion-icon {
+        color: #d97706;
+      }
+
+      &:hover {
+        background: #fef3c7;
+        color: #92400e;
+        border-color: #fcd34d;
+      }
+    }
+  }
+
+  &.day-friday {
+    .tt-day-badge {
+      background: #fff1f2;
+      color: #be123c;
+      border: 1px solid #fecdd3;
+    }
+
+    .tt-start-btn {
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      color: #be123c;
+
+      ion-icon {
+        color: #e11d48;
+      }
+
+      &:hover {
+        background: #ffe4e6;
+        color: #9f1239;
+        border-color: #fda4af;
+      }
+    }
+  }
+
+  // TOP META ROW: Day badge & Time
+  .tt-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.4rem;
 
-    .schedule-time {
+    .tt-day-badge {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
+      font-size: 0.67rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 5px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .tt-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
       color: #64748b;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      white-space: nowrap;
+
+      ion-icon {
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
     }
   }
 
-  ion-card-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #0f172a;
+  // MIDDLE ROW: Course Code & Subject Name
+  .tt-body {
+    margin-bottom: 0.45rem;
+
+    .tt-course-code {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .tt-course-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.77rem;
+      font-weight: 500;
+      color: #475569;
+      margin: 0.15rem 0 0 0;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  // BOTTOM ROW: Venue info (Left) + Start Class Action (Right)
+  .tt-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.4rem;
+    padding-top: 0.4rem;
+    border-top: 1px dashed #f1f5f9;
+
+    .tt-venue {
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: #334155;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 55%;
+
+      ion-icon {
+        color: #2563eb;
+        font-size: 0.82rem;
+        flex-shrink: 0;
+      }
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .tt-start-btn {
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.26rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+
+      ion-icon {
+        font-size: 0.8rem;
+      }
+
+      &:active {
+        transform: scale(0.96);
+      }
+    }
   }
 }
 
-.course-card {
+.tt-empty-state {
+  padding: 2.5rem 1rem;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  margin-top: 1rem;
+
+  ion-icon {
+    font-size: 2.5rem;
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+/* ==========================================================================
+   ASSIGNED COURSES - MODERN 2-COLUMN CARDS WITH METRIC TILES & THEMES
+   ========================================================================== */
+.courses-section {
+  margin-top: 0.25rem;
+}
+
+.courses-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  padding: 0.45rem 0.75rem;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 0.85rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 
-  .course-header-row {
+  .courses-search-box {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 240px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.35rem 0.65rem;
+    transition: all 0.2s ease;
 
-    .course-code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #059669;
+    &:focus-within {
+      background: #ffffff;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
-    ion-card-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: #0f172a;
-      margin-top: 2px;
-    }
-
-    .course-dept {
-      font-size: 0.78rem;
+    ion-icon {
       color: #64748b;
-      margin: 2px 0 0 0;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+    }
+
+    .course-search-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 0.82rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #0f172a;
+
+      &::placeholder {
+        color: #94a3b8;
+      }
+    }
+
+    .clear-search-btn {
+      border: none;
+      background: transparent;
+      padding: 0;
+      color: #94a3b8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        color: #64748b;
+      }
     }
   }
 
-  .course-info-row {
-    margin-top: 0.75rem;
+  .courses-summary-badge {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #2563eb;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #eff6ff;
+    padding: 0.28rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid #bfdbfe;
+    font-family: 'JetBrains Mono', monospace;
 
-    p {
-      font-size: 0.82rem;
-      color: #475569;
-      margin: 0.25rem 0;
+    ion-icon {
+      font-size: 0.88rem;
+    }
+  }
+}
+
+.courses-grid {
+  margin: -0.45rem;
+
+  ion-col {
+    padding: 0.45rem;
+    display: flex;
+  }
+}
+
+.course-card-v2 {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.95rem 1.05rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07);
+    border-color: #cbd5e1;
+  }
+
+  // ACCENT COLOR THEMES (Pill badge styling without top border stripe)
+  &.theme-royal-blue {
+    .course-code-pill {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+  }
+
+  &.theme-cyan-blue {
+    .course-code-pill {
+      background: #f0f9ff;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+  }
+
+  &.theme-emerald-green {
+    .course-code-pill {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+  }
+
+  &.theme-violet-purple {
+    .course-code-pill {
+      background: #f5f3ff;
+      color: #6d28d9;
+      border: 1px solid #ddd6fe;
+    }
+  }
+
+  // TOP METADATA
+  .course-top-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+
+    .code-and-dept {
       display: flex;
       align-items: center;
       gap: 0.4rem;
+      min-width: 0;
+      flex: 1;
+
+      .course-code-pill {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 0.18rem 0.5rem;
+        border-radius: 6px;
+        letter-spacing: 0.02em;
+        flex-shrink: 0;
+      }
+
+      .course-dept-tag {
+        font-size: 0.72rem;
+        color: #64748b;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        ion-icon {
+          font-size: 0.82rem;
+          color: #94a3b8;
+          flex-shrink: 0;
+        }
+
+        span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    .course-status-pill {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.18rem 0.5rem;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-shrink: 0;
+
+      &.active {
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
+
+        .status-pulse-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+          animation: pulseGreen 2s infinite ease-in-out;
+        }
+      }
     }
   }
 
-  .progress-box {
+  // COURSE TITLE
+  .course-title-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.7rem 0;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // 4 METRIC TILES GRID (2x2)
+  .course-metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+    margin-bottom: 0.75rem;
+
+    .metric-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.38rem 0.5rem;
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+      border-radius: 7px;
+      transition: background 0.15s ease;
+      min-width: 0;
+
+      &:hover {
+        background: #f1f5f9;
+      }
+
+      .metric-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.88rem;
+        flex-shrink: 0;
+
+        &.students {
+          background: #eff6ff;
+          color: #2563eb;
+        }
+
+        &.credits {
+          background: #fdf2f8;
+          color: #db2777;
+        }
+
+        &.schedule {
+          background: #fffbeb;
+          color: #d97706;
+        }
+
+        &.room {
+          background: #f0fdf4;
+          color: #16a34a;
+        }
+      }
+
+      .metric-detail {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-width: 0;
+
+        .metric-label {
+          font-size: 0.62rem;
+          font-weight: 600;
+          color: #64748b;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          line-height: 1.1;
+        }
+
+        .metric-value {
+          font-size: 0.74rem;
+          font-weight: 700;
+          color: #1e293b;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-height: 1.3;
+          margin-top: 1px;
+        }
+      }
+    }
+  }
+
+  // SYLLABUS PROGRESS CARD
+  .course-progress-card {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 0.6rem;
-    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    padding: 0.55rem 0.7rem;
+    margin-bottom: 0.75rem;
 
-    .progress-label {
+    .progress-info-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.78rem;
-      color: #334155;
-      margin-bottom: 0.4rem;
+      align-items: center;
+      margin-bottom: 0.38rem;
+
+      .progress-title {
+        font-size: 0.74rem;
+        font-weight: 600;
+        color: #334155;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+
+        ion-icon {
+          color: #2563eb;
+          font-size: 0.85rem;
+        }
+      }
+
+      .progress-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 0.08rem 0.45rem;
+        border-radius: 10px;
+
+        &.progress-high {
+          background: #ecfdf5;
+          color: #059669;
+        }
+
+        &.progress-mid {
+          background: #eff6ff;
+          color: #2563eb;
+        }
+
+        &.progress-low {
+          background: #fffbeb;
+          color: #d97706;
+        }
+      }
+    }
+
+    .custom-progress-track {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+
+      .custom-progress-fill {
+        height: 100%;
+        border-radius: 8px;
+        transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &.progress-high {
+          background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        &.progress-mid {
+          background: linear-gradient(90deg, #3b82f6, #2563eb);
+        }
+
+        &.progress-low {
+          background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+      }
     }
   }
 
-  .course-actions-footer {
+  // LIGHT ACTION BUTTONS TOOLBAR
+  .course-actions-toolbar {
     display: flex;
-    justify-content: space-between;
     gap: 0.5rem;
+    align-items: center;
+
+    .btn-action {
+      flex: 1;
+      height: 33px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.73rem;
+      font-weight: 600;
+      border-radius: 7px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.32rem;
+      white-space: nowrap;
+      transition: all 0.16s ease;
+
+      ion-icon {
+        font-size: 0.88rem;
+      }
+
+      &:active {
+        transform: scale(0.97);
+      }
+    }
+
+    // Light button 1: Announcement
+    .announcement-btn {
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+
+      ion-icon {
+        color: #64748b;
+      }
+
+      &:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+        border-color: #cbd5e1;
+      }
+    }
+
+    // Light button 2: Attendance (Soft light blue)
+    .attendance-btn {
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+
+      ion-icon {
+        color: #2563eb;
+      }
+
+      &:hover {
+        background: #dbeafe;
+        color: #1e40af;
+        border-color: #93c5fd;
+      }
+    }
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+
+      .btn-action {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.courses-empty-state {
+  padding: 2.5rem 1rem;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  margin-top: 1rem;
+
+  ion-icon {
+    font-size: 2.5rem;
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
 }

@@ -1,11 +1,13 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LanguageService, Language } from 'src/app/services/language.service';
 import { AuthService, User } from 'src/app/services/auth.service';
+import { FacultyLayoutService } from '../../services/faculty-layout.service';
 import { Subscription } from 'rxjs';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-faculty-header',
@@ -15,13 +17,23 @@ import { Subscription } from 'rxjs';
   imports: [IonicModule, RouterModule, FormsModule, CommonModule],
 })
 export class FacultyHeaderComponent implements OnInit, OnDestroy {
-  @Input() pageTitle: string = 'Faculty Portal';
+  @Input() pageTitle: string = '';
 
+  displayTitle: string = 'Faculty Dashboard';
   facultyName = 'Dr. Sarah Jenkins';
   facultyInitials = 'SJ';
   notificationsCount = 4;
   showProfileMenu = false;
+  showSettingsMenu = false;
+  settingsPopoverEvent: any = null;
+  profilePopoverEvent: any = null;
   currentUser: User | null = null;
+
+  // Additional settings modals
+  isAppearanceModalOpen = false;
+  isSecurityModalOpen = false;
+  isBackupModalOpen = false;
+  selectedTheme = 'light';
 
   // Language state & modal controls
   selectedLanguage!: Language;
@@ -42,15 +54,34 @@ export class FacultyHeaderComponent implements OnInit, OnDestroy {
   // Toast state
   toastMessage: string = '';
   showToast: boolean = false;
+  isCollapsed: boolean = false;
 
   private subs = new Subscription();
 
   constructor(
     private languageService: LanguageService,
-    private authService: AuthService
+    private authService: AuthService,
+    public layoutService: FacultyLayoutService,
+    private router: Router
   ) {}
 
   ngOnInit() {
+    this.displayTitle = this.pageTitle || 'Faculty Dashboard';
+
+    this.subs.add(
+      this.layoutService.isCollapsed$.subscribe((collapsed) => {
+        this.isCollapsed = collapsed;
+      })
+    );
+
+    this.subs.add(
+      this.layoutService.pageTitle$.subscribe((title) => {
+        if (!this.pageTitle) {
+          this.displayTitle = title;
+        }
+      })
+    );
+
     this.subs.add(
       this.authService.currentUser$.subscribe((user) => {
         this.currentUser = user;
@@ -73,6 +104,24 @@ export class FacultyHeaderComponent implements OnInit, OnDestroy {
         this.filterLanguages();
       })
     );
+  }
+
+  toggleSidebar() {
+    this.layoutService.toggleSidebar();
+  }
+
+  expandSidebar() {
+    this.layoutService.expandSidebar();
+  }
+
+  shrinkSidebar() {
+    this.layoutService.shrinkSidebar();
+  }
+
+  onLogoClick() {
+    if (this.isCollapsed) {
+      this.layoutService.expandSidebar();
+    }
   }
 
   ngOnDestroy() {
@@ -112,6 +161,7 @@ export class FacultyHeaderComponent implements OnInit, OnDestroy {
   triggerToast(msg: string) {
     this.toastMessage = msg;
     this.showToast = true;
+    toast.info(msg);
     setTimeout(() => {
       this.showToast = false;
     }, 3200);
@@ -130,8 +180,63 @@ export class FacultyHeaderComponent implements OnInit, OnDestroy {
     this.notificationsCount = 0;
   }
 
-  toggleProfileMenu() {
+  toggleSettingsMenu(event?: any) {
+    if (event) {
+      event.stopPropagation();
+      this.settingsPopoverEvent = event;
+    }
+    this.showSettingsMenu = !this.showSettingsMenu;
+    if (this.showSettingsMenu) {
+      this.showProfileMenu = false;
+    }
+  }
+
+  closeSettingsMenu() {
+    this.showSettingsMenu = false;
+  }
+
+  onSettingClick(key: string) {
+    this.closeSettingsMenu();
+
+    switch (key) {
+      case 'account':
+        this.router.navigate(['/faculty/profile']);
+        break;
+      case 'language':
+        this.openLanguageModal();
+        break;
+      case 'appearance':
+        this.isAppearanceModalOpen = true;
+        break;
+      case 'security':
+        this.isSecurityModalOpen = true;
+        break;
+      case 'backup':
+        this.isBackupModalOpen = true;
+        break;
+      case 'notifications':
+        this.openNotificationsModal();
+        break;
+      default:
+        break;
+    }
+  }
+
+  setTheme(theme: string) {
+    this.selectedTheme = theme;
+    this.isAppearanceModalOpen = false;
+    this.triggerToast(`Appearance theme updated to: ${theme.toUpperCase()}`);
+  }
+
+  toggleProfileMenu(event?: any) {
+    if (event) {
+      event.stopPropagation();
+      this.profilePopoverEvent = event;
+    }
     this.showProfileMenu = !this.showProfileMenu;
+    if (this.showProfileMenu) {
+      this.showSettingsMenu = false;
+    }
   }
 
   logout() {

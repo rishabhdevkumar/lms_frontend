@@ -1,113 +1,289 @@
-<app-faculty-header pageTitle="Student Attendance"></app-faculty-header>
+<ion-content class="ion-padding attendance-page-content">
+  <div class="attendance-container">
 
-<ion-content class="ion-padding">
-  <ion-grid>
-    <!-- SELECTION HEADER BAR -->
-    <ion-row class="ion-align-items-center ion-margin-bottom">
-      <ion-col size="12" size-md="4">
-        <ion-item class="filter-item">
-          <ion-label position="stacked">Select Course</ion-label>
-          <ion-select [(ngModel)]="selectedCourse">
-            <ion-select-option value="CS-402">CS-402: Web Engineering</ion-select-option>
-            <ion-select-option value="CS-501">CS-501: Microservices</ion-select-option>
-            <ion-select-option value="DS-302">DS-302: Data Analytics</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-col>
+    <!-- PAGE HERO & TITLE HEADER -->
+    <header class="page-header-card">
+      <div class="header-left">
+        <h1 class="page-title">Attendance Summary</h1>
+      </div>
 
-      <ion-col size="12" size-md="4">
-        <ion-item class="filter-item">
-          <ion-label position="stacked">Lecture Date</ion-label>
-          <ion-input type="date" [(ngModel)]="selectedDate"></ion-input>
-        </ion-item>
-      </ion-col>
+      <div class="header-actions">
+        <button type="button" class="btn-quick-action success-outline" (click)="markAllPresent()"
+          title="Mark all enrolled students as present">
+          <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+          <span>Mark All Present</span>
+        </button>
+        <button type="button" class="btn-quick-action danger-outline" (click)="markAllAbsent()"
+          title="Mark all students as absent">
+          <ion-icon name="close-circle-outline"></ion-icon>
+          <span>Mark All Absent</span>
+        </button>
+      </div>
+    </header>
 
-      <ion-col size="12" size-md="4" class="ion-text-end">
-        <ion-button fill="outline" color="tertiary" (click)="markAllPresent()">
-          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
-          Mark All Present
-        </ion-button>
-      </ion-col>
-    </ion-row>
+    <!-- FILTER & LECTURE CONFIGURATION CARD -->
+    <section class="filter-panel-card">
+      <div class="filter-grid">
+        <!-- 1. Select Course -->
+        <div class="filter-field">
+          <label class="field-label" for="course-select">
+            <ion-icon name="book-outline"></ion-icon>
+            <span>Course Module</span>
+          </label>
+          <div class="custom-select-wrapper">
+            <select id="course-select" class="custom-select-input" [(ngModel)]="selectedCourse">
+              <option *ngFor="let c of courses" [value]="c.code">
+                {{ c.name }} ({{ c.room }})
+              </option>
+            </select>
+            <ion-icon name="chevron-down-outline" class="select-chevron"></ion-icon>
+          </div>
+        </div>
 
-    <!-- SUMMARY METRICS -->
-    <ion-row class="ion-margin-bottom">
-      <ion-col size="6" size-md="3">
-        <ion-card class="mini-stat-card border-tertiary">
-          <ion-card-content>
-            <p>Total Class</p>
-            <h3>{{ students.length }}</h3>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size="6" size-md="3">
-        <ion-card class="mini-stat-card border-success">
-          <ion-card-content>
-            <p>Present</p>
-            <h3 class="text-success">{{ presentCount }}</h3>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size="6" size-md="3">
-        <ion-card class="mini-stat-card border-danger">
-          <ion-card-content>
-            <p>Absent</p>
-            <h3 class="text-danger">{{ absentCount }}</h3>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size="6" size-md="3">
-        <ion-card class="mini-stat-card border-warning">
-          <ion-card-content>
-            <p>Attendance %</p>
-            <h3 class="text-warning">{{ percentage }}%</h3>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <!-- ATTENDANCE ROSTER TABLE -->
-    <ion-row>
-      <ion-col size="12">
-        <ion-card class="roster-card">
-          <ion-card-header>
-            <ion-card-title>Class Roster - {{ selectedCourse }} ({{ selectedDate }})</ion-card-title>
-          </ion-card-header>
-
-          <ion-card-content>
-            <ion-list lines="full">
-              <ion-item *ngFor="let s of students" class="roster-item">
-                <ion-avatar slot="start" class="roster-avatar">
-                  <span>{{ s.rollNo.slice(-3) }}</span>
-                </ion-avatar>
-
-                <ion-label>
-                  <h3><b>{{ s.name }}</b></h3>
-                  <p>Roll No: {{ s.rollNo }}</p>
-                </ion-label>
-
-                <div slot="end" class="status-toggle-group">
-                  <ion-chip [color]="s.status === 'Present' ? 'success' : 'light'" (click)="setStatus(s, 'Present')" button>
-                    Present
-                  </ion-chip>
-                  <ion-chip [color]="s.status === 'Absent' ? 'danger' : 'light'" (click)="setStatus(s, 'Absent')" button>
-                    Absent
-                  </ion-chip>
-                  <ion-chip [color]="s.status === 'Late' ? 'warning' : 'light'" (click)="setStatus(s, 'Late')" button>
-                    Late
-                  </ion-chip>
-                </div>
-              </ion-item>
-            </ion-list>
-
-            <div class="ion-margin-top ion-text-end">
-              <ion-button color="tertiary" size="large" (click)="submitAttendance()">
-                <ion-icon name="save-outline" slot="start"></ion-icon> Submit Attendance Record
-              </ion-button>
+        <!-- 2. Lecture Date -->
+        <div class="filter-field">
+          <div class="field-label-row">
+            <label class="field-label" for="date-input">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>Lecture Date</span>
+            </label>
+            <div class="quick-date-btns">
+              <button type="button" class="quick-date-btn" (click)="setQuickDate('today')">Today</button>
+              <button type="button" class="quick-date-btn" (click)="setQuickDate('yesterday')">Yesterday</button>
             </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+          </div>
+          <div class="custom-input-wrapper">
+            <input id="date-input" type="date" class="custom-date-input" [(ngModel)]="selectedDate" />
+          </div>
+        </div>
+
+        <!-- 3. Session / Slot -->
+        <div class="filter-field">
+          <label class="field-label" for="session-select">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>Lecture Slot</span>
+          </label>
+          <div class="custom-select-wrapper">
+            <select id="session-select" class="custom-select-input" [(ngModel)]="selectedSession">
+              <option *ngFor="let s of sessions" [value]="s">
+                {{ s }}
+              </option>
+            </select>
+            <ion-icon name="chevron-down-outline" class="select-chevron"></ion-icon>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUMMARY KPI STAT CARDS (4 CARDS) -->
+    <section class="stats-overview-grid">
+      <!-- Total Enrolled -->
+      <div class="stat-card stat-total">
+        <div class="stat-icon-wrapper total-icon">
+          <ion-icon name="people"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Class</span>
+          <div class="stat-value">{{ students.length }}</div>
+          <span class="stat-sub">Enrolled Students</span>
+        </div>
+      </div>
+
+      <!-- Present -->
+      <div class="stat-card stat-present">
+        <div class="stat-icon-wrapper present-icon">
+          <ion-icon name="checkmark-circle"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Present</span>
+          <div class="stat-value text-present">{{ presentCount }}</div>
+          <span class="stat-sub">{{ presentPercentage }}% of class</span>
+        </div>
+      </div>
+
+      <!-- Absent -->
+      <div class="stat-card stat-absent">
+        <div class="stat-icon-wrapper absent-icon">
+          <ion-icon name="close-circle"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Absent</span>
+          <div class="stat-value text-absent">{{ absentCount }}</div>
+          <span class="stat-sub">{{ absentPercentage }}% missing</span>
+        </div>
+      </div>
+
+      <!-- Attendance Percentage & Late Count -->
+      <div class="stat-card stat-rate">
+        <div class="stat-icon-wrapper rate-icon">
+          <ion-icon name="pie-chart"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-rate-header">
+            <span class="stat-label">Attendance %</span>
+            <span class="late-badge-tag" *ngIf="lateCount > 0">{{ lateCount }} Late</span>
+          </div>
+          <div class="stat-value text-rate">{{ percentage }}%</div>
+          <div class="stat-progress-track">
+            <div class="stat-progress-bar" [style.width.%]="percentage" [ngClass]="{
+                'bar-high': percentage >= 75,
+                'bar-med': percentage >= 50 && percentage < 75,
+                'bar-low': percentage < 50
+              }">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLASS ROSTER MAIN SECTION -->
+    <section class="roster-card-container">
+      <div class="roster-header-bar">
+        <div class="roster-title-group">
+          <div class="roster-badge-row">
+            <h2 class="roster-title">Class Attendance</h2>
+          </div>
+        </div>
+
+        <div class="roster-toolbar-right">
+          <!-- Real-Time Search Box -->
+          <div class="roster-search-box">
+            <ion-icon name="search-outline" class="search-icon"></ion-icon>
+            <input type="text" class="search-input" [(ngModel)]="searchQuery"
+              placeholder="Search by name or roll number..." />
+            <button *ngIf="searchQuery" type="button" class="clear-search-btn" (click)="searchQuery = ''"
+              title="Clear search">
+              <ion-icon name="close-circle"></ion-icon>
+            </button>
+          </div>
+
+          <!-- Quick Filter Tabs -->
+          <div class="status-filter-pills">
+            <button type="button" class="filter-pill" [class.active]="activeFilter === 'all'"
+              (click)="setFilter('all')">
+              <span>All</span>
+              <span class="pill-badge">{{ students.length }}</span>
+            </button>
+            <button type="button" class="filter-pill pill-present" [class.active]="activeFilter === 'Present'"
+              (click)="setFilter('Present')">
+              <span>Present</span>
+              <span class="pill-badge">{{ presentCount }}</span>
+            </button>
+            <button type="button" class="filter-pill pill-absent" [class.active]="activeFilter === 'Absent'"
+              (click)="setFilter('Absent')">
+              <span>Absent</span>
+              <span class="pill-badge">{{ absentCount }}</span>
+            </button>
+            <button type="button" class="filter-pill pill-late" [class.active]="activeFilter === 'Late'"
+              (click)="setFilter('Late')">
+              <span>Late</span>
+              <span class="pill-badge">{{ lateCount }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT ROSTER LIST -->
+      <div class="roster-list">
+        <div *ngFor="let s of filteredStudents" class="roster-student-row"
+          [ngClass]="'status-' + s.status.toLowerCase()">
+
+          <!-- Left: Status Indicator Color Strip -->
+          <div class="status-indicator-strip"></div>
+
+          <!-- Student Identity -->
+          <div class="student-profile">
+            <!-- Modern Avatar Badge with Roll Sequence -->
+            <div class="avatar-badge" [ngClass]="'avatar-' + s.status.toLowerCase()">
+              <span class="roll-sequence">{{ s.rollNo.slice(-3) }}</span>
+            </div>
+
+            <div class="student-meta">
+              <div class="name-status-row">
+                <h3 class="student-name">{{ s.name }}</h3>
+                <span class="current-status-tag" [ngClass]="'tag-' + s.status.toLowerCase()">
+                  {{ s.status }}
+                </span>
+              </div>
+              <div class="student-roll">
+                <span class="roll-label">Roll No:</span>
+                <span class="roll-value">{{ s.rollNo }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Tactile Segmented Attendance Toggle Group -->
+          <div class="attendance-toggle-controls">
+            <!-- Present Button -->
+            <button type="button" class="toggle-btn btn-present" [class.selected]="s.status === 'Present'"
+              (click)="setStatus(s, 'Present')" title="Mark as Present">
+              <ion-icon [name]="s.status === 'Present' ? 'checkmark-circle' : 'checkmark-circle-outline'"></ion-icon>
+              <span>Present</span>
+            </button>
+
+            <!-- Late Button -->
+            <button type="button" class="toggle-btn btn-late" [class.selected]="s.status === 'Late'"
+              (click)="setStatus(s, 'Late')" title="Mark as Late">
+              <ion-icon [name]="s.status === 'Late' ? 'time' : 'time-outline'"></ion-icon>
+              <span>Late</span>
+            </button>
+
+            <!-- Absent Button -->
+            <button type="button" class="toggle-btn btn-absent" [class.selected]="s.status === 'Absent'"
+              (click)="setStatus(s, 'Absent')" title="Mark as Absent">
+              <ion-icon [name]="s.status === 'Absent' ? 'close-circle' : 'close-circle-outline'"></ion-icon>
+              <span>Absent</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredStudents.length === 0" class="roster-empty-state">
+          <div class="empty-icon-circle">
+            <ion-icon name="search-outline"></ion-icon>
+          </div>
+          <h4>No students matched your criteria</h4>
+          <p>Try clearing the search query or changing the status filter tab.</p>
+          <button type="button" class="btn-reset-filter" (click)="searchQuery = ''; activeFilter = 'all'">
+            <ion-icon name="refresh-outline"></ion-icon>
+            <span>Reset Filters</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ROSTER FOOTER & SUBMIT ACTION BAR -->
+      <div class="roster-footer-bar">
+        <div class="footer-summary-chips">
+          <span class="summary-chip chip-present">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            <strong>{{ presentCount }}</strong> Present
+          </span>
+          <span class="summary-chip chip-late">
+            <ion-icon name="time"></ion-icon>
+            <strong>{{ lateCount }}</strong> Late
+          </span>
+          <span class="summary-chip chip-absent">
+            <ion-icon name="close-circle"></ion-icon>
+            <strong>{{ absentCount }}</strong> Absent
+          </span>
+          <span class="summary-chip chip-rate">
+            <ion-icon name="stats-chart"></ion-icon>
+            <strong>{{ percentage }}%</strong> Rate
+          </span>
+        </div>
+
+        <div class="footer-actions">
+          <button type="button" class="btn-reset" (click)="resetAttendance()">
+            <ion-icon name="refresh-outline"></ion-icon>
+            <span>Reset</span>
+          </button>
+          <button type="button" class="btn-submit-attendance" [disabled]="isSubmitting" (click)="submitAttendance()">
+            <ion-icon [name]="isSubmitting ? 'hourglass-outline' : 'save-outline'"></ion-icon>
+            <span>{{ isSubmitting ? 'Saving Record...' : 'Submit Attendance Record' }}</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
 </ion-content>

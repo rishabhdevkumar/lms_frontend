@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { AuthService } from '../../services/auth.service';
+import { toast } from 'ngx-sonner';
 
 export interface PlanTier {
   id: string;
@@ -128,21 +129,28 @@ export class PricingPage implements OnInit {
 
   selectPlan(plan: PlanTier) {
     if (plan.id === 'starter') {
-      this.triggerToast('Starter plan activated! Welcome to LearnSphere.');
+      toast.success('Starter Plan Activated', {
+        description: 'Welcome to LearnSphere! Your free starter plan is ready.'
+      });
       return;
     }
 
     if (this.authService.isLoggedInValue) {
       const price = this.isAnnual ? plan.annualMonthlyPrice * 12 : plan.monthlyPrice;
-      this.triggerToast(`Selected "${plan.name}" (${this.isAnnual ? 'Annual' : 'Monthly'}) - Total: $${price}. Redirecting to checkout...`);
+      toast.success(`Plan Selected: ${plan.name}`, {
+        description: `${this.isAnnual ? 'Annual' : 'Monthly'} Subscription • Total: $${price}. Redirecting...`
+      });
     } else {
-      this.triggerToast(`Please sign in to subscribe to the "${plan.name}" plan.`);
+      toast.info('Sign In Required', {
+        description: `Please sign in to subscribe to the "${plan.name}" plan.`
+      });
     }
   }
 
   triggerToast(msg: string) {
     this.toastMessage = msg;
     this.showToast = true;
+    toast.info(msg);
     setTimeout(() => {
       this.showToast = false;
     }, 3500);

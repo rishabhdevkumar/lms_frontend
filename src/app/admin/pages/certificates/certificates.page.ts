@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from '../../components/header/header.component';
+import { toast } from 'ngx-sonner';
 
 export interface CertificateRecord {
   id: number;
@@ -60,7 +61,9 @@ export class CertificatesPage implements OnInit {
 
   issueCertificate(item: CertificateRecord) {
     item.status = 'Issued';
-    alert(`Certificate "${item.certId}" issued to ${item.studentName}!`);
+    toast.success('Certificate Issued', {
+      description: `Certificate "${item.certId}" issued to ${item.studentName}.`
+    });
   }
 
 }

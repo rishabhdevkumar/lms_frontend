@@ -2,14 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { FacultyHeaderComponent } from '../../components/faculty-header/faculty-header.component';
-
+import { toast } from 'ngx-sonner';
 @Component({
   selector: 'app-faculty-profile',
   templateUrl: './faculty-profile.page.html',
   styleUrls: ['./faculty-profile.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, FacultyHeaderComponent]
+  imports: [IonicModule, CommonModule, FormsModule]
 })
 export class FacultyProfilePage implements OnInit {
   facultyData = {
@@ -36,6 +35,8 @@ export class FacultyProfilePage implements OnInit {
   ngOnInit() { }
 
   saveProfile() {
-    alert('Faculty profile settings updated successfully!');
+    toast.success('Profile Saved', {
+      description: 'Faculty profile settings updated successfully.'
+    });
   }
 }

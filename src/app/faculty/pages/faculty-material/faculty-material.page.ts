@@ -2,19 +2,46 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { FacultyHeaderComponent } from '../../components/faculty-header/faculty-header.component';
+import { toast } from 'ngx-sonner';
+
+export interface CourseMaterial {
+  id: string;
+  title: string;
+  courseCode: string;
+  fileType: 'PDF' | 'PPTX' | 'IPYNB' | 'ZIP';
+  fileSize: string;
+  uploadDate: string;
+  downloads: number;
+}
 
 @Component({
   selector: 'app-faculty-material',
   templateUrl: './faculty-material.page.html',
   styleUrls: ['./faculty-material.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, FacultyHeaderComponent]
+  imports: [IonicModule, CommonModule, FormsModule]
 })
 export class FacultyMaterialPage implements OnInit {
   selectedCourseFilter: string = 'all';
+  selectedFormatFilter: string = 'all';
+  searchQuery: string = '';
 
-  materialsList = [
+  courses = [
+    { code: 'CS-402', name: 'CS-402: Web Engineering' },
+    { code: 'CS-501', name: 'CS-501: Microservices' },
+    { code: 'DS-302', name: 'DS-302: Data Analytics' },
+    { code: 'SE-601', name: 'SE-601: Software Architecture' }
+  ];
+
+  formatTabs = [
+    { label: 'All', value: 'all' },
+    { label: 'PDFs', value: 'PDF' },
+    { label: 'Slides (PPTX)', value: 'PPTX' },
+    { label: 'Notebooks (IPYNB)', value: 'IPYNB' },
+    { label: 'Archives (ZIP)', value: 'ZIP' }
+  ];
+
+  materialsList: CourseMaterial[] = [
     {
       id: 'MAT-1',
       title: 'Module 1: Angular Directives & Services Deep Dive',
@@ -57,7 +84,7 @@ export class FacultyMaterialPage implements OnInit {
   newMaterial = {
     course: 'CS-402',
     title: '',
-    type: 'PDF',
+    type: 'PDF' as 'PDF' | 'PPTX' | 'IPYNB' | 'ZIP',
     description: ''
   };
 
@@ -65,9 +92,38 @@ export class FacultyMaterialPage implements OnInit {
 
   ngOnInit() {}
 
-  get filteredMaterials() {
-    if (this.selectedCourseFilter === 'all') return this.materialsList;
-    return this.materialsList.filter(m => m.courseCode === this.selectedCourseFilter);
+  get totalDownloadsCount(): number {
+    return this.materialsList.reduce((acc, curr) => acc + curr.downloads, 0);
+  }
+
+  get filteredMaterials(): CourseMaterial[] {
+    return this.materialsList.filter(m => {
+      const matchCourse = this.selectedCourseFilter === 'all' || m.courseCode === this.selectedCourseFilter;
+      const matchFormat = this.selectedFormatFilter === 'all' || m.fileType === this.selectedFormatFilter;
+      
+      const q = this.searchQuery.toLowerCase().trim();
+      const matchSearch = 
+        !q || 
+        m.title.toLowerCase().includes(q) || 
+        m.courseCode.toLowerCase().includes(q);
+
+      return matchCourse && matchFormat && matchSearch;
+    });
+  }
+
+  getFormatCount(format: string): number {
+    if (format === 'all') return this.materialsList.length;
+    return this.materialsList.filter(m => m.fileType === format).length;
+  }
+
+  getCourseThemeClass(code: string): string {
+    const map: { [key: string]: string } = {
+      'CS-402': 'theme-royal-blue',
+      'CS-501': 'theme-cyan-blue',
+      'DS-302': 'theme-emerald-green',
+      'SE-601': 'theme-violet-purple'
+    };
+    return map[code] || 'theme-royal-blue';
   }
 
   openUploadModal() {
@@ -79,7 +135,12 @@ export class FacultyMaterialPage implements OnInit {
   }
 
   submitUpload() {
-    if (!this.newMaterial.title) return;
+    if (!this.newMaterial.title || !this.newMaterial.title.trim()) {
+      toast.error('Title Required', {
+        description: 'Please enter a title for the resource.'
+      });
+      return;
+    }
     this.materialsList.unshift({
       id: `MAT-${Math.floor(100 + Math.random() * 900)}`,
       title: this.newMaterial.title,
@@ -89,14 +150,26 @@ export class FacultyMaterialPage implements OnInit {
       uploadDate: 'Just Now',
       downloads: 0
     });
-    alert(`Resource "${this.newMaterial.title}" uploaded successfully!`);
+    toast.success('Resource Uploaded', {
+      description: `"${this.newMaterial.title}" uploaded successfully.`
+    });
     this.newMaterial = { course: 'CS-402', title: '', type: 'PDF', description: '' };
     this.closeUploadModal();
   }
 
-  deleteMaterial(mat: any) {
+  downloadMaterial(mat: CourseMaterial) {
+    mat.downloads += 1;
+    toast.info('Downloading Resource', {
+      description: `Preparing download for "${mat.title}" (${mat.fileSize})...`
+    });
+  }
+
+  deleteMaterial(mat: CourseMaterial) {
     if (confirm(`Are you sure you want to delete "${mat.title}"?`)) {
       this.materialsList = this.materialsList.filter(m => m.id !== mat.id);
+      toast.info('Resource Deleted', {
+        description: `"${mat.title}" was removed from course materials.`
+      });
     }
   }
 }
