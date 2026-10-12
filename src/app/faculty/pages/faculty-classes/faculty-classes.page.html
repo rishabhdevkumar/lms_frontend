@@ -1,5 +1,3 @@
-<app-faculty-header pageTitle="My Classes & Timetable"></app-faculty-header>
-
 <ion-content class="ion-padding">
   <ion-grid>
     <!-- HEADER BAR & SEGMENT CONTROLS -->
@@ -25,86 +23,196 @@
     </ion-row>
 
     <!-- TAB 1: WEEKLY TIMETABLE SCHEDULE -->
-    <div *ngIf="selectedSegment === 'schedule'">
-      <ion-row>
-        <ion-col size="12" *ngFor="let item of weeklyTimetable" size-md="6" size-lg="4">
-          <ion-card class="schedule-card">
-            <ion-card-header>
-              <div class="schedule-top">
-                <ion-badge color="tertiary">{{ item.day }}</ion-badge>
-                <span class="schedule-time"><ion-icon name="time-outline"></ion-icon> {{ item.time }}</span>
+    <div *ngIf="selectedSegment === 'schedule'" class="timetable-section">
+      <!-- DAY FILTER BAR -->
+      <div class="timetable-filter-bar">
+        <div class="filter-pills">
+          <button 
+            type="button"
+            *ngFor="let d of filterDays" 
+            class="filter-pill-btn" 
+            [class.active]="selectedDayFilter === d.value"
+            (click)="selectedDayFilter = d.value">
+            <span>{{ d.label }}</span>
+            <span class="pill-count">{{ getCountForDay(d.value) }}</span>
+          </button>
+        </div>
+        <div class="timetable-summary-badge">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>{{ filteredTimetable.length }} Classes</span>
+        </div>
+      </div>
+
+      <!-- 4-COLUMN RESPONSIVE COMPACT CARDS GRID -->
+      <ion-row class="timetable-grid">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let item of filteredTimetable">
+          <div class="tt-card" [ngClass]="getDayClass(item.day)">
+            <!-- Top Row: Day Pill + Time -->
+            <div class="tt-header">
+              <span class="tt-day-badge">{{ item.day }}</span>
+              <span class="tt-time">
+                <ion-icon name="time-outline"></ion-icon>
+                {{ item.time }}
+              </span>
+            </div>
+
+            <!-- Middle: Course Code & Subject Name -->
+            <div class="tt-body">
+              <span class="tt-course-code">{{ item.course }}</span>
+              <p class="tt-course-title" [title]="item.title">{{ item.title }}</p>
+            </div>
+
+            <!-- Bottom: Venue info + Start Virtual Class button -->
+            <div class="tt-footer">
+              <div class="tt-venue" [title]="'Venue: ' + item.room">
+                <ion-icon name="location-outline"></ion-icon>
+                <span>{{ item.room }}</span>
               </div>
-              <ion-card-title class="ion-margin-top">{{ item.course }}</ion-card-title>
-              <ion-card-subtitle>{{ item.title }}</ion-card-subtitle>
-            </ion-card-header>
-            <ion-card-content>
-              <p><ion-icon name="location-outline" color="primary"></ion-icon> <b>Venue:</b> {{ item.room }}</p>
-              <div class="schedule-actions ion-margin-top">
-                <ion-button size="small" color="tertiary" fill="solid" shape="round">
-                  <ion-icon name="videocam-outline" slot="start"></ion-icon> Start Virtual Class
-                </ion-button>
-              </div>
-            </ion-card-content>
-          </ion-card>
+              <button type="button" class="tt-start-btn" (click)="startVirtualClass(item)" title="Start Virtual Class">
+                <ion-icon name="videocam"></ion-icon>
+                <span>Start Class</span>
+              </button>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
+
+      <!-- EMPTY STATE -->
+      <div *ngIf="filteredTimetable.length === 0" class="tt-empty-state ion-text-center">
+        <ion-icon name="calendar-clear-outline"></ion-icon>
+        <p>No lectures scheduled for {{ selectedDayFilter | titlecase }}.</p>
+      </div>
     </div>
 
     <!-- TAB 2: ASSIGNED COURSES GRID -->
-    <div *ngIf="selectedSegment === 'courses'">
-      <ion-row>
-        <ion-col size="12" size-md="6" *ngFor="let course of assignedCourses">
-          <ion-card class="course-card">
-            <ion-card-header>
-              <div class="course-header-row">
-                <div>
-                  <span class="course-code">{{ course.code }}</span>
-                  <ion-card-title>{{ course.name }}</ion-card-title>
-                  <p class="course-dept">{{ course.department }}</p>
-                </div>
-                <ion-chip color="success">{{ course.status }}</ion-chip>
+    <div *ngIf="selectedSegment === 'courses'" class="courses-section">
+      <!-- COURSES TOOLBAR / FILTER BAR -->
+      <div class="courses-filter-bar">
+        <div class="courses-search-box">
+          <ion-icon name="search-outline"></ion-icon>
+          <input 
+            type="text" 
+            [(ngModel)]="courseSearchQuery" 
+            placeholder="Search assigned courses by name, code, dept..."
+            class="course-search-input" />
+          <button 
+            *ngIf="courseSearchQuery" 
+            type="button" 
+            class="clear-search-btn" 
+            (click)="courseSearchQuery = ''">
+            <ion-icon name="close-circle"></ion-icon>
+          </button>
+        </div>
+        <div class="courses-summary-badge">
+          <ion-icon name="school-outline"></ion-icon>
+          <span>{{ filteredAssignedCourses.length }} Active Modules</span>
+        </div>
+      </div>
+
+      <!-- 3-COLUMN ATTRACTIVE RESPONSIVE COURSE CARDS -->
+      <ion-row class="courses-grid">
+        <ion-col size="12" size-sm="6" size-md="6" size-lg="4" *ngFor="let course of filteredAssignedCourses">
+          <div class="course-card-v2" [ngClass]="getCourseThemeClass(course.code)">
+            <!-- Top Metadata -->
+            <div class="course-top-meta">
+              <div class="code-and-dept">
+                <span class="course-code-pill">{{ course.code }}</span>
+                <span class="course-dept-tag" [title]="course.department">
+                  <ion-icon name="layers-outline"></ion-icon>
+                  <span>{{ course.department }}</span>
+                </span>
               </div>
-            </ion-card-header>
+              <span class="course-status-pill active">
+                <span class="status-pulse-dot"></span>
+                {{ course.status }}
+              </span>
+            </div>
 
-            <ion-card-content>
-              <ion-grid class="ion-no-padding">
-                <ion-row class="course-info-row">
-                  <ion-col size="6">
-                    <p><ion-icon name="people-outline"></ion-icon> <b>{{ course.students }}</b> Students</p>
-                  </ion-col>
-                  <ion-col size="6">
-                    <p><ion-icon name="ribbon-outline"></ion-icon> <b>{{ course.credits }}</b> Credits</p>
-                  </ion-col>
-                  <ion-col size="6">
-                    <p><ion-icon name="time-outline"></ion-icon> {{ course.days }}</p>
-                  </ion-col>
-                  <ion-col size="6">
-                    <p><ion-icon name="location-outline"></ion-icon> {{ course.room }}</p>
-                  </ion-col>
-                </ion-row>
+            <!-- Course Title -->
+            <h3 class="course-title-text" [title]="course.name">{{ course.name }}</h3>
 
-                <!-- SYLLABUS PROGRESS -->
-                <div class="progress-box ion-margin-top">
-                  <div class="progress-label">
-                    <span>Syllabus Covered</span>
-                    <b>{{ course.syllabusProgress }}%</b>
-                  </div>
-                  <ion-progress-bar [value]="course.syllabusProgress / 100" color="tertiary"></ion-progress-bar>
+            <!-- 4 Metric Tiles (2x2 Grid) -->
+            <div class="course-metrics-grid">
+              <div class="metric-item">
+                <div class="metric-icon students">
+                  <ion-icon name="people-outline"></ion-icon>
                 </div>
-
-                <div class="course-actions-footer ion-margin-top">
-                  <ion-button size="small" fill="outline" color="tertiary" (click)="openAddNoteModal(course)">
-                    <ion-icon name="megaphone-outline" slot="start"></ion-icon> Post Announcement
-                  </ion-button>
-                  <ion-button size="small" color="tertiary" routerLink="/faculty/attendance">
-                    <ion-icon name="checkmark-done-circle-outline" slot="start"></ion-icon> Take Attendance
-                  </ion-button>
+                <div class="metric-detail">
+                  <span class="metric-label">Students</span>
+                  <span class="metric-value">{{ course.students }} Enrolled</span>
                 </div>
-              </ion-grid>
-            </ion-card-content>
-          </ion-card>
+              </div>
+
+              <div class="metric-item">
+                <div class="metric-icon credits">
+                  <ion-icon name="ribbon-outline"></ion-icon>
+                </div>
+                <div class="metric-detail">
+                  <span class="metric-label">Credits</span>
+                  <span class="metric-value">{{ course.credits }} Credits</span>
+                </div>
+              </div>
+
+              <div class="metric-item">
+                <div class="metric-icon schedule">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                </div>
+                <div class="metric-detail">
+                  <span class="metric-label">Schedule</span>
+                  <span class="metric-value" [title]="course.days">{{ course.days }}</span>
+                </div>
+              </div>
+
+              <div class="metric-item">
+                <div class="metric-icon room">
+                  <ion-icon name="location-outline"></ion-icon>
+                </div>
+                <div class="metric-detail">
+                  <span class="metric-label">Venue</span>
+                  <span class="metric-value">{{ course.room }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Syllabus Progress Bar -->
+            <div class="course-progress-card">
+              <div class="progress-info-row">
+                <span class="progress-title">
+                  <ion-icon name="analytics-outline"></ion-icon>
+                  Syllabus Covered
+                </span>
+                <span class="progress-badge" [ngClass]="getProgressBadgeClass(course.syllabusProgress)">
+                  {{ course.syllabusProgress }}%
+                </span>
+              </div>
+              <div class="custom-progress-track">
+                <div class="custom-progress-fill" 
+                     [style.width.%]="course.syllabusProgress"
+                     [ngClass]="getProgressBadgeClass(course.syllabusProgress)">
+                </div>
+              </div>
+            </div>
+
+            <!-- Light Action Buttons -->
+            <div class="course-actions-toolbar">
+              <button type="button" class="btn-action announcement-btn" (click)="openAddNoteModal(course)" title="Post Announcement">
+                <ion-icon name="megaphone-outline"></ion-icon>
+                <span>Announcement</span>
+              </button>
+              <button type="button" class="btn-action attendance-btn" routerLink="/faculty/attendance" title="Take Attendance">
+                <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+                <span>Attendance</span>
+              </button>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
+
+      <!-- Empty State for Courses -->
+      <div *ngIf="filteredAssignedCourses.length === 0" class="courses-empty-state ion-text-center">
+        <ion-icon name="search-outline"></ion-icon>
+        <p>No courses matched "{{ courseSearchQuery }}".</p>
+      </div>
     </div>
 
   </ion-grid>

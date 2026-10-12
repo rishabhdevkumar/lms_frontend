@@ -2,17 +2,25 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { FacultyHeaderComponent } from '../../components/faculty-header/faculty-header.component';
-
+import { toast } from 'ngx-sonner';
 @Component({
   selector: 'app-faculty-doubts',
   templateUrl: './faculty-doubts.page.html',
   styleUrls: ['./faculty-doubts.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, FacultyHeaderComponent]
+  imports: [IonicModule, CommonModule, FormsModule]
 })
 export class FacultyDoubtsPage implements OnInit {
   selectedStatus: string = 'unresolved';
+  selectedCourse: string = 'all';
+  searchQuery: string = '';
+
+  courses = [
+    { code: 'all', name: 'All Courses' },
+    { code: 'CS-402', name: 'CS-402: Web Engineering' },
+    { code: 'CS-501', name: 'CS-501: Microservices' },
+    { code: 'DS-302', name: 'DS-302: Data Analytics' }
+  ];
 
   doubtsList = [
     {
@@ -51,13 +59,43 @@ export class FacultyDoubtsPage implements OnInit {
   selectedDoubt: any = null;
   replyText = '';
 
-  constructor() {}
+  constructor() { }
 
-  ngOnInit() {}
+  ngOnInit() { }
+
+  get unresolvedCount(): number {
+    return this.doubtsList.filter(d => d.status.toLowerCase() === 'unresolved').length;
+  }
+
+  get resolvedCount(): number {
+    return this.doubtsList.filter(d => d.status.toLowerCase() === 'resolved').length;
+  }
+
+  get totalCount(): number {
+    return this.doubtsList.length;
+  }
 
   get filteredDoubts() {
-    if (this.selectedStatus === 'all') return this.doubtsList;
-    return this.doubtsList.filter(d => d.status.toLowerCase() === this.selectedStatus);
+    return this.doubtsList.filter(d => {
+      const matchStatus = this.selectedStatus === 'all' || d.status.toLowerCase() === this.selectedStatus;
+      const matchCourse = this.selectedCourse === 'all' || d.courseCode === this.selectedCourse;
+      const query = this.searchQuery.toLowerCase().trim();
+      const matchSearch = !query ||
+        d.questionTitle.toLowerCase().includes(query) ||
+        d.questionBody.toLowerCase().includes(query) ||
+        d.studentName.toLowerCase().includes(query);
+      return matchStatus && matchCourse && matchSearch;
+    });
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'ST';
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
   }
 
   openReplyModal(doubt: any) {
@@ -69,13 +107,29 @@ export class FacultyDoubtsPage implements OnInit {
   closeReplyModal() {
     this.isReplyModalOpen = false;
     this.selectedDoubt = null;
+    this.replyText = '';
   }
 
   submitReply() {
-    if (!this.replyText) return;
-    this.selectedDoubt.reply = this.replyText;
-    this.selectedDoubt.status = 'Resolved';
-    alert(`Reply published to ${this.selectedDoubt.studentName}!`);
+    if (!this.replyText || !this.replyText.trim()) {
+      toast.error('Response Required', {
+        description: 'Please write an answer before publishing.'
+      });
+      return;
+    }
+    if (this.selectedDoubt) {
+      this.selectedDoubt.reply = this.replyText.trim();
+      this.selectedDoubt.status = 'Resolved';
+      toast.success('Response Published', {
+        description: `Your answer was successfully shared with ${this.selectedDoubt.studentName}.`
+      });
+    }
     this.closeReplyModal();
+  }
+
+  resetFilters() {
+    this.selectedStatus = 'all';
+    this.selectedCourse = 'all';
+    this.searchQuery = '';
   }
 }
