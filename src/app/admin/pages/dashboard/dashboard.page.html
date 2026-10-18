@@ -1,5 +1,5 @@
 <ion-content [fullscreen]="true" class="admin-dashboard-content">
-  
+
   <div class="dashboard-wrapper">
 
     <!-- WELCOME HEADER BANNER -->
@@ -11,44 +11,48 @@
 
     <!-- KEY STATS METRICS CARDS GRID (4 COLUMNS) -->
     <div class="metrics-grid">
-      
+
       <!-- Stat 1: Students -->
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon-box amber-bg">👥</div>
-          <div class="trend-badge green-trend">+12% 📈</div>
+          <div class="stat-icon-box amber-bg">
+            <ion-icon name="people"></ion-icon>
+          </div>
         </div>
-        <div class="stat-number">2,850</div>
+        <div class="stat-number">{{ totalStudents | number }}</div>
         <div class="stat-label">Total Students Enrolled</div>
       </div>
 
       <!-- Stat 2: Faculty -->
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon-box green-bg">🎓</div>
-          <div class="status-chip active-chip">Active</div>
+          <div class="stat-icon-box green-bg">
+            <ion-icon name="school"></ion-icon>
+          </div>
         </div>
-        <div class="stat-number">142</div>
+        <div class="stat-number">{{ totalFaculty | number }}</div>
         <div class="stat-label">Total Faculty Members</div>
       </div>
 
       <!-- Stat 3: Published Courses -->
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon-box purple-bg">📚</div>
-          <div class="status-chip count-chip">84 Active</div>
+          <div class="stat-icon-box purple-bg">
+            <ion-icon name="book"></ion-icon>
+          </div>
         </div>
-        <div class="stat-number">120</div>
+        <div class="stat-number">{{ totalCourses | number }}</div>
         <div class="stat-label">Published Courses</div>
       </div>
 
       <!-- Stat 4: Revenue -->
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon-box teal-bg">💰</div>
-          <div class="trend-badge green-trend">+18% 📈</div>
+          <div class="stat-icon-box teal-bg">
+            <ion-icon name="cash"></ion-icon>
+          </div>
         </div>
-        <div class="stat-number">$145.2k</div>
+        <div class="stat-number">{{ formattedRevenue }}</div>
         <div class="stat-label">Tuition Revenue</div>
       </div>
 
@@ -56,15 +60,11 @@
 
     <!-- MIDDLE SECTION: RECENT ENROLLMENTS & QUICK ACTIONS GRID -->
     <div class="main-sections-grid">
-      
+
       <!-- RECENT STUDENT ENROLLMENTS PANEL -->
       <div class="panel-card enrollments-panel">
         <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Recent Student Enrollments</h2>
-            <p class="panel-subtitle">Real-time registration summary across departments</p>
-          </div>
-          <button (click)="openAddStudentModal()" class="view-all-link">+ Add New Student</button>
+          <h2 class="panel-title">Recent Student Enrollments</h2>
         </div>
 
         <!-- ENROLLMENTS DATA TABLE WITH COLUMN HEADERS -->
@@ -72,30 +72,90 @@
           <table class="enrollment-table">
             <thead>
               <tr>
-                <th>PROFILE</th>
-                <th>NAME / EMAIL</th>
-                <th>COURSE</th>
-                <th>STATUS</th>
-                <th class="text-right">ACTIONS</th>
+                <th class="sl-col text-center">SL NO</th>
+                <th class="roll-col">ROLL NO</th>
+                <th class="profile-col text-center">PROFILE</th>
+                <th>NAME</th>
+                <th>EMAIL</th>
+                <th class="status-col text-center">STATUS</th>
+                <th class="actions-col text-right">ACTIONS</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let student of studentsList">
-                <td>
-                  <div class="student-avatar" [ngClass]="student.avatarBg">{{ student.avatar }}</div>
+              <tr *ngIf="studentsList.length === 0">
+                <td colspan="7" class="text-center" style="padding: 2.5rem 1rem; color: #64748b; font-size: 0.9rem;">
+                  No student records found in the database.
+                </td>
+              </tr>
+              <tr *ngFor="let student of studentsList; let i = index" [class.row-pending]="student.status === 'Pending'"
+                [class.dropdown-open]="activeDropdownStudentId === (student.dbId || student.id)">
+                <td class="sl-col text-center">
+                  <span class="sl-number">{{ i + 1 }}</span>
+                </td>
+                <td class="roll-col">
+                  <span class="student-roll-badge" (click)="openStudentModal(student)" style="cursor: pointer;"
+                    title="View details">{{ student.rollNo }}</span>
+                </td>
+                <td class="profile-col text-center">
+                  <div class="student-avatar" [ngClass]="student.avatarBg" (click)="openStudentModal(student)"
+                    style="cursor: pointer;" title="View details">{{ student.avatar }}</div>
                 </td>
                 <td>
-                  <div class="student-name">{{ student.name }}</div>
-                  <div class="student-email">{{ student.email }}</div>
+                  <div class="student-name" (click)="openStudentModal(student)" style="cursor: pointer;"
+                    title="View details">{{ student.name }}</div>
                 </td>
                 <td>
-                  <div class="course-title">{{ student.course }}</div>
+                  <div class="student-email-cell">{{ student.email }}</div>
                 </td>
-                <td>
-                  <span class="status-badge" [ngClass]="student.status === 'Active' ? 'green' : 'amber'">{{ student.status }}</span>
+                <td class="status-col text-center">
+                  <span class="status-badge" [ngClass]="getStatusBadgeClass(student.status)">
+                    <span *ngIf="student.status === 'Pending'" class="blinker-dot-orange"
+                      title="Currently Pending"></span>
+                    {{ student.status }}
+                  </span>
                 </td>
-                <td class="text-right">
-                  <button class="table-action-btn" (click)="openStudentModal(student)">View</button>
+                <td class="actions-col text-right">
+                  <!-- PENDING: Custom Dropdown Menu (Change Status) -->
+                  <div class="custom-dropdown-container" *ngIf="student.status === 'Pending'">
+                    <button type="button" class="custom-dropdown-btn btn-status-pending"
+                      (click)="toggleStatusDropdown(student, $event)" [disabled]="student.isUpdatingStatus"
+                      title="Change status">
+                      <span *ngIf="student.isUpdatingStatus" class="select-spinner">⏳</span>
+                      <span *ngIf="!student.isUpdatingStatus">Change Status</span>
+                      <span class="dropdown-chevron"
+                        [class.open]="activeDropdownStudentId === (student.dbId || student.id)">▾</span>
+                    </button>
+
+                    <div class="custom-dropdown-menu" *ngIf="activeDropdownStudentId === (student.dbId || student.id)"
+                      (click)="$event.stopPropagation()">
+                      <button type="button" class="dropdown-menu-item item-active"
+                        (click)="selectStatusFromDropdown(student, 'Active', $event)">
+                        <span class="menu-icon">✓</span> Activate
+                      </button>
+                      <button type="button" class="dropdown-menu-item item-deactive"
+                        (click)="selectStatusFromDropdown(student, 'Deactive', $event)">
+                        <span class="menu-icon">✕</span> Deactivate
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- ACTIVE: ONLY Red Deactivate Button -->
+                  <button *ngIf="student.status === 'Active'" type="button"
+                    class="table-action-btn status-toggle-btn btn-deactivate"
+                    (click)="requestStatusChange(student, 'Deactive')" [disabled]="student.isUpdatingStatus"
+                    title="Deactivate student">
+                    <span *ngIf="student.isUpdatingStatus" class="btn-spinner">⏳</span>
+                    <span *ngIf="!student.isUpdatingStatus">Deactivate</span>
+                  </button>
+
+                  <!-- DEACTIVE: Green Activate Button -->
+                  <button *ngIf="student.status === 'Deactive'" type="button"
+                    class="table-action-btn status-toggle-btn btn-activate"
+                    (click)="requestStatusChange(student, 'Active')" [disabled]="student.isUpdatingStatus"
+                    title="Activate student">
+                    <span *ngIf="student.isUpdatingStatus" class="btn-spinner">⏳</span>
+                    <span *ngIf="!student.isUpdatingStatus">Activate</span>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -111,25 +171,23 @@
 
         <div class="action-buttons-stack">
           <button (click)="openAddStudentModal()" class="btn-action primary-amber">
-            <span>👤</span> Register New Student
-          </button>
-
-          <button (click)="openAddFacultyModal()" class="btn-action secondary-green">
-            <span>💼</span> Add Faculty Member
+            <ion-icon name="person-add-outline"></ion-icon> Add New User
           </button>
 
           <button (click)="openAddCourseModal()" class="btn-action dark-brand">
-            <span>📖</span> Create New Course
+            <ion-icon name="book-outline"></ion-icon> Create New Course
           </button>
 
           <button class="btn-action outline-btn">
-            <span>📥</span> Export Reports (PDF/CSV)
+            <ion-icon name="download-outline"></ion-icon> Export Reports (PDF/CSV)
           </button>
         </div>
 
         <!-- SYSTEM ALERT CALLOUT -->
         <div class="system-alert-card">
-          <div class="alert-icon">⚠️</div>
+          <div class="alert-icon">
+            <ion-icon name="warning-outline"></ion-icon>
+          </div>
           <div>
             <h4 class="alert-title">System Maintenance</h4>
             <p class="alert-desc">Scheduled server backup on Sunday, 2:00 AM UTC.</p>
@@ -147,11 +205,11 @@
   <!-- ========================================== -->
   <div class="custom-modal-backdrop" *ngIf="isStudentModalOpen" (click)="closeStudentModal()">
     <div class="custom-modal-card" (click)="$event.stopPropagation()">
-      
+
       <!-- CENTERED TOP HEADER BANNER (NAME, EMAIL & PHONE) -->
       <div class="modal-header-banner modal-centered-header">
         <button class="modal-close-icon corner-close" (click)="closeStudentModal()">✕</button>
-        
+
         <div class="modal-student-avatar large-centered-avatar" [ngClass]="selectedStudent?.avatarBg">
           {{ selectedStudent?.avatar }}
         </div>
@@ -203,7 +261,8 @@
           </div>
           <div class="info-cell">
             <span class="cell-label">FEE PAYMENT STATUS</span>
-            <span class="status-badge" [ngClass]="selectedStudent?.status === 'Active' ? 'green' : 'amber'">{{ selectedStudent?.feeStatus }}</span>
+            <span class="status-badge" [ngClass]="selectedStudent?.status === 'Active' ? 'green' : 'amber'">{{
+              selectedStudent?.feeStatus }}</span>
           </div>
         </div>
       </div>
@@ -222,7 +281,7 @@
     <div class="custom-modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header-banner modal-brand-amber">
         <div class="modal-student-title">
-          <h3 class="modal-title-white">Add New Student</h3>
+          <h3 class="modal-title-white">Add New User</h3>
         </div>
         <button class="modal-close-icon" (click)="closeAddStudentModal()">✕</button>
       </div>
@@ -230,13 +289,15 @@
       <div class="modal-form-body">
         <div class="form-group">
           <label class="form-label">Full Name</label>
-          <input type="text" [(ngModel)]="newStudent.name" placeholder="e.g. Vikramaditya Roy" class="modal-form-input" />
+          <input type="text" [(ngModel)]="newStudent.name" placeholder="e.g. Vikramaditya Roy"
+            class="modal-form-input" />
         </div>
 
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label">Email Address</label>
-            <input type="email" [(ngModel)]="newStudent.email" placeholder="student@lms-edu.com" class="modal-form-input" />
+            <input type="email" [(ngModel)]="newStudent.email" placeholder="student@lms-edu.com"
+              class="modal-form-input" />
           </div>
           <div class="form-group">
             <label class="form-label">Phone Number</label>
@@ -270,17 +331,14 @@
           </div>
         </div>
       </div>
-
       <div class="modal-footer-actions">
         <button class="btn-modal-secondary" (click)="closeAddStudentModal()">Cancel</button>
-        <button class="btn-modal-primary btn-amber" (click)="submitAddStudent()">Register Student</button>
+        <button class="btn-modal-primary btn-amber" (click)="submitAddStudent()">Register User</button>
       </div>
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- 3. ADD FACULTY MEMBER MODAL -->
-  <!-- ========================================== -->
+
   <div class="custom-modal-backdrop" *ngIf="isAddFacultyModalOpen" (click)="closeAddFacultyModal()">
     <div class="custom-modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header-banner modal-brand-green">
@@ -293,13 +351,15 @@
       <div class="modal-form-body">
         <div class="form-group">
           <label class="form-label">Faculty Full Name</label>
-          <input type="text" [(ngModel)]="newFaculty.name" placeholder="e.g. Dr. Rajesh Kumar" class="modal-form-input" />
+          <input type="text" [(ngModel)]="newFaculty.name" placeholder="e.g. Dr. Rajesh Kumar"
+            class="modal-form-input" />
         </div>
 
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label">Academic Email</label>
-            <input type="email" [(ngModel)]="newFaculty.email" placeholder="faculty@lms-edu.com" class="modal-form-input" />
+            <input type="email" [(ngModel)]="newFaculty.email" placeholder="faculty@lms-edu.com"
+              class="modal-form-input" />
           </div>
           <div class="form-group">
             <label class="form-label">Phone Number</label>
@@ -352,7 +412,8 @@
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label">Course Title</label>
-            <input type="text" [(ngModel)]="newCourse.title" placeholder="e.g. Advanced Machine Learning" class="modal-form-input" />
+            <input type="text" [(ngModel)]="newCourse.title" placeholder="e.g. Advanced Machine Learning"
+              class="modal-form-input" />
           </div>
           <div class="form-group">
             <label class="form-label">Course Code</label>
@@ -381,13 +442,51 @@
 
         <div class="form-group">
           <label class="form-label">Assigned Lead Instructor</label>
-          <input type="text" [(ngModel)]="newCourse.instructor" class="modal-form-input" placeholder="e.g. Dr. Sarah Jenkins" />
+          <input type="text" [(ngModel)]="newCourse.instructor" class="modal-form-input"
+            placeholder="e.g. Dr. Sarah Jenkins" />
         </div>
       </div>
 
       <div class="modal-footer-actions">
         <button class="btn-modal-secondary" (click)="closeAddCourseModal()">Cancel</button>
         <button class="btn-modal-primary btn-dark" (click)="submitAddCourse()">Create Course</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 5. STATUS CHANGE CONFIRMATION MODAL -->
+  <!-- ========================================== -->
+  <div class="custom-modal-backdrop" *ngIf="isStatusConfirmModalOpen" (click)="cancelStatusChange()">
+    <div class="custom-modal-card confirm-modal-card" (click)="$event.stopPropagation()">
+      <div class="confirm-modal-body">
+        <div class="confirm-icon-bubble"
+          [ngClass]="pendingStatusChange?.newStatus === 'Active' ? 'bubble-green' : 'bubble-rose'">
+          {{ pendingStatusChange?.newStatus === 'Active' ? '✓' : '🔒' }}
+        </div>
+        <h4 class="confirm-heading">Change Status to {{ pendingStatusChange?.newStatus }}?</h4>
+        <p class="confirm-msg">
+          Are you sure you want to change the status of
+          <strong>{{ pendingStatusChange?.student?.name }}</strong> to
+          <span class="status-badge" [ngClass]="pendingStatusChange?.newStatus === 'Active' ? 'green' : 'deactive'">
+            {{ pendingStatusChange?.newStatus }}
+          </span>?
+        </p>
+        <p class="confirm-subnote" *ngIf="pendingStatusChange?.newStatus === 'Active'">
+          Active students are permitted to log in and access enrolled courses.
+        </p>
+        <p class="confirm-subnote warning" *ngIf="pendingStatusChange?.newStatus === 'Deactive'">
+          Deactivated students will be blocked from logging in.
+        </p>
+      </div>
+
+      <div class="modal-footer-actions confirm-modal-footer">
+        <button class="btn-modal-secondary" (click)="cancelStatusChange()">Cancel</button>
+        <button class="btn-modal-primary"
+          [ngClass]="pendingStatusChange?.newStatus === 'Active' ? 'btn-green' : 'btn-danger'"
+          (click)="confirmStatusChange()">
+          OK
+        </button>
       </div>
     </div>
   </div>

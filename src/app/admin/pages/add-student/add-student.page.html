@@ -50,7 +50,6 @@
       <div class="card-top-header">
         <div class="title-group">
           <h2 class="section-title">Users Directory & Database Records</h2>
-          <span class="count-pill">{{ getFilteredUsers().length }} Records Found</span>
         </div>
 
         <button class="btn-register-student" (click)="openAddModal()">
@@ -60,14 +59,35 @@
 
       <!-- SEARCH & FILTER TOOLBAR -->
       <div class="toolbar-row">
-        <div class="search-box-container">
-          <span class="search-icon">🔍</span>
-          <input 
-            type="text" 
-            [(ngModel)]="searchText" 
-            placeholder="Search by name, email, roll no, role, phone, course, department..." 
-            class="student-search-input" 
-          />
+        <!-- Compact Search (Icon only by default; clicking opens input and hides icon; cross icon closes and brings search icon back) -->
+        <div class="search-compact-wrapper">
+          <!-- SEARCH ICON ONLY (Hidden when open) -->
+          <button 
+            *ngIf="!isSearchOpen" 
+            type="button" 
+            class="search-icon-btn" 
+            (click)="openSearch()" 
+            title="Search users">
+            <ion-icon name="search-outline"></ion-icon>
+          </button>
+          
+          <!-- SEARCH INPUT WITH CROSS CLOSE ICON AT THE END -->
+          <div class="search-input-box" *ngIf="isSearchOpen">
+            <input 
+              id="student-compact-search-input"
+              type="text" 
+              [(ngModel)]="searchText" 
+              placeholder="Search by name, email, roll no..." 
+              class="compact-search-input" 
+            />
+            <button 
+              type="button" 
+              class="search-close-cross-btn" 
+              (click)="closeSearch()" 
+              title="Close search">
+              ✕
+            </button>
+          </div>
         </div>
 
         <div class="filter-pills-group">
@@ -96,10 +116,22 @@
             Admins ({{ getAdminCount() }})
           </button>
           <button 
-            class="filter-pill-btn red" 
+            class="filter-pill-btn green" 
             [class.active]="statusFilter === 'Active'" 
             (click)="statusFilter = 'Active'">
             Active ({{ getActiveCount() }})
+          </button>
+          <button 
+            class="filter-pill-btn amber" 
+            [class.active]="statusFilter === 'Pending'" 
+            (click)="statusFilter = 'Pending'">
+            Pending ({{ getPendingCount() }})
+          </button>
+          <button 
+            class="filter-pill-btn red" 
+            [class.active]="statusFilter === 'Deactive'" 
+            (click)="statusFilter = 'Deactive'">
+            Deactive ({{ getDeactiveCount() }})
           </button>
         </div>
       </div>
@@ -178,7 +210,11 @@
 
               <!-- STATUS BADGE -->
               <td>
-                <span class="status-pill-badge" [class.status-active]="usr.status === 'Active'" [class.status-suspended]="usr.status === 'Suspended'">
+                <span class="status-pill-badge" 
+                  [class.status-active]="usr.status === 'Active'" 
+                  [class.status-pending]="usr.status === 'Pending'"
+                  [class.status-deactive]="usr.status === 'Deactive'">
+                  <span *ngIf="usr.status === 'Pending'" class="blinker-dot-orange"></span>
                   {{ usr.status }}
                 </span>
               </td>
@@ -200,9 +236,9 @@
                       <ion-icon name="create-outline" class="item-ion-icon"></ion-icon>
                       <span class="item-label">Edit</span>
                     </button>
-                    <button class="dropdown-item" (click)="onMenuAction('toggle-status', usr)" [class.suspend]="usr.status === 'Active'" [class.activate]="usr.status === 'Suspended'">
+                    <button class="dropdown-item" (click)="onMenuAction('toggle-status', usr)" [class.suspend]="usr.status === 'Active'" [class.activate]="usr.status !== 'Active'">
                       <ion-icon [name]="usr.status === 'Active' ? 'pause-circle-outline' : 'checkmark-circle-outline'" class="item-ion-icon"></ion-icon>
-                      <span class="item-label">{{ usr.status === 'Active' ? 'Suspend' : 'Activate' }}</span>
+                      <span class="item-label">{{ usr.status === 'Active' ? 'Deactivate' : 'Activate' }}</span>
                     </button>
                     <button class="dropdown-item" (click)="onMenuAction('change-password', usr)">
                       <ion-icon name="key-outline" class="item-ion-icon"></ion-icon>
@@ -352,25 +388,70 @@
       <div class="modal-header-banner modal-brand-amber">
         <div class="modal-student-title">
           <h3 class="modal-title-white">
-            {{ modalMode === 'add' ? '➕ Register New Student' : '✏️ Edit Student Profile' }}
+            {{ modalMode === 'add' ? ('➕ Register New ' + newUserRole) : ('✏️ Edit ' + newUserRole + ' Profile') }}
           </h3>
-          <p class="modal-sub-white">Enrollment form with database validations</p>
+          <p class="modal-sub-white">Unified user registration with backend database validations</p>
         </div>
         <button class="modal-close-icon" (click)="closeAddEditModal()">✕</button>
       </div>
 
       <!-- DYNAMIC FORM STEPPER TABS -->
       <div class="modal-tab-bar">
-        <button class="tab-btn" [class.active]="activeFormTab === 'basic'" (click)="selectFormTab('basic')">1. Personal Details</button>
-        <button class="tab-btn" [class.active]="activeFormTab === 'academic'" (click)="selectFormTab('academic')">2. Course & Academic</button>
-        <button class="tab-btn" [class.active]="activeFormTab === 'parent'" (click)="selectFormTab('parent')">3. Parent & Emergency Info</button>
+        <button class="tab-btn" [class.active]="activeFormTab === 'basic'" (click)="selectFormTab('basic')">1. Personal & Account Details</button>
+        <button *ngIf="newUserRole === 'Student'" class="tab-btn" [class.active]="activeFormTab === 'academic'" (click)="selectFormTab('academic')">2. Course & Academic</button>
+        <button *ngIf="newUserRole === 'Student'" class="tab-btn" [class.active]="activeFormTab === 'parent'" (click)="selectFormTab('parent')">3. Parent & Emergency Info</button>
       </div>
 
       <!-- FORM BODY CONTAINER -->
       <div class="modal-form-body">
+
+        <!-- SERVER ERROR / SUCCESS BANNERS -->
+        <div class="alert-box alert-error" *ngIf="serverErrorMessage">
+          <div class="alert-content">
+            <span class="alert-icon">⚠️</span>
+            <span class="alert-msg">{{ serverErrorMessage }}</span>
+          </div>
+          <button type="button" class="alert-close-btn" (click)="serverErrorMessage = ''">✕</button>
+        </div>
+
+        <div class="alert-box alert-success" *ngIf="serverSuccessMessage">
+          <div class="alert-content">
+            <span class="alert-icon">✅</span>
+            <span class="alert-msg">{{ serverSuccessMessage }}</span>
+          </div>
+        </div>
         
         <!-- STEP 1: PERSONAL DETAILS (MATCHING DB USERS SCHEMA) -->
         <div *ngIf="activeFormTab === 'basic'" class="form-step-section">
+          
+          <!-- USER ROLE SELECTOR (IN ADD MODE) -->
+          <div class="role-selector-bar" *ngIf="modalMode === 'add'">
+            <label class="role-selector-label">SELECT USER ROLE *</label>
+            <div class="role-pills-selector">
+              <button 
+                type="button" 
+                class="role-pill-btn" 
+                [class.active]="newUserRole === 'Student'" 
+                (click)="setRole('Student')">
+                🎓 Student
+              </button>
+              <button 
+                type="button" 
+                class="role-pill-btn faculty" 
+                [class.active]="newUserRole === 'Faculty'" 
+                (click)="setRole('Faculty')">
+                👨‍🏫 Faculty
+              </button>
+              <button 
+                type="button" 
+                class="role-pill-btn admin" 
+                [class.active]="newUserRole === 'Admin'" 
+                (click)="setRole('Admin')">
+                🛡️ Administrator
+              </button>
+            </div>
+          </div>
+
           <div class="form-row-2">
             <div class="floating-field" [class.has-error]="!!formErrors['name']">
               <input 
@@ -384,16 +465,16 @@
               <span class="field-error-text" *ngIf="formErrors['name']">⚠️ {{ formErrors['name'] }}</span>
             </div>
 
-            <div class="floating-field">
+            <div class="floating-field" [class.has-error]="!!formErrors['roll_no']">
               <input 
                 type="text" 
                 [(ngModel)]="formData.roll_no" 
                 id="stu_roll"
                 placeholder=" " 
-                class="floating-input readonly-input" 
-                readonly 
+                class="floating-input" 
               />
-              <label for="stu_roll" class="floating-label">Roll No (Auto-Generated)</label>
+              <label for="stu_roll" class="floating-label">Roll Number (Optional - Auto if empty)</label>
+              <span class="field-error-text" *ngIf="formErrors['roll_no']">⚠️ {{ formErrors['roll_no'] }}</span>
             </div>
           </div>
 
@@ -411,15 +492,21 @@
             </div>
 
             <div class="floating-field" [class.has-error]="!!formErrors['password']">
-              <input 
-                type="password" 
-                [(ngModel)]="formData.password" 
-                id="stu_password"
-                placeholder=" " 
-                class="floating-input"
-              />
+              <div class="password-field-wrap">
+                <input 
+                  [type]="showPassword ? 'text' : 'password'" 
+                  [(ngModel)]="formData.password" 
+                  id="stu_password"
+                  placeholder=" " 
+                  class="floating-input"
+                />
+                <button type="button" class="btn-toggle-eye" (click)="showPassword = !showPassword" tabindex="-1">
+                  {{ showPassword ? '🙈' : '👁️' }}
+                </button>
+              </div>
               <label for="stu_password" class="floating-label">Account Password *</label>
               <span class="field-error-text" *ngIf="formErrors['password']">⚠️ {{ formErrors['password'] }}</span>
+              <span class="field-hint-text" *ngIf="!formErrors['password']">Min 8 chars (1 letter, 1 number & 1 special character)</span>
             </div>
           </div>
 
@@ -430,10 +517,12 @@
                 [(ngModel)]="formData.phone" 
                 id="stu_phone"
                 placeholder=" " 
+                maxlength="10"
                 class="floating-input"
               />
-              <label for="stu_phone" class="floating-label">Phone Number *</label>
+              <label for="stu_phone" class="floating-label">Phone Number (10 Digits) *</label>
               <span class="field-error-text" *ngIf="formErrors['phone']">⚠️ {{ formErrors['phone'] }}</span>
+              <span class="field-hint-text" *ngIf="!formErrors['phone']">Exactly 10 numeric digits</span>
             </div>
 
             <div class="floating-field" [class.has-error]="!!formErrors['dob']">
@@ -442,9 +531,9 @@
                 [(ngModel)]="formData.dob" 
                 id="stu_dob"
                 placeholder=" " 
-                class="floating-input"
+                class="floating-input" 
               />
-              <label for="stu_dob" class="floating-label">Date of Birth *</label>
+              <label for="stu_dob" class="floating-label">Date of Birth</label>
               <span class="field-error-text" *ngIf="formErrors['dob']">⚠️ {{ formErrors['dob'] }}</span>
             </div>
           </div>
@@ -460,7 +549,7 @@
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
-              <label for="stu_gender" class="floating-label">Gender *</label>
+              <label for="stu_gender" class="floating-label">Gender</label>
               <span class="field-error-text" *ngIf="formErrors['gender']">⚠️ {{ formErrors['gender'] }}</span>
             </div>
 
@@ -493,18 +582,20 @@
                 placeholder=" " 
                 class="floating-input" 
               />
-              <label for="stu_lang" class="floating-label">Language</label>
+              <label for="stu_lang" class="floating-label">Language (e.g. English)</label>
             </div>
 
-            <div class="floating-field">
+            <div class="floating-field" [class.has-error]="!!formErrors['aadhar_n']">
               <input 
                 type="text" 
                 [(ngModel)]="formData.aadhar_n" 
                 id="stu_aadhar"
                 placeholder=" " 
+                maxlength="12"
                 class="floating-input" 
               />
-              <label for="stu_aadhar" class="floating-label">Aadhar Card Number</label>
+              <label for="stu_aadhar" class="floating-label">Aadhar Card Number (12 Digits)</label>
+              <span class="field-error-text" *ngIf="formErrors['aadhar_n']">⚠️ {{ formErrors['aadhar_n'] }}</span>
             </div>
           </div>
         </div>
@@ -522,7 +613,7 @@
               <option value="" disabled selected></option>
               <option *ngFor="let s of sessions" [value]="s.id">{{ s.session_name }}</option>
             </select>
-            <label for="stu_session" class="floating-label">Academic Session *</label>
+            <label for="stu_session" class="floating-label">Academic Session</label>
             <span class="field-error-text" *ngIf="formErrors['session_id']">⚠️ {{ formErrors['session_id'] }}</span>
           </div>
 
@@ -538,7 +629,7 @@
               <option value="" disabled selected></option>
               <option *ngFor="let c of courses" [value]="c.id">{{ c.course_name }}</option>
             </select>
-            <label for="stu_course" class="floating-label">Course Program *</label>
+            <label for="stu_course" class="floating-label">Course Program</label>
             <span class="field-error-text" *ngIf="formErrors['course_id']">⚠️ {{ formErrors['course_id'] }}</span>
           </div>
 
@@ -553,7 +644,7 @@
               <option value="" disabled selected></option>
               <option *ngFor="let sem of semesters" [value]="sem.id">{{ sem.semester_name }}</option>
             </select>
-            <label for="stu_semester" class="floating-label">Semester *</label>
+            <label for="stu_semester" class="floating-label">Semester</label>
             <span class="field-error-text" *ngIf="formErrors['semester_id']">⚠️ {{ formErrors['semester_id'] }}</span>
           </div>
 
@@ -632,22 +723,25 @@
 
       </div>
 
-      <!-- STEPPER FOOTER (REGISTER BUTTON HIDDEN UNTIL FINAL STEP 3: PARENT INFO) -->
+      <!-- STEPPER FOOTER -->
       <div class="modal-footer-actions">
         <button class="btn-modal-secondary" (click)="closeAddEditModal()">Cancel</button>
 
-        <button *ngIf="activeFormTab !== 'basic'" class="btn-modal-secondary" (click)="goToPreviousStep()">
+        <button *ngIf="newUserRole === 'Student' && activeFormTab !== 'basic'" class="btn-modal-secondary" (click)="goToPreviousStep()">
           ⬅ Previous Step
         </button>
 
-        <!-- NEXT STEP BUTTON (SHOWN ON STEPS 1 & 2) -->
-        <button *ngIf="activeFormTab !== 'parent'" class="btn-modal-primary btn-amber" (click)="goToNextStep()">
+        <!-- NEXT STEP BUTTON (SHOWN ON STEPS 1 & 2 FOR STUDENT) -->
+        <button *ngIf="newUserRole === 'Student' && activeFormTab !== 'parent'" class="btn-modal-primary btn-amber" (click)="goToNextStep()">
           Next Step ➔
         </button>
 
-        <!-- REGISTER STUDENT / SAVE CHANGES BUTTON (ONLY SHOWN ON LAST STEP 3: PARENT INFO) -->
-        <button *ngIf="activeFormTab === 'parent'" class="btn-modal-primary" (click)="saveStudent()" [disabled]="isSaving">
-          {{ isSaving ? 'Saving...' : (modalMode === 'add' ? 'Register Student' : 'Save Changes') }}
+        <!-- REGISTER USER / SAVE CHANGES BUTTON -->
+        <button class="btn-modal-primary" (click)="saveUser()" [disabled]="isSaving">
+          <span *ngIf="isSaving">⏳ Saving...</span>
+          <span *ngIf="!isSaving">
+            {{ modalMode === 'edit' ? 'Save Changes' : ('➕ Register ' + newUserRole) }}
+          </span>
         </button>
       </div>
 

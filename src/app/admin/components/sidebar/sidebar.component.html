@@ -73,16 +73,16 @@
 
         </ion-content>
 
-        <!-- BOTTOM USER PROFILE FOOTER CARD (MATCHING ULTIMA SIDEBAR BOTTOM SCREENSHOT) -->
-        <div class="sidebar-profile-footer" (click)="goToAccountSetting()">
+        <!-- BOTTOM USER PROFILE FOOTER CARD (NON-CLICKABLE: AVATAR, NAME & EMAIL ONLY) -->
+        <div class="sidebar-profile-footer">
           <div class="footer-avatar">
-            {{ adminInitials }}
+            <img *ngIf="adminAvatarUrl" [src]="adminAvatarUrl" alt="Profile" class="avatar-img-round" />
+            <span *ngIf="!adminAvatarUrl">{{ adminInitials }}</span>
           </div>
           <div class="footer-user-details">
-            <span class="user-name">{{ adminName }}</span>
-            <span class="user-role">{{ adminRole }}</span>
+            <span class="user-name" [title]="adminName">{{ adminName }}</span>
+            <span class="user-email" [title]="adminEmail">{{ adminEmail }}</span>
           </div>
-          <span class="footer-expand-arrow">^</span>
         </div>
 
       </ion-menu>

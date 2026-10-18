@@ -144,6 +144,21 @@ export class AuthService {
         }
 
         const resUser = this.unwrapUserData(res) || {};
+        const userStatus = String(resUser?.status || resUser?.Status || '').toLowerCase();
+        if (userStatus && userStatus !== 'active') {
+          if (userStatus === 'pending') {
+            return {
+              success: false,
+              message: 'Your account is pending admin approval. Only active accounts can login.'
+            };
+          } else {
+            return {
+              success: false,
+              message: 'Your account has been deactivated. Only active accounts can login.'
+            };
+          }
+        }
+
         const token = res?.token || res?.accessToken || res?.data?.token || resUser?.token;
         if (!token) {
           return {
@@ -246,6 +261,23 @@ export class AuthService {
         if (!res || res.ok === false || res.ok === 0 || res.success === false) {
           const failureMsg = res?.msg || res?.message || 'Registration failed.';
           return { success: false, message: failureMsg };
+        }
+
+        const rawStatus = String(resUser?.status || res?.status || res?.data?.status || '').toLowerCase();
+        const isStudentPending = (finalRole === 'student' && !email.toLowerCase().includes('admin')) || rawStatus === 'pending';
+        if (isStudentPending) {
+          return {
+            success: true,
+            requiresApproval: true,
+            message: res?.msg || 'Registration successful! Your account is pending admin approval. You can login once an administrator activates your account.',
+            user: {
+              id: resUser?.id || resUser?._id || 'usr-' + Date.now(),
+              name: resUser?.name || resUser?.fullName || fullName,
+              email: resUser?.email || email,
+              role: finalRole,
+              rollNo: resUser?.rollNo || resUser?.roll_no,
+            }
+          };
         }
 
         const user: User = {

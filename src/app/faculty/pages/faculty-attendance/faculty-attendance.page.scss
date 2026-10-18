@@ -680,7 +680,9 @@ ion-content.attendance-page-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.85rem 1.4rem;
+    gap: 1.25rem;
+    flex-wrap: wrap; // prevents controls from overlapping student details
+    padding: 0.95rem 1.4rem;
     border-bottom: 1px solid #f1f5f9;
     background: #ffffff;
     transition: background-color 0.15s ease;
@@ -721,10 +723,12 @@ ion-content.attendance-page-content {
       display: flex;
       align-items: center;
       gap: 0.95rem;
+      flex: 1 1 320px;
+      min-width: 0;
 
       .avatar-badge {
-        width: 42px;
-        height: 42px;
+        width: 44px;
+        height: 44px;
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -733,6 +737,16 @@ ion-content.attendance-page-content {
         border: 1.5px solid #cbd5e1;
         transition: all 0.2s ease;
         flex-shrink: 0;
+        overflow: hidden;
+        position: relative;
+
+        .avatar-photo {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          border-radius: 10px;
+        }
 
         .roll-sequence {
           font-family: 'JetBrains Mono', monospace;
@@ -767,6 +781,11 @@ ion-content.attendance-page-content {
       }
 
       .student-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 0;
+
         .name-status-row {
           display: flex;
           align-items: center;
@@ -809,22 +828,88 @@ ion-content.attendance-page-content {
           }
         }
 
-        .student-roll {
+        .student-meta-details {
           display: flex;
           align-items: center;
-          gap: 0.35rem;
-          margin-top: 0.2rem;
+          gap: 0.65rem;
+          flex-wrap: wrap;
           font-size: 0.74rem;
           color: #64748b;
 
-          .roll-label {
-            font-weight: 500;
-          }
+          .meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            line-height: 1.2;
 
-          .roll-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-            color: #334155;
+            ion-icon {
+              font-size: 0.85rem;
+              color: #64748b;
+            }
+
+            &.meta-roll {
+              .meta-label {
+                font-weight: 500;
+                color: #64748b;
+              }
+              .meta-val {
+                font-family: 'JetBrains Mono', monospace;
+                font-weight: 700;
+                color: #0f172a;
+              }
+            }
+
+            &.meta-email {
+              color: #475569;
+              font-weight: 500;
+              max-width: 220px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+
+              ion-icon {
+                color: #64748b;
+              }
+            }
+
+            &.meta-badge {
+              padding: 0.12rem 0.5rem;
+              border-radius: 6px;
+              font-weight: 600;
+              font-size: 0.71rem;
+              white-space: nowrap;
+
+              ion-icon {
+                font-size: 0.78rem;
+              }
+
+              &.meta-session {
+                color: #1d4ed8;
+                background: #eff6ff;
+                border: 1px solid #bfdbfe;
+                ion-icon {
+                  color: #2563eb;
+                }
+              }
+
+              &.meta-course {
+                color: #0f766e;
+                background: #f0fdfa;
+                border: 1px solid #99f6e4;
+                ion-icon {
+                  color: #0d9488;
+                }
+              }
+
+              &.meta-semester {
+                color: #6d28d9;
+                background: #f5f3ff;
+                border: 1px solid #ddd6fe;
+                ion-icon {
+                  color: #7c3aed;
+                }
+              }
+            }
           }
         }
       }
@@ -834,7 +919,9 @@ ion-content.attendance-page-content {
     .attendance-toggle-controls {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
+      flex-shrink: 0;
+      flex-wrap: wrap;
 
       .toggle-btn {
         display: inline-flex;
@@ -900,6 +987,35 @@ ion-content.attendance-page-content {
 
           ion-icon {
             color: #ffffff;
+          }
+        }
+
+        /* Attendance History Action Button */
+        &.btn-history {
+          background: #eff6ff;
+          border-color: #bfdbfe;
+          color: #2563eb;
+          font-weight: 600;
+
+          ion-icon {
+            color: #2563eb;
+            font-size: 0.95rem;
+          }
+
+          &:hover {
+            background: #2563eb;
+            border-color: #1d4ed8;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+            transform: translateY(-1px);
+
+            ion-icon {
+              color: #ffffff;
+            }
+          }
+
+          &:active {
+            transform: scale(0.97);
           }
         }
       }
@@ -1197,3 +1313,1423 @@ ion-content.attendance-page-content {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   STUDENT ATTENDANCE HISTORY COMPREHENSIVE DARK MODAL (7 MODULES)
+   ========================================================================== */
+/* ==========================================================================
+   STUDENT ATTENDANCE HISTORY MODAL - LIGHT & SILVER THEME
+   Crisp white & silver palette with high-contrast emerald, coral, and blue accents
+   ========================================================================== */
+.history-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: fadeInModal 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+  from { transform: translateY(18px) scale(0.985); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.history-modal-card.light-silver-modal,
+.history-modal-card.dark-theme-modal {
+  width: 100%;
+  max-width: 890px;
+  max-height: 92vh;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(203, 213, 225, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #0f172a;
+  font-family: inherit;
+  animation: slideUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  /* Header Top Bar */
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.15rem 1.5rem;
+    border-bottom: 1.5px solid #e2e8f0;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+
+    .modal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+
+      .modal-icon-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: #eff6ff;
+        border: 1.5px solid #bfdbfe;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+      }
+
+      .modal-title {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0f172a;
+        letter-spacing: -0.01em;
+      }
+
+      .modal-subtitle {
+        margin: 0.15rem 0 0;
+        font-size: 0.76rem;
+        color: #64748b;
+      }
+    }
+
+    .btn-close-modal {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1.5px solid #e2e8f0;
+      background: #f1f5f9;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.25rem;
+      transition: all 0.18s ease;
+
+      &:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+        color: #dc2626;
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  /* Student Identity Hero Card */
+  .student-profile-hero {
+    padding: 1rem 1.5rem;
+    background: #ffffff;
+    border-bottom: 1.5px solid #e2e8f0;
+
+    .hero-left {
+      display: flex;
+      align-items: center;
+      gap: 0.95rem;
+
+      .hero-avatar-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1.5px solid #cbd5e1;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        .hero-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .hero-initials {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 1.05rem;
+          font-weight: 800;
+          color: #2563eb;
+        }
+      }
+
+      .hero-meta {
+        flex: 1;
+        min-width: 0;
+
+        .hero-name-row {
+          display: flex;
+          align-items: center;
+          gap: 0.55rem;
+          flex-wrap: wrap;
+
+          .hero-student-name {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #0f172a;
+          }
+
+          .hero-roll-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+          }
+        }
+
+        .hero-badges-row {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          margin-top: 0.35rem;
+          flex-wrap: wrap;
+
+          .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 6px;
+
+            ion-icon {
+              font-size: 0.8rem;
+            }
+
+            &.tag-course {
+              background: #eff6ff;
+              color: #1d4ed8;
+              border: 1px solid #bfdbfe;
+            }
+
+            &.tag-session {
+              background: #ecfdf5;
+              color: #047857;
+              border: 1px solid #a7f3d0;
+            }
+
+            &.tag-semester {
+              background: #f5f3ff;
+              color: #6d28d9;
+              border: 1px solid #ddd6fe;
+            }
+
+            &.tag-empty {
+              background: #f8fafc;
+              color: #94a3b8;
+              border: 1px dashed #cbd5e1;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* 7-Modules Nav Tabs Scroller */
+  .modal-tabs-scroller {
+    background: #ffffff;
+    border-bottom: 1.5px solid #e2e8f0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+
+    &::-webkit-scrollbar { display: none; }
+
+    .modal-nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.55rem 1.25rem;
+      min-width: max-content;
+
+      .nav-tab-btn {
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        color: #64748b;
+        padding: 0.42rem 0.85rem;
+        border-radius: 10px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.18s ease;
+
+        .tab-index {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.68rem;
+          color: #94a3b8;
+          font-weight: 700;
+        }
+
+        &:hover {
+          color: #0f172a;
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+        }
+
+        &.active {
+          background: #0284c7;
+          border-color: #0284c7;
+          color: #ffffff;
+          font-weight: 700;
+          box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+
+          .tab-index {
+            color: #ffffff;
+          }
+        }
+
+        &.tab-all {
+          border: 1.5px solid #cbd5e1;
+          &.active {
+            background: #10b981;
+            border-color: #059669;
+            color: #ffffff;
+          }
+        }
+      }
+    }
+  }
+
+  /* Modal Scrollable Body */
+  .modal-body-scroll {
+    padding: 1.35rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background: #f8fafc;
+
+    .module-card.silver-card,
+    .module-card.dark-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.35rem;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+
+      .module-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.15rem;
+
+        .title-wrap {
+          .card-main-title {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0f172a;
+          }
+
+          .card-sub-title {
+            display: block;
+            margin-top: 0.2rem;
+            font-size: 0.78rem;
+            color: #64748b;
+          }
+        }
+
+        .icon-action-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          border: 1.5px solid #e2e8f0;
+          background: #f8fafc;
+          color: #0284c7;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.15rem;
+          cursor: pointer;
+          transition: all 0.18s ease;
+
+          &:hover {
+            background: #0284c7;
+            border-color: #0284c7;
+            color: #ffffff;
+          }
+        }
+      }
+    }
+
+    /* 01. OVERALL ATTENDANCE */
+    .section-overview {
+      .overview-metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.85rem;
+        margin-bottom: 1.25rem;
+
+        .metric-item {
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 0.85rem 1rem;
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+
+          .metric-icon-wrap {
+            font-size: 1.15rem;
+            margin-bottom: 0.4rem;
+
+            &.icon-total { color: #0284c7; }
+            &.icon-present { color: #059669; }
+            &.icon-absent { color: #dc2626; }
+            &.icon-late { color: #d97706; }
+          }
+
+          .metric-info {
+            .metric-label {
+              display: block;
+              font-size: 0.72rem;
+              color: #64748b;
+              font-weight: 600;
+            }
+
+            .metric-value {
+              font-size: 1.65rem;
+              font-weight: 800;
+              color: #0f172a;
+              line-height: 1.2;
+              margin-top: 0.2rem;
+              font-family: 'Plus Jakarta Sans', sans-serif;
+
+              &.text-emerald { color: #059669; }
+              &.text-coral { color: #dc2626; }
+              &.text-amber { color: #d97706; }
+            }
+          }
+        }
+      }
+
+      .overall-rate-row {
+        .rate-label-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+
+          .rate-heading {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #0f172a;
+          }
+
+          .rate-percentage {
+            font-size: 1.05rem;
+            font-weight: 800;
+            &.text-emerald { color: #059669; }
+          }
+        }
+
+        .silver-progress-track,
+        .dark-progress-track {
+          height: 10px;
+          background: #e2e8f0;
+          border-radius: 20px;
+          overflow: hidden;
+
+          .silver-progress-bar,
+          .dark-progress-bar {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.4s ease;
+
+            &.glow-emerald {
+              background: #10b981;
+              box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+            }
+          }
+        }
+
+        .rate-footnote {
+          margin: 0.65rem 0 0;
+          font-size: 0.72rem;
+          color: #94a3b8;
+        }
+      }
+    }
+
+    /* 02. YEAR-WISE ATTENDANCE */
+    .section-yearwise {
+      .year-rows-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+
+        .year-row-item {
+          .year-top-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.35rem;
+
+            .year-identity {
+              display: flex;
+              align-items: center;
+              gap: 0.6rem;
+
+              .year-name {
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: #0f172a;
+              }
+
+              .year-range {
+                font-size: 0.8rem;
+                color: #64748b;
+              }
+
+              .current-badge {
+                font-size: 0.62rem;
+                font-weight: 800;
+                padding: 1px 6px;
+                border-radius: 4px;
+                background: #ecfdf5;
+                color: #047857;
+                border: 1px solid #a7f3d0;
+              }
+            }
+
+            .year-percentage {
+              font-size: 1rem;
+              font-weight: 800;
+              color: #0f172a;
+            }
+          }
+
+          .silver-progress-track,
+          .dark-progress-track {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 0.4rem;
+
+            .silver-progress-bar,
+            .dark-progress-bar {
+              height: 100%;
+              border-radius: 20px;
+              transition: width 0.4s ease;
+
+              &.glow-emerald {
+                background: #10b981;
+              }
+
+              &.bar-amber {
+                background: #f59e0b;
+              }
+
+              &.bar-gray {
+                background: #cbd5e1;
+              }
+            }
+          }
+
+          .year-sub-figures {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            font-size: 0.74rem;
+
+            .fig-present { color: #059669; font-weight: 600; }
+            .fig-absent { color: #dc2626; font-weight: 600; }
+            .fig-late { color: #d97706; font-weight: 600; }
+          }
+        }
+      }
+
+      .rate-footnote {
+        margin: 1.25rem 0 0;
+        font-size: 0.72rem;
+        color: #94a3b8;
+      }
+    }
+
+    /* 03. MONTHLY ATTENDANCE */
+    .section-monthly {
+      .important-notice-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.55rem;
+        background: #eff6ff;
+        border: 1.5px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        color: #1e40af;
+        font-size: 0.78rem;
+        line-height: 1.4;
+        margin-bottom: 1.15rem;
+
+        ion-icon {
+          font-size: 1.1rem;
+          color: #2563eb;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+      }
+
+      .monthly-filter-controls {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+
+        .control-box {
+          .control-label {
+            display: block;
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-bottom: 0.35rem;
+            font-weight: 600;
+          }
+
+          .custom-select-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+
+            select {
+              width: 100%;
+              background: #ffffff;
+              border: 1.5px solid #cbd5e1;
+              border-radius: 20px;
+              padding: 0.55rem 2rem 0.55rem 1rem;
+              font-size: 0.84rem;
+              color: #0f172a;
+              font-family: inherit;
+              appearance: none;
+              cursor: pointer;
+              transition: border-color 0.18s ease;
+
+              &:focus {
+                outline: none;
+                border-color: #0284c7;
+                box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+              }
+            }
+
+            ion-icon {
+              position: absolute;
+              right: 1rem;
+              color: #64748b;
+              pointer-events: none;
+            }
+          }
+        }
+      }
+
+      .monthly-bars-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+
+        .monthly-item {
+          .monthly-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.35rem;
+
+            .monthly-title {
+              font-size: 0.92rem;
+              font-weight: 700;
+              color: #0f172a;
+            }
+
+            .monthly-pct {
+              font-size: 0.82rem;
+              color: #64748b;
+              font-weight: 600;
+            }
+          }
+
+          /* Stacked Progress Bar */
+          .stacked-progress-track {
+            height: 9px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            margin-bottom: 0.4rem;
+
+            .stacked-segment {
+              height: 100%;
+              transition: width 0.35s ease;
+
+              &.segment-present {
+                background: #10b981;
+              }
+
+              &.segment-absent {
+                background: #ef4444;
+              }
+
+              &.segment-late {
+                background: #f59e0b;
+              }
+            }
+          }
+
+          .monthly-sub-stats {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            font-size: 0.74rem;
+
+            .sub-present { color: #059669; font-weight: 600; }
+            .sub-absent { color: #dc2626; font-weight: 600; }
+            .sub-late { color: #d97706; font-weight: 600; }
+          }
+        }
+      }
+    }
+
+    /* 04. SUBJECT-WISE ATTENDANCE */
+    .section-subjectwise {
+      .subject-cards-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+
+        .subject-item-card {
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 1rem 1.15rem;
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+
+          .sub-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.65rem;
+
+            .sub-code-badge {
+              display: inline-block;
+              font-family: 'JetBrains Mono', monospace;
+              font-size: 0.68rem;
+              font-weight: 700;
+              color: #1d4ed8;
+              background: #eff6ff;
+              border: 1px solid #bfdbfe;
+              padding: 1px 6px;
+              border-radius: 4px;
+              margin-bottom: 0.25rem;
+            }
+
+            .sub-name {
+              margin: 0;
+              font-size: 0.95rem;
+              font-weight: 700;
+              color: #0f172a;
+            }
+
+            .sub-faculty {
+              display: block;
+              margin-top: 0.15rem;
+              font-size: 0.72rem;
+              color: #64748b;
+            }
+
+            .sub-pct-badge {
+              padding: 3px 9px;
+              border-radius: 20px;
+              font-size: 0.85rem;
+              font-weight: 800;
+
+              &.badge-green {
+                background: #ecfdf5;
+                color: #047857;
+                border: 1px solid #a7f3d0;
+              }
+
+              &.badge-amber {
+                background: #fffbeb;
+                color: #b45309;
+                border: 1px solid #fde68a;
+              }
+            }
+          }
+
+          .silver-progress-track,
+          .dark-progress-track {
+            height: 7px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+
+            .silver-progress-bar.glow-emerald,
+            .dark-progress-bar.glow-emerald {
+              height: 100%;
+              background: #10b981;
+            }
+          }
+
+          .sub-card-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            font-size: 0.72rem;
+            color: #64748b;
+
+            .text-coral { color: #dc2626; font-weight: 700; }
+            .text-amber { color: #d97706; font-weight: 700; }
+          }
+        }
+      }
+    }
+
+    /* 05. SEMESTER-WISE ATTENDANCE */
+    .section-semesterwise {
+      .semester-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+
+        .semester-row {
+          display: flex;
+          align-items: center;
+          gap: 1.15rem;
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 0.85rem 1.15rem;
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+
+          .sem-info-col {
+            width: 140px;
+            flex-shrink: 0;
+
+            .sem-name-row {
+              display: flex;
+              align-items: center;
+              gap: 0.4rem;
+
+              .sem-name {
+                font-size: 0.92rem;
+                font-weight: 700;
+                color: #0f172a;
+              }
+
+              .sem-badge-cur {
+                font-size: 0.6rem;
+                font-weight: 800;
+                padding: 1px 5px;
+                border-radius: 4px;
+                background: #ecfdf5;
+                color: #047857;
+                border: 1px solid #a7f3d0;
+              }
+            }
+
+            .sem-term {
+              font-size: 0.72rem;
+              color: #64748b;
+            }
+          }
+
+          .sem-bar-col {
+            flex: 1;
+            min-width: 0;
+
+            .silver-progress-track,
+            .dark-progress-track {
+              height: 7px;
+              background: #e2e8f0;
+              border-radius: 20px;
+              overflow: hidden;
+              margin-bottom: 0.35rem;
+
+              .silver-progress-bar,
+              .dark-progress-bar {
+                height: 100%;
+                &.glow-emerald { background: #10b981; }
+                &.bar-amber { background: #f59e0b; }
+                &.bar-gray { background: #cbd5e1; }
+              }
+            }
+
+            .sem-counts {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+              font-size: 0.72rem;
+              color: #64748b;
+            }
+          }
+
+          .sem-pct-col {
+            width: 60px;
+            text-align: right;
+            flex-shrink: 0;
+
+            .sem-pct-val {
+              font-size: 1.05rem;
+              font-weight: 800;
+              color: #0f172a;
+            }
+          }
+        }
+      }
+    }
+
+    /* 06. ATTENDANCE CALENDAR */
+    .section-calendar {
+      .calendar-nav-buttons {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+
+        .btn-cal-nav {
+          width: 30px;
+          height: 30px;
+          border-radius: 8px;
+          border: 1.5px solid #cbd5e1;
+          background: #ffffff;
+          color: #475569;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.15s ease;
+
+          &:hover {
+            background: #0284c7;
+            border-color: #0284c7;
+            color: #ffffff;
+          }
+        }
+
+        .cal-current-label {
+          font-size: 0.88rem;
+          font-weight: 700;
+          color: #0f172a;
+          min-width: 120px;
+          text-align: center;
+        }
+      }
+
+      .calendar-summary-pills {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+
+        .cal-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 20px;
+          padding: 0.25rem 0.7rem;
+          font-size: 0.72rem;
+          color: #64748b;
+
+          .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            &.dot-green { background: #10b981; }
+            &.dot-red { background: #ef4444; }
+            &.dot-amber { background: #f59e0b; }
+          }
+        }
+      }
+
+      .calendar-matrix {
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.85rem;
+
+        .cal-weekdays {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          text-align: center;
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #64748b;
+          padding-bottom: 0.5rem;
+          border-bottom: 1.5px solid #e2e8f0;
+        }
+
+        .cal-days-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 5px;
+          padding-top: 0.5rem;
+
+          .cal-day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 0.82rem;
+            color: #0f172a;
+            position: relative;
+            cursor: default;
+
+            &.outside-month {
+              opacity: 0.25;
+            }
+
+            &.is-today {
+              border-color: #0284c7;
+              background: #f0f9ff;
+              font-weight: 800;
+            }
+
+            .day-status-indicator {
+              position: absolute;
+              bottom: 4px;
+
+              .status-marker {
+                display: block;
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+
+                &.marker-present { background: #10b981; box-shadow: 0 0 5px #10b981; }
+                &.marker-absent { background: #ef4444; box-shadow: 0 0 5px #ef4444; }
+                &.marker-late { background: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
+              }
+            }
+
+            &.day-present {
+              background: rgba(16, 185, 129, 0.12);
+            }
+
+            &.day-absent {
+              background: rgba(239, 68, 68, 0.12);
+            }
+
+            &.day-late {
+              background: rgba(245, 158, 11, 0.12);
+            }
+          }
+        }
+      }
+
+      .calendar-legend {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 0.85rem;
+        font-size: 0.72rem;
+        color: #64748b;
+
+        .leg-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+
+          .leg-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            &.green { background: #10b981; }
+            &.red { background: #ef4444; }
+            &.amber { background: #f59e0b; }
+            &.muted { background: #cbd5e1; }
+          }
+        }
+      }
+    }
+
+    /* 07. DETAILED HISTORY & DOWNLOAD */
+    .section-historylogs {
+      .export-actions-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .btn-export {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          padding: 0.42rem 0.75rem;
+          border-radius: 8px;
+          font-size: 0.76rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.18s ease;
+
+          &.btn-export-csv {
+            background: #ecfdf5;
+            border: 1.5px solid #a7f3d0;
+            color: #047857;
+
+            &:hover {
+              background: #10b981;
+              color: #ffffff;
+            }
+          }
+
+          &.btn-export-pdf {
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
+            color: #1d4ed8;
+
+            &:hover {
+              background: #2563eb;
+              color: #ffffff;
+            }
+          }
+        }
+      }
+
+      .logs-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+
+        .logs-search-box {
+          position: relative;
+          flex: 1;
+          min-width: 220px;
+          display: flex;
+          align-items: center;
+
+          ion-icon {
+            position: absolute;
+            left: 0.75rem;
+            color: #94a3b8;
+          }
+
+          input {
+            width: 100%;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0.48rem 2rem 0.48rem 2.2rem;
+            font-size: 0.8rem;
+            color: #0f172a;
+
+            &:focus {
+              outline: none;
+              border-color: #0284c7;
+              box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+            }
+          }
+
+          .clear-btn {
+            position: absolute;
+            right: 0.5rem;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+          }
+        }
+
+        .logs-filter-pills {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+
+          .l-pill {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            color: #64748b;
+            padding: 0.32rem 0.65rem;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+            &:hover { color: #0f172a; border-color: #cbd5e1; }
+
+            &.active {
+              background: #0f172a;
+              border-color: #0f172a;
+              color: #ffffff;
+
+              &.pill-present {
+                background: #10b981;
+                border-color: #059669;
+              }
+
+              &.pill-late {
+                background: #f59e0b;
+                border-color: #d97706;
+              }
+
+              &.pill-absent {
+                background: #ef4444;
+                border-color: #dc2626;
+              }
+            }
+          }
+        }
+      }
+
+      .history-loading-box {
+        padding: 2.5rem;
+        text-align: center;
+        color: #64748b;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .history-records-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        max-height: 320px;
+        overflow-y: auto;
+        padding-right: 0.25rem;
+
+        .history-record-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 10px;
+          transition: background-color 0.15s ease;
+
+          &:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+          }
+
+          .record-date-col {
+            width: 110px;
+            flex-shrink: 0;
+
+            .day-abbr {
+              display: block;
+              font-size: 0.68rem;
+              font-weight: 700;
+              color: #64748b;
+              text-transform: uppercase;
+            }
+
+            .date-full {
+              font-size: 0.82rem;
+              font-weight: 700;
+              color: #0f172a;
+            }
+          }
+
+          .record-details-col {
+            flex: 1;
+            min-width: 0;
+
+            .session-name {
+              display: flex;
+              align-items: center;
+              gap: 0.35rem;
+              font-size: 0.82rem;
+              font-weight: 600;
+              color: #0f172a;
+
+              ion-icon {
+                font-size: 0.85rem;
+                color: #64748b;
+              }
+            }
+
+            .session-faculty-row {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+              margin-top: 0.2rem;
+              font-size: 0.7rem;
+              color: #64748b;
+
+              span {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.25rem;
+
+                ion-icon {
+                  font-size: 0.75rem;
+                }
+              }
+            }
+          }
+
+          .record-badge-col {
+            flex-shrink: 0;
+
+            .log-status-tag {
+              display: inline-flex;
+              align-items: center;
+              gap: 0.3rem;
+              padding: 0.25rem 0.65rem;
+              border-radius: 20px;
+              font-size: 0.72rem;
+              font-weight: 700;
+
+              &.tag-present {
+                background: #ecfdf5;
+                color: #047857;
+                border: 1px solid #a7f3d0;
+              }
+
+              &.tag-late {
+                background: #fffbeb;
+                color: #b45309;
+                border: 1px solid #fde68a;
+              }
+
+              &.tag-absent {
+                background: #fef2f2;
+                color: #dc2626;
+                border: 1px solid #fecaca;
+              }
+            }
+          }
+        }
+      }
+
+      .history-empty-box {
+        padding: 2.5rem;
+        text-align: center;
+        color: #64748b;
+
+        ion-icon {
+          font-size: 2.2rem;
+          margin-bottom: 0.4rem;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.82rem;
+        }
+      }
+    }
+  }
+
+  /* Modal Footer */
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.95rem 1.5rem;
+    border-top: 1.5px solid #e2e8f0;
+    background: #ffffff;
+
+    .footer-count-text {
+      font-size: 0.76rem;
+      color: #64748b;
+
+      strong {
+        color: #0f172a;
+      }
+    }
+
+    .btn-footer-close {
+      padding: 0.48rem 1.25rem;
+      border-radius: 10px;
+      background: #0f172a;
+      border: 1px solid #0f172a;
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+
+      &:hover {
+        background: #1e293b;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN FOR MODAL
+   ========================================================================== */
+@media (max-width: 768px) {
+  .history-modal-card.light-silver-modal,
+  .history-modal-card.dark-theme-modal {
+    max-height: 96vh;
+    border-radius: 16px;
+
+    .modal-header {
+      padding: 1rem;
+    }
+
+    .student-profile-hero {
+      padding: 0.85rem 1rem;
+    }
+
+    .modal-body-scroll {
+      padding: 1rem;
+      gap: 1rem;
+
+      .overview-metrics-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+
+      .monthly-filter-controls {
+        grid-template-columns: 1fr !important;
+      }
+
+      .semester-row {
+        flex-direction: column;
+        align-items: flex-start !important;
+
+        .sem-info-col {
+          width: 100% !important;
+        }
+
+        .sem-bar-col {
+          width: 100% !important;
+        }
+
+        .sem-pct-col {
+          width: 100% !important;
+          text-align: left !important;
+        }
+      }
+
+      .logs-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  }
+}
+
+

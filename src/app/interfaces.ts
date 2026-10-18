@@ -29,7 +29,46 @@ export interface users {
 // Aliases for compatibility
 export type User = users;
 export type student = users;
-export type Student = users;
+
+export interface Student {
+  id?: number;
+  users_id: number;
+  rollNo: string;
+  name: string;
+  email: string;
+  profile_image: string;
+  fallbackInitials?: boolean;
+  session_id?: number | null;
+  sessionName: string;
+  course_id?: number | null;
+  courseName: string;
+  semester_id?: number | null;
+  semesterName: string;
+  status: 'Present' | 'Absent' | 'Late';
+  attendanceRecordId?: number | null;
+}
+
+export interface CourseOption {
+  id: number;
+  code: string;
+  name: string;
+  department: string;
+  room: string;
+  session_id?: number;
+}
+
+export interface SessionOption {
+  id: number;
+  session_name: string;
+  short_name?: string;
+}
+
+export interface SemesterOption {
+  id: number;
+  course_id?: number;
+  semester_name: string;
+  short_name?: string;
+}
 
 export interface Session {
   id: number;
@@ -83,3 +122,61 @@ export interface City {
   city_name: string;
   is_active?: boolean;
 }
+
+export interface BatchItemBackend {
+  id: number;
+  batch_code: string;
+  course_id: number;
+  course_name: string;
+  course_short_name?: string;
+  users_id: number;
+  instructor_name: string;
+  instructor_email?: string;
+  instructor_phone?: string;
+  start_date?: string;
+  end_date?: string;
+  start_time?: string;
+  end_time?: string;
+  room?: string;
+  status: 'active' | 'upcoming' | 'completed' | string;
+  created_at?: string;
+  updated_at?: string;
+  enrolled_students_count: number;
+}
+
+export interface BatchStudent {
+  enrollment_id: number;
+  batch_id: number;
+  enrolled_at: string;
+  user_id: number;
+  roll_no?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  gender?: string;
+  student_status?: string;
+}
+
+export interface AddBatchPayload {
+  course_id: number;
+  users_id: number;
+  start_date?: string | null;
+  end_date?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  room?: string | null;
+  status?: string;
+}
+
+export interface UpdateBatchPayload {
+  id: number;
+  batch_code?: string | null;
+  course_id: number;
+  users_id: number;
+  start_date?: string | null;
+  end_date?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  room?: string | null;
+  status: string;
+}

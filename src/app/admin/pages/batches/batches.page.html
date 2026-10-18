@@ -5,38 +5,54 @@
     <div class="page-title-row">
       <div class="title-group">
         <h1 class="page-title">Batches & Classroom Management</h1>
-        <span class="count-badge font-mono-code">{{ getFilteredBatches().length }} Active Batches</span>
+        <span class="count-badge font-mono-code">{{ getActiveBatchesCount() }} Active Batches</span>
       </div>
 
       <button class="btn-light-primary" (click)="openAddModal()">
-        <span>➕</span> Create New Batch
+        <ion-icon name="add-outline"></ion-icon> Create New Batch
       </button>
     </div>
 
-    <!-- 3 STAT CARDS -->
+    <!-- 4 STAT OVERVIEW CARDS (INCLUDING COMPLETED BATCHES) -->
     <div class="stats-overview-grid">
-      <div class="stat-mini-card">
+      <div class="stat-mini-card clickable-card" [class.active-card]="activeTab === 'all'" (click)="activeTab = 'all'" title="View all batches">
         <div class="stat-info">
           <span class="stat-label">TOTAL BATCHES</span>
           <h3 class="stat-value">{{ batchesList.length }}</h3>
         </div>
-        <div class="stat-icon-badge blue-badge">📦</div>
+        <div class="stat-icon-badge blue-badge">
+          <ion-icon name="albums-outline"></ion-icon>
+        </div>
       </div>
 
-      <div class="stat-mini-card">
+      <div class="stat-mini-card clickable-card" [class.active-card]="activeTab === 'active'" (click)="activeTab = 'active'" title="Filter active learning batches">
         <div class="stat-info">
           <span class="stat-label">ACTIVE LEARNING BATCHES</span>
-          <h3 class="stat-value">2</h3>
+          <h3 class="stat-value">{{ getActiveBatchesCount() }}</h3>
         </div>
-        <div class="stat-icon-badge green-badge">⚡</div>
+        <div class="stat-icon-badge green-badge">
+          <ion-icon name="flash-outline"></ion-icon>
+        </div>
       </div>
 
-      <div class="stat-mini-card">
+      <div class="stat-mini-card clickable-card" [class.active-card]="activeTab === 'upcoming'" (click)="activeTab = 'upcoming'" title="Filter upcoming sessions">
         <div class="stat-info">
           <span class="stat-label">UPCOMING SESSIONS</span>
-          <h3 class="stat-value">1</h3>
+          <h3 class="stat-value">{{ getUpcomingBatchesCount() }}</h3>
         </div>
-        <div class="stat-icon-badge purple-badge">📅</div>
+        <div class="stat-icon-badge purple-badge">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
+      </div>
+
+      <div class="stat-mini-card clickable-card" [class.active-card]="activeTab === 'completed'" (click)="activeTab = 'completed'" title="Filter completed batches">
+        <div class="stat-info">
+          <span class="stat-label">COMPLETED BATCHES</span>
+          <h3 class="stat-value">{{ getCompletedBatchesCount() }}</h3>
+        </div>
+        <div class="stat-icon-badge gray-badge">
+          <ion-icon name="school-outline"></ion-icon>
+        </div>
       </div>
     </div>
 
@@ -46,11 +62,11 @@
       <!-- TOOLBAR ROW (SEARCH & TAB PILLS) -->
       <div class="toolbar-row">
         <div class="search-box-container">
-          <span class="search-icon">🔍</span>
+          <ion-icon name="search-outline" class="search-icon"></ion-icon>
           <input 
             type="text" 
             [(ngModel)]="searchQuery" 
-            placeholder="Search batches by code, course, instructor, or room no..." 
+            placeholder="Search batches by code, course, instructor, or room..." 
             class="batches-search-input" 
           />
         </div>
@@ -60,22 +76,29 @@
             All Batches ({{ batchesList.length }})
           </button>
           <button class="filter-pill-btn green" [class.active]="activeTab === 'active'" (click)="activeTab = 'active'">
-            Active
+            Active ({{ getActiveBatchesCount() }})
           </button>
           <button class="filter-pill-btn purple" [class.active]="activeTab === 'upcoming'" (click)="activeTab = 'upcoming'">
-            Upcoming
+            Upcoming ({{ getUpcomingBatchesCount() }})
           </button>
           <button class="filter-pill-btn gray" [class.active]="activeTab === 'completed'" (click)="activeTab = 'completed'">
-            Completed
+            Completed ({{ getCompletedBatchesCount() }})
           </button>
         </div>
       </div>
 
+      <!-- LOADING INDICATOR -->
+      <div class="loading-state-container" *ngIf="isLoading">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+        <span>Loading dynamic batches from database...</span>
+      </div>
+
       <!-- BATCHES DATA TABLE -->
-      <div class="table-responsive">
+      <div class="table-responsive" *ngIf="!isLoading">
         <table class="batches-data-table">
           <thead>
             <tr>
+              <th style="width: 65px;">S.NO</th>
               <th>BATCH CODE</th>
               <th>COURSE PROGRAM</th>
               <th>INSTRUCTOR</th>
@@ -86,43 +109,57 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let batch of getFilteredBatches()">
+            <tr *ngFor="let batch of getFilteredBatches(); let i = index">
               <td>
-                <span class="batch-code-pill">{{ batch.batchCode }}</span>
+                <span class="sno-badge">{{ i + 1 }}</span>
               </td>
               <td>
-                <span class="course-title-text">{{ batch.courseName }}</span>
+                <span class="batch-code-pill">{{ batch.batch_code || ('BAT00' + batch.id) }}</span>
               </td>
               <td>
-                <span class="instructor-text">{{ batch.instructorName }}</span>
+                <span class="course-title-text">{{ batch.course_name || 'General Course' }}</span>
               </td>
               <td>
-                <span class="students-count-badge">👥 {{ batch.totalStudents }} Enrolled</span>
+                <span class="instructor-text">{{ batch.instructor_name || 'Assigned Faculty' }}</span>
+              </td>
+              <td>
+                <button 
+                  class="students-count-badge interactive-btn" 
+                  (click)="openStudentsModal(batch)"
+                  title="Click to manage enrolled students"
+                >
+                  <ion-icon name="people-outline"></ion-icon> {{ batch.enrolled_students_count || 0 }} Enrolled
+                </button>
               </td>
               <td>
                 <div class="timing-cell">
-                  <span class="time-text">{{ batch.timing }}</span>
-                  <span class="room-text">📍 {{ batch.roomNo }}</span>
+                  <span class="time-text">{{ formatTiming(batch.start_time, batch.end_time) }}</span>
+                  <span class="room-text"><ion-icon name="location-outline"></ion-icon> {{ batch.room || 'TBD Room' }}</span>
                 </div>
               </td>
               <td>
                 <span class="status-badge" 
-                      [class.active-status]="batch.status === 'Active'"
-                      [class.upcoming-status]="batch.status === 'Upcoming'"
-                      [class.completed-status]="batch.status === 'Completed'">
-                  {{ batch.status }}
+                      [class.active-status]="(batch.status || '').toLowerCase() === 'active'"
+                      [class.upcoming-status]="(batch.status || '').toLowerCase() === 'upcoming'"
+                      [class.completed-status]="(batch.status || '').toLowerCase() === 'completed'">
+                  {{ (batch.status || 'Active') | titlecase }}
                 </span>
               </td>
               <td class="text-center">
                 <div class="actions-flex">
                   <button class="btn-light-action" (click)="openEditModal(batch)">Edit</button>
-                  <button class="btn-light-danger" (click)="deleteBatch(batch.id)">Delete</button>
+                  <button class="btn-light-danger" (click)="deleteBatch(batch)">Delete</button>
                 </div>
               </td>
             </tr>
 
             <tr *ngIf="getFilteredBatches().length === 0">
-              <td colspan="7" class="empty-msg">No batches found matching your search term.</td>
+              <td colspan="8" class="empty-msg">
+                <div class="empty-state-box">
+                  <ion-icon name="folder-open-outline" class="empty-icon"></ion-icon>
+                  <p>No batches found matching your current filter.</p>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -132,64 +169,238 @@
 
   </div>
 
-  <!-- ADD / EDIT MODAL POPUP -->
+  <!-- ADD / EDIT BATCH MODAL POPUP -->
   <div class="custom-modal-backdrop" *ngIf="isAddModalOpen" (click)="closeModal()">
     <div class="custom-modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header-banner">
-        <h3 class="modal-title">{{ modalMode === 'add' ? '+ Create New Batch' : '✏️ Edit Batch' }}</h3>
-        <button class="modal-close-icon" (click)="closeModal()">✕</button>
+      <div class="modal-header-banner batch-modal-header">
+        <h3 class="modal-title">{{ modalMode === 'add' ? 'Create New Batch' : 'Edit Batch' }}</h3>
+        <button class="modal-close-icon" (click)="closeModal()" aria-label="Close modal">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
       </div>
 
       <div class="modal-form-body">
+        
+        <!-- Batch Code & Status -->
         <div class="form-row-2">
-          <div class="form-group">
-            <label class="form-label">Batch Code</label>
-            <input type="text" [(ngModel)]="formData.batchCode" placeholder="e.g. CS-2026-A1" class="modal-input" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Total Students Capacity</label>
-            <input type="number" [(ngModel)]="formData.totalStudents" placeholder="e.g. 45" class="modal-input" />
-          </div>
+          <ion-input 
+            label="Batch Code" 
+            labelPlacement="floating" 
+            fill="outline" 
+            type="text" 
+            [(ngModel)]="formData.batch_code" 
+            [readonly]="true" 
+            class="ionic-floating-input batch-code-input"
+          ></ion-input>
+
+          <ion-select 
+            label="Batch Status" 
+            labelPlacement="floating" 
+            fill="outline" 
+            [(ngModel)]="formData.status" 
+            interface="popover" 
+            placeholder="Select Status"
+            class="ionic-floating-input"
+          >
+            <ion-select-option value="active">Active</ion-select-option>
+            <ion-select-option value="upcoming">Upcoming</ion-select-option>
+            <ion-select-option value="completed">Completed</ion-select-option>
+          </ion-select>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Course Program</label>
-          <input type="text" [(ngModel)]="formData.courseName" placeholder="e.g. B.Tech Computer Science" class="modal-input" />
-        </div>
+        <!-- Course Program Dropdown -->
+        <ion-select 
+          label="Course Program *" 
+          labelPlacement="floating" 
+          fill="outline" 
+          [(ngModel)]="formData.course_id" 
+          interface="popover" 
+          placeholder="Select Course Program"
+          class="ionic-floating-input"
+        >
+          <ion-select-option *ngFor="let c of coursesList" [value]="c.id">
+            {{ c.course_name }} {{ c.short_name ? '(' + c.short_name + ')' : '' }}
+          </ion-select-option>
+        </ion-select>
 
-        <div class="form-group">
-          <label class="form-label">Assigned Faculty / Instructor</label>
-          <input type="text" [(ngModel)]="formData.instructorName" placeholder="e.g. Dr. Sarah Jenkins" class="modal-input" />
-        </div>
+        <!-- Assigned Faculty Instructor Dropdown -->
+        <ion-select 
+          label="Assigned Faculty / Instructor *" 
+          labelPlacement="floating" 
+          fill="outline" 
+          [(ngModel)]="formData.users_id" 
+          interface="popover" 
+          placeholder="Select Faculty / Instructor"
+          class="ionic-floating-input"
+        >
+          <ion-select-option *ngFor="let f of facultyList" [value]="f.id">
+            {{ f.name }}
+          </ion-select-option>
+        </ion-select>
 
+        <!-- Start & End Date -->
         <div class="form-row-2">
-          <div class="form-group">
-            <label class="form-label">Lecture Timings</label>
-            <input type="text" [(ngModel)]="formData.timing" placeholder="e.g. 09:00 AM - 11:00 AM" class="modal-input" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Classroom / Lab Room</label>
-            <input type="text" [(ngModel)]="formData.roomNo" placeholder="e.g. Lab 204" class="modal-input" />
-          </div>
+          <ion-input 
+            label="Batch Start Date" 
+            labelPlacement="floating" 
+            fill="outline" 
+            type="date" 
+            [(ngModel)]="formData.start_date" 
+            class="ionic-floating-input"
+          ></ion-input>
+
+          <ion-input 
+            label="Batch End Date" 
+            labelPlacement="floating" 
+            fill="outline" 
+            type="date" 
+            [(ngModel)]="formData.end_date" 
+            class="ionic-floating-input"
+          ></ion-input>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Batch Status</label>
-          <select [(ngModel)]="formData.status" class="modal-select">
-            <option value="Active">Active</option>
-            <option value="Upcoming">Upcoming</option>
-            <option value="Completed">Completed</option>
-          </select>
+        <!-- Timings -->
+        <div class="form-row-2">
+          <ion-input 
+            label="Start Time" 
+            labelPlacement="floating" 
+            fill="outline" 
+            type="time" 
+            [(ngModel)]="formData.start_time" 
+            class="ionic-floating-input"
+          ></ion-input>
+
+          <ion-input 
+            label="End Time" 
+            labelPlacement="floating" 
+            fill="outline" 
+            type="time" 
+            [(ngModel)]="formData.end_time" 
+            class="ionic-floating-input"
+          ></ion-input>
         </div>
+
+        <!-- Classroom / Room -->
+        <ion-input 
+          label="Classroom / Lab Room" 
+          labelPlacement="floating" 
+          fill="outline" 
+          type="text" 
+          [(ngModel)]="formData.room" 
+          placeholder="e.g. Block B - Room 204 or AI Lab 3" 
+          class="ionic-floating-input"
+        ></ion-input>
+
       </div>
 
       <div class="modal-footer-actions">
-        <button class="btn-modal-cancel" (click)="closeModal()">Cancel</button>
-        <button class="btn-light-primary" (click)="saveBatch()">
-          {{ modalMode === 'add' ? 'Save Batch' : 'Update Batch' }}
+        <button class="btn-modal-cancel" (click)="closeModal()" [disabled]="isSaving">Cancel</button>
+        <button class="btn-light-primary" (click)="saveBatch()" [disabled]="isSaving">
+          <span *ngIf="isSaving">⏳ Saving...</span>
+          <span *ngIf="!isSaving">{{ modalMode === 'add' ? 'Save Batch' : 'Update Batch' }}</span>
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- ENROLLED STUDENTS MANAGEMENT MODAL -->
+  <div class="custom-modal-backdrop" *ngIf="isStudentsModalOpen" (click)="closeStudentsModal()">
+    <div class="custom-modal-card students-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header-banner batch-modal-header">
+        <h3 class="modal-title">
+          <ion-icon name="people-outline"></ion-icon> Enrolled Students &bull; {{ currentBatchForStudents?.batch_code }}
+        </h3>
+        <button class="modal-close-icon" (click)="closeStudentsModal()" aria-label="Close modal">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="modal-students-body">
+        
+        <!-- QUICK ENROLL STUDENT FORM -->
+        <div class="enroll-control-box">
+          <label class="form-label">Enroll New Student to this Batch</label>
+          <div class="enroll-input-row">
+            <select [(ngModel)]="selectedStudentToEnroll" class="modal-select enroll-select">
+              <option value="" disabled>-- Select Student --</option>
+              <option *ngFor="let s of getAvailableStudentsToEnroll()" [value]="s.id">
+                {{ s.roll_no ? '[' + s.roll_no + '] ' : '' }}{{ s.name }} ({{ s.email }})
+              </option>
+            </select>
+            <button 
+              class="btn-enroll-action" 
+              (click)="enrollStudent()" 
+              [disabled]="!selectedStudentToEnroll || isEnrolling"
+            >
+              <span *ngIf="isEnrolling">...</span>
+              <span *ngIf="!isEnrolling">+ Enroll</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- STUDENTS LIST TABLE -->
+        <div class="enrolled-list-container">
+          <div class="loading-state-mini" *ngIf="isLoadingStudents">
+            <ion-spinner name="dots" color="primary"></ion-spinner>
+            <span>Loading students...</span>
+          </div>
+
+          <div *ngIf="!isLoadingStudents && enrolledStudentsList.length === 0" class="empty-students-msg">
+            <p>No students enrolled in this batch yet.</p>
+            <small>Use the selector above to enroll students.</small>
+          </div>
+
+          <table class="students-mini-table" *ngIf="!isLoadingStudents && enrolledStudentsList.length > 0">
+            <thead>
+              <tr>
+                <th>STUDENT</th>
+                <th>ROLL NO</th>
+                <th>EMAIL</th>
+                <th class="text-center">ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of enrolledStudentsList">
+                <td>
+                  <div class="student-name-cell">
+                    <span class="student-avatar-circle">{{ s.name.charAt(0) | uppercase }}</span>
+                    <span class="student-name-text">{{ s.name }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="font-mono-code roll-pill">{{ s.roll_no || 'STU-' + s.user_id }}</span>
+                </td>
+                <td>
+                  <span class="student-email-text">{{ s.email }}</span>
+                </td>
+                <td class="text-center">
+                  <button 
+                    class="btn-remove-student" 
+                    (click)="removeStudent(s)" 
+                    title="Remove student from batch"
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-modal-cancel" (click)="closeStudentsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING TOAST NOTIFICATION -->
+  <div class="toast-popup" [class.show]="toast.show" [class.success]="toast.type === 'success'" [class.error]="toast.type === 'error'" [class.info]="toast.type === 'info'">
+    <span class="toast-icon">
+      {{ toast.type === 'success' ? '✓' : toast.type === 'error' ? '⚠️' : 'ℹ️' }}
+    </span>
+    <span class="toast-msg">{{ toast.msg }}</span>
   </div>
 
 </ion-content>
