@@ -46,6 +46,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'users',
+        loadComponent: () =>
+          import('./admin/pages/add-student/add-student.page').then(
+            (m) => m.AddStudentPage,
+          ),
+      },
+      {
+        path: 'add-user',
+        loadComponent: () =>
+          import('./admin/pages/add-student/add-student.page').then(
+            (m) => m.AddStudentPage,
+          ),
+      },
+      {
         path: 'account-setting',
         redirectTo: 'dashboard',
         pathMatch: 'full',

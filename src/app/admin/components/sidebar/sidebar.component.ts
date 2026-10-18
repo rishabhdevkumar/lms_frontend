@@ -18,9 +18,11 @@ import { HeaderComponent } from '../header/header.component';
 export class SidebarComponent implements OnInit, OnDestroy {
   menuSide: 'start' | 'end' = 'start';
 
-  adminName = 'Dr. Rajeshwardat Sharma';
-  adminInitials = 'AD';
-  adminRole = 'Super Administrator';
+  adminName = 'Dev Kumar';
+  adminEmail = 'admin@lms-edu.com';
+  adminInitials = 'DK';
+  adminRole = 'Admin';
+  adminAvatarUrl: string | null = null;
 
   private subs = new Subscription();
 
@@ -33,6 +35,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.updateMenuSide();
+    const savedAvatar = localStorage.getItem('lms_admin_avatar');
+    if (savedAvatar) {
+      this.adminAvatarUrl = savedAvatar;
+    }
+
     this.updateUserInfo(this.authService.currentUserValue);
 
     this.subs.add(
@@ -56,7 +63,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   private getInitials(name: string): string {
-    if (!name) return 'RD';
+    if (!name) return 'DK';
     const cleanName = name.trim();
     const parts = cleanName.split(/\s+/);
     if (parts.length >= 2) {
@@ -65,17 +72,82 @@ export class SidebarComponent implements OnInit, OnDestroy {
     return cleanName.slice(0, 2).toUpperCase();
   }
 
-  private updateUserInfo(user: User | null) {
-    if (user) {
-      const u = user as any;
-      let resolvedName = user.name || u.fullName || u.username || u.displayName;
-      if (resolvedName && resolvedName.toLowerCase().includes('rishabh')) {
-        resolvedName = 'Rishabh Dev Kumar';
-      } else if (!resolvedName && user.email) {
-        resolvedName = 'Rishabh Dev Kumar';
+  private extractNameFromEmail(email: string): string {
+    if (!email) return 'Dev Kumar';
+    const lower = email.toLowerCase();
+    if (lower.includes('dev')) {
+      return 'Dev Kumar';
+    }
+    const namePart = email.split('@')[0];
+    const cleaned = namePart.replace(/[0-9]+$/g, '');
+    const parts = (cleaned || namePart).split(/[._-]/);
+    return parts
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
+  private getUserDisplayName(userObj: any): string {
+    if (!userObj) return 'Dev Kumar';
+    if (typeof userObj === 'string') {
+      const cleaned = userObj.replace(/[0-9]+$/g, '');
+      return cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : userObj;
+    }
+    let candidate = userObj.name || userObj.fullName || userObj.username || userObj.displayName;
+    if (candidate && typeof candidate === 'string' && candidate.trim()) {
+      candidate = candidate.trim();
+      if (candidate.includes('@')) {
+        return this.extractNameFromEmail(candidate);
       }
-      this.adminName = resolvedName || 'Rishabh Dev Kumar';
-      this.adminInitials = this.getInitials(this.adminName);
+      return candidate;
+    }
+    if (userObj.email && typeof userObj.email === 'string') {
+      return this.extractNameFromEmail(userObj.email);
+    }
+    return 'Dev Kumar';
+  }
+
+  private updateUserInfo(user: User | null) {
+    let resolvedName = '';
+    let resolvedEmail = '';
+    let resolvedRole = '';
+
+    if (user) {
+      resolvedName = this.getUserDisplayName(user);
+      resolvedEmail = user.email || '';
+      if (user.role) {
+        resolvedRole = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+      }
+    }
+
+    const savedUserStr = localStorage.getItem('lms_auth_user');
+    if (savedUserStr) {
+      try {
+        const savedUser = JSON.parse(savedUserStr);
+        if (savedUser) {
+          if (!resolvedName) resolvedName = this.getUserDisplayName(savedUser);
+          if (!resolvedEmail) resolvedEmail = savedUser.email || '';
+          if (!resolvedRole && savedUser.role) {
+            resolvedRole = savedUser.role.charAt(0).toUpperCase() + savedUser.role.slice(1);
+          }
+        }
+      } catch (e) {}
+    }
+
+    if (!resolvedName && this.settingsService?.adminProfile?.name) {
+      resolvedName = this.settingsService.adminProfile.name;
+    }
+    if (!resolvedEmail && this.settingsService?.adminProfile?.email) {
+      resolvedEmail = this.settingsService.adminProfile.email;
+    }
+
+    this.adminName = resolvedName || 'Dev Kumar';
+    this.adminEmail = resolvedEmail || 'admin@lms-edu.com';
+    this.adminRole = resolvedRole || 'Admin';
+    this.adminInitials = this.getInitials(this.adminName);
+
+    const savedAvatar = localStorage.getItem('lms_admin_avatar');
+    if (savedAvatar) {
+      this.adminAvatarUrl = savedAvatar;
     }
   }
 

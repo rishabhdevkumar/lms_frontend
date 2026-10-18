@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { HeaderComponent } from '../../components/header/header.component';
 import { toast } from 'ngx-sonner';
 
 @Component({
@@ -11,7 +10,7 @@ import { toast } from 'ngx-sonner';
   templateUrl: './account-setting.page.html',
   styleUrls: ['./account-setting.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, RouterModule, HeaderComponent]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule]
 })
 export class AccountSettingPage implements OnInit {
 

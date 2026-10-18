@@ -135,9 +135,15 @@ export class LoginPage implements OnInit {
           this.isLoading = false;
           if (res.success) {
             this.successMessage = res.message;
-            setTimeout(() => {
-              this.authService.navigateToDashboard(res.user?.role);
-            }, 500);
+            if ((res as any).requiresApproval) {
+              this.authMode = 'signin';
+              this.password = '';
+              this.confirmPassword = '';
+            } else {
+              setTimeout(() => {
+                this.authService.navigateToDashboard(res.user?.role);
+              }, 500);
+            }
           } else {
             this.errorMessage = res.message || 'Registration failed.';
           }

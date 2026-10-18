@@ -1,16 +1,17 @@
 <ion-header class="ultima-top-header">
   <ion-toolbar class="ultima-toolbar">
-    
+
     <!-- LEFT SECTION: LOGO BOX -->
     <div slot="start" class="header-left-group">
-      
+
       <!-- LOGO BOX -->
       <a class="ultima-logo-box" routerLink="/admin/dashboard">
         <div class="logo-polygon-badge">
           <svg class="polygon-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16 2L2 10V22L16 30L30 22V10L16 2Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
-            <path d="M16 8L8 12.5V20L16 24.5L24 20V12.5L16 8Z" fill="currentColor" opacity="0.3"/>
-            <path d="M16 12L11 15V18.5L16 21L21 18.5V15L16 12Z" fill="currentColor"/>
+            <path d="M16 2L2 10V22L16 30L30 22V10L16 2Z" stroke="currentColor" stroke-width="2.5"
+              stroke-linejoin="round" />
+            <path d="M16 8L8 12.5V20L16 24.5L24 20V12.5L16 8Z" fill="currentColor" opacity="0.3" />
+            <path d="M16 12L11 15V18.5L16 21L21 18.5V15L16 12Z" fill="currentColor" />
           </svg>
         </div>
         <span class="brand-title">LearnSphere</span>
@@ -21,27 +22,67 @@
     <!-- DESKTOP RIGHT SECTION (VISIBILITY: DESKTOP ONLY >= 1024px) -->
     <ion-buttons slot="end" class="header-right-group desktop-only-actions">
 
-      <!-- 1. SEARCH ICON BUTTON -->
-      <button class="header-icon-btn" (click)="toggleSearchOverlay()" title="Search">
-        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </button>
+      <!-- 1. SEARCH: ICON BUTTON (HIDES ON CLICK) & CIRCLE INPUT SEARCH BAR WITH CLOSE ICON -->
+      <div class="header-search-wrapper">
+        <!-- Search icon button (hidden when open) -->
+        <button *ngIf="!isSearchOpen" class="header-icon-btn" (click)="toggleSearchOverlay()" title="Search">
+          <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+
+        <!-- Circle input search bar in header (shown when open) -->
+        <div class="header-circle-search-box" *ngIf="isSearchOpen">
+          <svg class="search-lens-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            id="header-circle-search-input"
+            type="text" 
+            [(ngModel)]="headerSearchQuery" 
+            (input)="filterSearchResults()" 
+            placeholder="Search..."
+            class="header-circle-input" 
+          />
+          <button type="button" class="header-search-close-btn" (click)="closeHeaderSearch()" title="Close search">
+            ✕
+          </button>
+
+          <!-- Search results dropdown right below circle search input -->
+          <div class="header-search-results-dropdown" *ngIf="headerSearchQuery.trim()">
+            <div class="search-res-item" *ngFor="let item of filteredSearchResults"
+              (click)="navigateToSearchResult(item.route)">
+              <ion-icon [name]="item.icon"></ion-icon>
+              <span class="res-name">{{ item.title }}</span>
+              <span class="res-cat">{{ item.category }}</span>
+            </div>
+            <div class="no-res-msg" *ngIf="filteredSearchResults.length === 0">
+              No matching results found
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- 2. QUICK SETTINGS GEAR ICON BUTTON WITH TWO CURVED ARCS ( ⚙️ ) -->
       <button class="header-icon-btn gear-ring-btn" (click)="toggleSettingsDrawer()" title="Settings Customizer">
         <div class="ring-outline">
-          <svg class="h-icon gear-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="h-icon gear-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
           </svg>
         </div>
       </button>
 
       <!-- 3. NOTIFICATION BELL ICON BUTTON -->
       <button class="header-icon-btn bell-btn" (click)="toggleNotificationsMenu($event)" title="Notifications">
-        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
         </svg>
@@ -50,7 +91,8 @@
 
       <!-- 4. FOUR SQUARE APPS GRID ICON BUTTON -->
       <button class="header-icon-btn apps-btn" (click)="toggleAppsMenu($event)" title="Modules & Apps">
-        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
           <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
           <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
@@ -58,10 +100,21 @@
         </svg>
       </button>
 
-      <!-- 5. USER PROFILE AVATAR BUTTON -->
-      <button class="ultima-profile-btn" (click)="toggleProfileMenu($event)" title="Admin Account">
+      <button class="ultima-profile-btn" (click)="toggleProfileMenu($event)" title="Admin Account"
+        [class.is-active]="showProfileMenu">
         <div class="avatar-circle-img">
-          {{ adminInitials }}
+          <img *ngIf="adminAvatarUrl" [src]="adminAvatarUrl" alt="Profile" class="avatar-photo" />
+          <span *ngIf="!adminAvatarUrl">{{ adminInitials }}</span>
+        </div>
+        <div class="profile-info-block">
+          <span class="profile-user-name" [title]="adminName">{{ adminName }}</span>
+          <span class="profile-user-role" [title]="adminRole">{{ adminRole }}</span>
+        </div>
+        <div class="profile-chevron-arrow">
+          <svg class="chevron-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
         </div>
       </button>
 
@@ -69,13 +122,15 @@
 
     <!-- MOBILE & TABLET RIGHT SECTION (VISIBILITY: MOBILE/TAB ONLY < 1024px) -->
     <ion-buttons slot="end" class="header-right-group mobile-only-actions">
-      
+
       <!-- 1. RINGED GEAR BUTTON WITH TWO CURVED ARCS ( ⚙️ ) -->
       <button class="header-icon-btn gear-ring-btn" (click)="toggleSettingsDrawer()" title="Settings Customizer">
         <div class="ring-outline">
           <svg class="h-icon gear-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
           </svg>
         </div>
       </button>
@@ -86,8 +141,10 @@
       </button>
 
       <!-- 3. HAMBURGER MENU ICON BUTTON (THREE LINES ICON ON RIGHT SIDE) -->
-      <button class="sidebar-menu-btn" (click)="toggleSidebar()" title="Open Sidebar Menu" aria-label="Open Sidebar Menu">
-        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <button class="sidebar-menu-btn" (click)="toggleSidebar()" title="Open Sidebar Menu"
+        aria-label="Open Sidebar Menu">
+        <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -101,14 +158,27 @@
   <!-- SECONDARY MOBILE & TABLET ACTION TOOLBAR STRIP (TOGGLED BY THREE DOTS BUTTON) -->
   <div class="mobile-sub-toolbar-strip" *ngIf="isMobileSubBarOpen">
     <div class="mobile-sub-actions-row">
-      
-      <!-- Search Button -->
-      <button class="sub-action-btn" (click)="toggleSearchOverlay()" title="Search">
+
+      <!-- Search Button or Circle Search Bar -->
+      <button *ngIf="!isSearchOpen" class="sub-action-btn" (click)="toggleSearchOverlay()" title="Search">
         <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
       </button>
+
+      <div class="header-circle-search-box mobile-box" *ngIf="isSearchOpen">
+        <input 
+          type="text" 
+          [(ngModel)]="headerSearchQuery" 
+          (input)="filterSearchResults()" 
+          placeholder="Search..."
+          class="header-circle-input" 
+        />
+        <button type="button" class="header-search-close-btn" (click)="closeHeaderSearch()" title="Close search">
+          ✕
+        </button>
+      </div>
 
       <!-- Notification Bell -->
       <button class="sub-action-btn" (click)="toggleNotificationsMenu($event)" title="Notifications">
@@ -132,7 +202,8 @@
       <!-- Profile Avatar -->
       <button class="sub-profile-btn" (click)="toggleProfileMenu($event)" title="Profile">
         <div class="avatar-circle-img">
-          {{ adminInitials }}
+          <img *ngIf="adminAvatarUrl" [src]="adminAvatarUrl" alt="Profile" class="avatar-photo" />
+          <span *ngIf="!adminAvatarUrl">{{ adminInitials }}</span>
         </div>
       </button>
 
@@ -148,20 +219,14 @@
   </div>
 
   <!-- NOTIFICATION DROPDOWN POPOVER -->
-  <ion-popover
-    [isOpen]="isNotificationsOpen"
-    [event]="notifPopoverEvent"
-    (didDismiss)="isNotificationsOpen = false"
-    side="bottom"
-    alignment="end"
-    class="ultima-notif-popover"
-  >
+  <ion-popover [isOpen]="isNotificationsOpen" [event]="notifPopoverEvent" (didDismiss)="isNotificationsOpen = false"
+    side="bottom" alignment="end" class="ultima-notif-popover">
     <ng-template>
       <div class="popover-notif-container">
         <div class="notif-header-title">
           You have <strong>{{ notificationsList.length }}</strong> new notifications
         </div>
-        
+
         <div class="notif-items-list">
           <div class="notif-item-card" *ngFor="let notif of notificationsList" [class.unread]="!notif.read">
             <div class="notif-avatar-circle" [ngClass]="notif.avatarBg">
@@ -185,18 +250,12 @@
   </ion-popover>
 
   <!-- APPS GRID POPOVER CARD -->
-  <ion-popover
-    [isOpen]="isAppsOpen"
-    [event]="appsPopoverEvent"
-    (didDismiss)="isAppsOpen = false"
-    side="bottom"
-    alignment="end"
-    class="ultima-apps-popover"
-  >
+  <ion-popover [isOpen]="isAppsOpen" [event]="appsPopoverEvent" (didDismiss)="isAppsOpen = false" side="bottom"
+    alignment="end" class="ultima-apps-popover">
     <ng-template>
       <div class="popover-apps-container">
         <div class="ultima-apps-grid">
-          
+
           <div class="app-tile" (click)="openLocationModal()">
             <div class="app-icon-circle bg-blue">
               <ion-icon name="location-outline" class="tile-ion-icon"></ion-icon>
@@ -220,7 +279,8 @@
 
           <div class="app-tile" (click)="isAppsOpen = false; router.navigate(['/admin/dashboard'])">
             <div class="app-icon-circle bg-amber">
-              <svg class="tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 22v-5"></path>
                 <path d="M9 8V2"></path>
                 <path d="M15 2v6"></path>
@@ -232,7 +292,8 @@
 
           <div class="app-tile" (click)="isAppsOpen = false; toggleSettingsDrawer('maintenance')">
             <div class="app-icon-circle bg-cyan">
-              <svg class="tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <ellipse cx="12" cy="5" rx="8" ry="3"></ellipse>
                 <path d="M4 5v6a8 3 0 0 0 16 0V5"></path>
                 <path d="M4 11v6a8 3 0 0 0 12 2.6"></path>
@@ -256,23 +317,18 @@
   </ion-popover>
 
   <!-- PROFILE SETTINGS DROPDOWN -->
-  <ion-popover
-    #adminProfilePopover
-    [isOpen]="showProfileMenu"
-    [event]="profilePopoverEvent"
-    (didDismiss)="showProfileMenu = false"
-    side="bottom"
-    alignment="end"
-    class="ultima-profile-popover"
-  >
+  <ion-popover #adminProfilePopover [isOpen]="showProfileMenu" [event]="profilePopoverEvent"
+    (didDismiss)="showProfileMenu = false" side="bottom" alignment="end" class="ultima-profile-popover">
     <ng-template>
       <div class="profile-menu-container">
         <ul class="ultima-dropdown-menu">
-          
+
           <li (click)="closeAdminProfilePopover(); goToSettings()">
             <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
             </svg>
             <span>Settings</span>
           </li>
@@ -310,44 +366,12 @@
 
 </ion-header>
 
-<!-- TOP EXPANDABLE INLINE SEARCH BAR -->
-<div class="ultima-search-bar-strip" *ngIf="isSearchOpen">
-  <div class="search-inner-wrapper">
-    <svg class="search-lens-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="11" cy="11" r="8"></circle>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-    <input
-      type="text"
-      [(ngModel)]="headerSearchQuery"
-      (input)="filterSearchResults()"
-      placeholder="Search..."
-      class="inline-search-input"
-      autoFocus
-    />
-    <button class="close-inline-search-btn" (click)="toggleSearchOverlay()">✕</button>
-  </div>
 
-  <div class="inline-search-results-dropdown" *ngIf="headerSearchQuery.trim()">
-    <div
-      class="search-res-item"
-      *ngFor="let item of filteredSearchResults"
-      (click)="navigateToSearchResult(item.route)"
-    >
-      <ion-icon [name]="item.icon"></ion-icon>
-      <span class="res-name">{{ item.title }}</span>
-      <span class="res-cat">{{ item.category }}</span>
-    </div>
-    <div class="no-res-msg" *ngIf="filteredSearchResults.length === 0">
-      No matching results found
-    </div>
-  </div>
-</div>
 
 <!-- RIGHT SIDE ACCOUNT & SYSTEM SETTINGS DRAWER PANEL -->
 <div class="settings-drawer-backdrop" *ngIf="isSettingsDrawerOpen" (click)="closeSettingsDrawer()">
   <div class="settings-drawer-panel" (click)="$event.stopPropagation()">
-    
+
     <!-- DRAWER TOP BAR -->
     <div class="drawer-header-row">
       <div class="drawer-title-group">
@@ -358,7 +382,7 @@
 
     <!-- DRAWER BODY SCROLLABLE -->
     <div class="drawer-body-content">
-      
+
       <!-- TOP ADMIN PROFILE CARD (LIGHT THEME) -->
       <div class="drawer-hero-card">
         <div class="hero-left-profile">
@@ -375,12 +399,14 @@
         <!-- RIGHT SIDE PENCIL ICON BUTTON FOR UPDATE PHOTO -->
         <div class="hero-edit-photo-action">
           <button class="btn-pencil-edit" (click)="photoInput.click()" title="Update Profile Photo">
-            <svg class="pencil-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="pencil-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 20h9"></path>
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
             </svg>
           </button>
-          <input #photoInput type="file" accept="image/*" (change)="onProfilePhotoUpload($event)" style="display: none;" />
+          <input #photoInput type="file" accept="image/*" (change)="onProfilePhotoUpload($event)"
+            style="display: none;" />
         </div>
       </div>
 
@@ -447,41 +473,24 @@
 
         <div class="settings-form-grid">
           <div class="field-group">
-            <ion-input
-              label="Current Password"
-              labelPlacement="floating"
-              fill="outline"
-              type="password"
-              [(ngModel)]="settingsService.passwordData.currentPassword"
-              class="ionic-floating-input"
-            >
+            <ion-input label="Current Password" labelPlacement="floating" fill="outline" type="password"
+              [(ngModel)]="settingsService.passwordData.currentPassword" class="ionic-floating-input">
               <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
             </ion-input>
           </div>
 
           <div class="form-row-2">
             <div class="field-group">
-              <ion-input
-                label="New Password"
-                labelPlacement="floating"
-                fill="outline"
-                type="password"
-                [(ngModel)]="settingsService.passwordData.newPassword"
-                class="ionic-floating-input"
-              >
+              <ion-input label="New Password" labelPlacement="floating" fill="outline" type="password"
+                [(ngModel)]="settingsService.passwordData.newPassword" class="ionic-floating-input">
                 <ion-icon slot="start" name="key-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
               </ion-input>
             </div>
             <div class="field-group">
-              <ion-input
-                label="Confirm New Password"
-                labelPlacement="floating"
-                fill="outline"
-                type="password"
-                [(ngModel)]="settingsService.passwordData.confirmPassword"
-                class="ionic-floating-input"
-              >
-                <ion-icon slot="start" name="shield-checkmark-outline" aria-hidden="true" class="input-ion-icon"></ion-icon>
+              <ion-input label="Confirm New Password" labelPlacement="floating" fill="outline" type="password"
+                [(ngModel)]="settingsService.passwordData.confirmPassword" class="ionic-floating-input">
+                <ion-icon slot="start" name="shield-checkmark-outline" aria-hidden="true"
+                  class="input-ion-icon"></ion-icon>
               </ion-input>
             </div>
           </div>
@@ -518,21 +527,19 @@
           <div class="maint-card-box">
             <div class="maint-info">
               <h4 class="maint-title">System Maintenance Mode</h4>
-              <p class="maint-sub">Enabling this puts the LMS app under scheduled maintenance. Only Admins can access.</p>
+              <p class="maint-sub">Enabling this puts the LMS app under scheduled maintenance. Only Admins can access.
+              </p>
             </div>
 
-            <ion-toggle
-              [(ngModel)]="settingsService.maintenanceData.maintenanceMode"
-              (ionChange)="toggleMaintenanceMode()"
-              color="danger"
-              class="maint-ion-toggle"
-            >
+            <ion-toggle [(ngModel)]="settingsService.maintenanceData.maintenanceMode"
+              (ionChange)="toggleMaintenanceMode()" color="danger" class="maint-ion-toggle">
             </ion-toggle>
           </div>
 
           <div class="form-group" *ngIf="settingsService.maintenanceData.maintenanceMode">
             <label class="form-label">Maintenance Banner Notice Message</label>
-            <input type="text" [(ngModel)]="settingsService.maintenanceData.maintenanceMessage" class="modal-form-input" />
+            <input type="text" [(ngModel)]="settingsService.maintenanceData.maintenanceMessage"
+              class="modal-form-input" />
           </div>
 
           <!-- DATABASE BACKUP & CACHE OPERATIONS -->
@@ -544,7 +551,8 @@
                 </div>
                 <div class="op-card-info">
                   <h5 class="op-name">Database Snapshot Backup</h5>
-                  <span class="op-meta">Size: {{ settingsService.maintenanceData.dbSize }} • Last: {{ settingsService.maintenanceData.lastBackupTime }}</span>
+                  <span class="op-meta">Size: {{ settingsService.maintenanceData.dbSize }} • Last: {{
+                    settingsService.maintenanceData.lastBackupTime }}</span>
                 </div>
               </div>
               <button class="btn-op-action" (click)="triggerBackup()">
@@ -608,7 +616,8 @@
     </div>
     <div class="modal-info-body">
       <h4>EduDesk LMS & Ultima System Agreement</h4>
-      <p>Welcome to EduDesk LMS Administration Portal. By accessing and operating this dashboard, you agree to comply with system security protocols, student data confidentiality rules, and role-based access controls.</p>
+      <p>Welcome to EduDesk LMS Administration Portal. By accessing and operating this dashboard, you agree to comply
+        with system security protocols, student data confidentiality rules, and role-based access controls.</p>
       <ul>
         <li>Keep administrative login credentials secure and confidential.</li>
         <li>Student personal details and fee records must strictly be accessed for authorized academic purposes.</li>
@@ -630,7 +639,8 @@
     </div>
     <div class="modal-info-body">
       <h4>Need Assistance with EduDesk LMS?</h4>
-      <p>Our dedicated technical team is available to assist you 24/7 with server maintenance, student database sync, and feature updates.</p>
+      <p>Our dedicated technical team is available to assist you 24/7 with server maintenance, student database sync,
+        and feature updates.</p>
       <div class="support-contact-grid">
         <div class="support-card">
           <span class="s-icon">✉️</span>
@@ -674,52 +684,25 @@
 
         <div class="loc-form-grid">
           <div class="loc-row-2">
-            <ion-input
-              label="Country"
-              labelPlacement="floating"
-              fill="outline"
-              type="text"
-              [(ngModel)]="newLocationCountry"
-              class="ionic-floating-input"
-            >
+            <ion-input label="Country" labelPlacement="floating" fill="outline" type="text"
+              [(ngModel)]="newLocationCountry" class="ionic-floating-input">
               <ion-icon slot="start" name="globe-outline" class="input-ion-icon"></ion-icon>
             </ion-input>
 
-            <ion-input
-              label="State"
-              labelPlacement="floating"
-              fill="outline"
-              type="text"
-              [(ngModel)]="newLocationState"
-              placeholder="e.g. Maharashtra"
-              class="ionic-floating-input"
-            >
+            <ion-input label="State" labelPlacement="floating" fill="outline" type="text" [(ngModel)]="newLocationState"
+              placeholder="e.g. Maharashtra" class="ionic-floating-input">
               <ion-icon slot="start" name="map-outline" class="input-ion-icon"></ion-icon>
             </ion-input>
           </div>
 
           <div class="loc-row-2">
-            <ion-input
-              label="City"
-              labelPlacement="floating"
-              fill="outline"
-              type="text"
-              [(ngModel)]="newLocationCity"
-              placeholder="e.g. Mumbai"
-              class="ionic-floating-input"
-            >
+            <ion-input label="City" labelPlacement="floating" fill="outline" type="text" [(ngModel)]="newLocationCity"
+              placeholder="e.g. Mumbai" class="ionic-floating-input">
               <ion-icon slot="start" name="business-outline" class="input-ion-icon"></ion-icon>
             </ion-input>
 
-            <ion-input
-              label="Pincode / ZIP"
-              labelPlacement="floating"
-              fill="outline"
-              type="text"
-              [(ngModel)]="newLocationPincode"
-              placeholder="e.g. 400001"
-              class="ionic-floating-input"
-            >
+            <ion-input label="Pincode / ZIP" labelPlacement="floating" fill="outline" type="text"
+              [(ngModel)]="newLocationPincode" placeholder="e.g. 400001" class="ionic-floating-input">
               <ion-icon slot="start" name="navigate-circle-outline" class="input-ion-icon"></ion-icon>
             </ion-input>
           </div>
@@ -763,12 +746,8 @@
           </div>
 
           <div class="loc-item-actions">
-            <button
-              class="btn-make-primary"
-              *ngIf="!loc.isPrimary"
-              (click)="setPrimaryLocation(loc.id)"
-              title="Set as primary branch"
-            >
+            <button class="btn-make-primary" *ngIf="!loc.isPrimary" (click)="setPrimaryLocation(loc.id)"
+              title="Set as primary branch">
               Set Primary
             </button>
             <button class="btn-del-loc" (click)="deleteLocation(loc.id)" title="Remove location">

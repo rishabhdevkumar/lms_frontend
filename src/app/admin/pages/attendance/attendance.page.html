@@ -5,26 +5,14 @@
     <!-- TOP FLOATING PILL CATEGORY TABS -->
     <div class="pills-tab-container">
       <button class="pill-tab-btn" [class.active]="activeTab === 'student'" (click)="selectTab('student')">
-        <span class="tab-icon">🎓</span> STUDENTS ATTENDANCE ({{ studentAttendance.length }})
+        <ion-icon name="school-outline" class="tab-icon"></ion-icon> 
+        <span>STUDENTS ATTENDANCE ({{ studentAttendance.length }})</span>
       </button>
 
       <button class="pill-tab-btn" [class.active]="activeTab === 'faculty'" (click)="selectTab('faculty')">
-        <span class="tab-icon">👨‍🏫</span> FACULTY ATTENDANCE ({{ facultyAttendance.length }})
+        <ion-icon name="people-outline" class="tab-icon"></ion-icon> 
+        <span>FACULTY ATTENDANCE ({{ facultyAttendance.length }})</span>
       </button>
-    </div>
-
-    <!-- DATE FILTER & HEADER TOOLBAR -->
-    <div class="date-header-card">
-      <div class="date-selector-group">
-        <label class="date-label">📅 SELECT DAY / DATE:</label>
-        <input type="date" [(ngModel)]="selectedDate" (change)="appliedFilters.date = selectedDate" class="date-input-picker" />
-        <span class="selected-date-badge">Showing Attendance for: <strong>{{ selectedDate }}</strong></span>
-      </div>
-
-      <div class="quick-date-buttons">
-        <button class="btn-quick-date" (click)="selectedDate = '2026-07-25'; appliedFilters.date = '2026-07-25'">Today</button>
-        <button class="btn-quick-date" (click)="selectedDate = '2026-07-24'; appliedFilters.date = '2026-07-24'">Yesterday</button>
-      </div>
     </div>
 
     <!-- STATS OVERVIEW CARDS -->
@@ -34,7 +22,9 @@
           <span class="stat-label">TOTAL {{ activeTab === 'student' ? 'STUDENTS' : 'FACULTY' }}</span>
           <h3 class="stat-value">{{ getCurrentList().length }}</h3>
         </div>
-        <div class="stat-icon-badge">📋</div>
+        <div class="stat-icon-badge">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
       </div>
 
       <div class="stat-mini-card brand-emerald">
@@ -42,7 +32,9 @@
           <span class="stat-label">PRESENT TODAY</span>
           <h3 class="stat-value">{{ getPresentCount() }}</h3>
         </div>
-        <div class="stat-icon-badge">✅</div>
+        <div class="stat-icon-badge">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
       </div>
 
       <div class="stat-mini-card brand-coral">
@@ -50,7 +42,9 @@
           <span class="stat-label">ABSENT TODAY</span>
           <h3 class="stat-value">{{ getAbsentCount() }}</h3>
         </div>
-        <div class="stat-icon-badge">❌</div>
+        <div class="stat-icon-badge">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </div>
       </div>
 
       <div class="stat-mini-card brand-amber">
@@ -58,31 +52,60 @@
           <span class="stat-label">LATE / ON LEAVE</span>
           <h3 class="stat-value">{{ getLateCount() + getLeaveCount() }}</h3>
         </div>
-        <div class="stat-icon-badge">⏰</div>
+        <div class="stat-icon-badge">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
       </div>
     </div>
 
     <!-- MAIN ATTENDANCE CARD -->
     <div class="attendance-main-card">
       
-      <!-- CARD TOP TITLE & FILTER MODAL BUTTON -->
+      <!-- CARD TOP TITLE & ACTIONS TOOLBAR -->
       <div class="card-top-header">
         <div class="title-group">
           <h2 class="section-title">
             {{ activeTab === 'student' ? 'Student Attendance Registry' : 'Faculty Attendance Registry' }}
           </h2>
-          <span class="count-pill">{{ getFilteredRecords().length }} Records Found</span>
+          <span class="count-pill">{{ getFilteredRecords().length }} Listed</span>
         </div>
 
-        <button class="btn-open-filter-modal" (click)="openFilterModal()">
-          <span>⚙️</span> Filter Records
-        </button>
+        <div class="header-action-group">
+          <!-- DATE PICKER -->
+          <div class="header-date-box" title="Change target date">
+            <ion-icon name="calendar-outline" class="date-icon"></ion-icon>
+            <input 
+              type="date" 
+              [(ngModel)]="selectedDate" 
+              (change)="onDateChange()" 
+              class="header-date-input" 
+            />
+          </div>
+
+          <!-- MARK ALL PRESENT -->
+          <button class="btn-action-primary" (click)="markAllPresent()" title="Mark all listed records as Present">
+            <ion-icon name="checkmark-done-outline"></ion-icon>
+            <span>Mark All Present</span>
+          </button>
+
+          <!-- EXPORT CSV -->
+          <button class="btn-action-outline" (click)="exportAttendanceCsv()" title="Export attendance to CSV">
+            <ion-icon name="download-outline"></ion-icon>
+            <span>Export CSV</span>
+          </button>
+
+          <!-- FILTER RECORDS MODAL BUTTON -->
+          <button class="btn-open-filter-modal" (click)="openFilterModal()">
+            <ion-icon name="options-outline"></ion-icon>
+            <span>Filter Records</span>
+          </button>
+        </div>
       </div>
 
-      <!-- SEARCH & FILTER TOOLBAR -->
+      <!-- SEARCH & FILTER PILLS ROW -->
       <div class="toolbar-row">
         <div class="search-box-container">
-          <span class="search-icon">🔍</span>
+          <ion-icon name="search-outline" class="search-icon"></ion-icon>
           <input 
             type="text" 
             [(ngModel)]="searchText" 
@@ -110,7 +133,7 @@
         </div>
       </div>
 
-      <!-- GETALL ATTENDANCE DATA TABLE -->
+      <!-- ATTENDANCE DATA TABLE -->
       <div class="table-responsive">
         <table class="attendance-data-table">
           <thead>
@@ -155,7 +178,18 @@
               <!-- TIMINGS -->
               <td>
                 <div class="time-cell">
-                  <span class="time-val">{{ item.timeIn }} - {{ item.timeOut }}</span>
+                  <ng-container *ngIf="item.status === 'Present' || item.status === 'Late'">
+                    <span class="time-val">{{ item.timeIn }} - {{ item.timeOut }}</span>
+                  </ng-container>
+                  <ng-container *ngIf="item.status === 'Absent'">
+                    <span class="time-val-muted">--:-- &nbsp;--:--</span>
+                  </ng-container>
+                  <ng-container *ngIf="item.status === 'Leave'">
+                    <span class="time-leave-badge">
+                      <ion-icon name="document-text-outline"></ion-icon>
+                      <span>{{ (item.timeIn && !item.timeIn.includes('--') && !item.timeIn.toLowerCase().includes('leave')) ? item.timeIn : 'On Leave' }}</span>
+                    </span>
+                  </ng-container>
                 </div>
               </td>
 
@@ -170,17 +204,47 @@
                 </span>
               </td>
 
-              <!-- QUICK ACTION MARK BUTTONS -->
+              <!-- QUICK ACTION MARK BUTTONS: PRESENT, ABSENT, LATE, ATTENDANCE HISTORY -->
               <td class="text-center">
                 <div class="actions-flex-group">
-                  <button class="btn-mark btn-present" (click)="markStatus(item, 'Present')" title="Mark Present">
-                    Present
+                  <button 
+                    type="button"
+                    class="btn-mark btn-present" 
+                    [class.is-active]="item.status === 'Present'"
+                    (click)="markStatus(item, 'Present')" 
+                    title="Mark Present">
+                    <ion-icon name="checkmark-outline" *ngIf="item.status === 'Present'" class="mark-btn-icon"></ion-icon>
+                    <span>Present</span>
                   </button>
-                  <button class="btn-mark btn-absent" (click)="markStatus(item, 'Absent')" title="Mark Absent">
-                    Absent
+
+                  <button 
+                    type="button"
+                    class="btn-mark btn-absent" 
+                    [class.is-active]="item.status === 'Absent'"
+                    (click)="markStatus(item, 'Absent')" 
+                    title="Mark Absent">
+                    <ion-icon name="close-outline" *ngIf="item.status === 'Absent'" class="mark-btn-icon"></ion-icon>
+                    <span>Absent</span>
                   </button>
-                  <button class="btn-mark btn-late" (click)="markStatus(item, 'Late')" title="Mark Late">
-                    Late
+
+                  <button 
+                    type="button"
+                    class="btn-mark btn-late" 
+                    [class.is-active]="item.status === 'Late'"
+                    (click)="markStatus(item, 'Late')" 
+                    title="Mark Late">
+                    <ion-icon name="time-outline" *ngIf="item.status === 'Late'" class="mark-btn-icon"></ion-icon>
+                    <span>Late</span>
+                  </button>
+
+                  <!-- ATTENDANCE HISTORY BUTTON WITH ICON -->
+                  <button 
+                    type="button"
+                    class="btn-mark btn-history" 
+                    (click)="openAttendanceHistory(item); $event.stopPropagation()" 
+                    title="View Attendance History for {{ item.name }}">
+                    <ion-icon name="calendar-outline" class="mark-btn-icon"></ion-icon>
+                    <span>History</span>
                   </button>
                 </div>
               </td>
@@ -189,7 +253,10 @@
 
             <!-- EMPTY MESSAGE -->
             <tr *ngIf="getFilteredRecords().length === 0">
-              <td colspan="6" class="empty-msg">No attendance records found matching your selected filters and date.</td>
+              <td colspan="6" class="empty-msg">
+                <ion-icon name="information-circle-outline" class="empty-icon"></ion-icon>
+                <p>No attendance records found matching your selected filters and date.</p>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -197,6 +264,213 @@
 
     </div>
 
+  </div>
+
+  <!-- ========================================================================== -->
+  <!-- ATTENDANCE HISTORY COMPREHENSIVE MODAL                                     -->
+  <!-- ========================================================================== -->
+  <div class="custom-modal-backdrop history-backdrop" *ngIf="isHistoryModalOpen" (click)="closeHistoryModal()">
+    <div class="history-modal-dialog" (click)="$event.stopPropagation()">
+      
+      <!-- MODAL TOP BAR -->
+      <div class="history-modal-header">
+        <div class="history-header-left">
+          <div class="history-header-icon">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </div>
+          <div>
+            <h3 class="history-modal-title">Attendance History</h3>
+            <p class="history-modal-subtitle" *ngIf="selectedUserForHistory">
+              {{ selectedUserForHistory.name }} ({{ selectedUserForHistory.codeOrRoll }}) • {{ selectedUserForHistory.departmentOrCourse }}
+            </p>
+          </div>
+        </div>
+
+        <div class="history-header-right">
+          <button type="button" class="btn-history-export" (click)="exportStudentHistoryCsv()" title="Download History CSV">
+            <ion-icon name="download-outline"></ion-icon>
+            <span>Export Report</span>
+          </button>
+          <button type="button" class="btn-close-history" (click)="closeHistoryModal()" aria-label="Close">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- MODAL BODY -->
+      <div class="history-modal-body">
+        
+        <!-- PROFILE HERO & KPI SUMMARY -->
+        <div class="history-stats-banner" *ngIf="selectedUserForHistory">
+          <div class="user-hero-card">
+            <div class="hero-avatar" [style.background-color]="selectedUserForHistory.avatarBg">
+              {{ getInitials(selectedUserForHistory.name) }}
+            </div>
+            <div class="hero-meta">
+              <div class="hero-title-row">
+                <h4 class="hero-name">{{ selectedUserForHistory.name }}</h4>
+                <span class="hero-pill">{{ selectedUserForHistory.type }}</span>
+              </div>
+              <p class="hero-email">{{ selectedUserForHistory.email }}</p>
+              <div class="hero-tags">
+                <span class="hero-tag">
+                  <ion-icon name="book-outline"></ion-icon> {{ selectedUserForHistory.departmentOrCourse }}
+                </span>
+                <span class="hero-tag">
+                  <ion-icon name="layers-outline"></ion-icon> {{ selectedUserForHistory.subMeta }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI STATS CARDS -->
+          <div class="history-kpis-grid">
+            <div class="kpi-card kpi-rate">
+              <div class="kpi-info">
+                <span class="kpi-label">ATTENDANCE RATE</span>
+                <h3 class="kpi-value">{{ historyStats.percentage }}%</h3>
+              </div>
+              <div class="kpi-icon-box">
+                <ion-icon name="stats-chart-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="kpi-card kpi-total">
+              <div class="kpi-info">
+                <span class="kpi-label">TOTAL SESSIONS</span>
+                <h3 class="kpi-value">{{ historyStats.total }}</h3>
+              </div>
+              <div class="kpi-icon-box">
+                <ion-icon name="albums-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="kpi-card kpi-present">
+              <div class="kpi-info">
+                <span class="kpi-label">PRESENT</span>
+                <h3 class="kpi-value">{{ historyStats.present }}</h3>
+              </div>
+              <div class="kpi-icon-box">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="kpi-card kpi-absent">
+              <div class="kpi-info">
+                <span class="kpi-label">ABSENT</span>
+                <h3 class="kpi-value">{{ historyStats.absent }}</h3>
+              </div>
+              <div class="kpi-icon-box">
+                <ion-icon name="close-circle-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="kpi-card kpi-late">
+              <div class="kpi-info">
+                <span class="kpi-label">LATE</span>
+                <h3 class="kpi-value">{{ historyStats.late }}</h3>
+              </div>
+              <div class="kpi-icon-box">
+                <ion-icon name="time-outline"></ion-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEARCH & FILTER TOOLBAR FOR HISTORY -->
+        <div class="history-toolbar">
+          <div class="history-search-box">
+            <ion-icon name="search-outline"></ion-icon>
+            <input 
+              type="text" 
+              [(ngModel)]="historySearchQuery" 
+              placeholder="Search history by date, slot, instructor..." 
+              class="history-search-input" 
+            />
+          </div>
+
+          <div class="history-pills">
+            <button class="h-pill" [class.active]="historyFilter === 'all'" (click)="historyFilter = 'all'">
+              All ({{ historyRecords.length }})
+            </button>
+            <button class="h-pill green" [class.active]="historyFilter === 'present'" (click)="historyFilter = 'present'">
+              Present ({{ historyStats.present }})
+            </button>
+            <button class="h-pill red" [class.active]="historyFilter === 'absent'" (click)="historyFilter = 'absent'">
+              Absent ({{ historyStats.absent }})
+            </button>
+            <button class="h-pill amber" [class.active]="historyFilter === 'late'" (click)="historyFilter = 'late'">
+              Late ({{ historyStats.late }})
+            </button>
+          </div>
+        </div>
+
+        <!-- LOADING INDICATOR -->
+        <div class="history-loading-box" *ngIf="isHistoryLoading">
+          <ion-spinner name="crescent" color="primary"></ion-spinner>
+          <p>Loading attendance history records...</p>
+        </div>
+
+        <!-- HISTORY DATA TABLE -->
+        <div class="history-table-wrapper" *ngIf="!isHistoryLoading">
+          <table class="history-data-table">
+            <thead>
+              <tr>
+                <th>DATE & DAY</th>
+                <th>SESSION / SUBJECT</th>
+                <th>CHECK-IN TIME</th>
+                <th>RECORDED BY</th>
+                <th class="text-center">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of filteredHistoryRecords">
+                <td>
+                  <div class="history-date-cell">
+                    <span class="date-main">{{ formatHistoryDate(record.session_date || record.marked_at) }}</span>
+                    <span class="date-day">{{ formatHistoryDay(record.session_date || record.marked_at) }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="session-name-text">{{ record.session_name || 'Academic Class Session' }}</span>
+                </td>
+                <td>
+                  <span class="time-text">{{ formatHistoryTime(record.marked_at, record.status) }}</span>
+                </td>
+                <td>
+                  <span class="marked-by-text">{{ record.marked_by_name || 'Academic Office' }}</span>
+                </td>
+                <td class="text-center">
+                  <span class="status-pill-badge" 
+                        [class.status-present]="record.status === 'present'" 
+                        [class.status-absent]="record.status === 'absent'"
+                        [class.status-late]="record.status === 'late'">
+                    {{ record.status | titlecase }}
+                  </span>
+                </td>
+              </tr>
+
+              <tr *ngIf="filteredHistoryRecords.length === 0">
+                <td colspan="5" class="empty-msg">
+                  <ion-icon name="calendar-outline" class="empty-icon"></ion-icon>
+                  <p>No historical attendance records found matching your filters.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <div class="history-modal-footer">
+        <span class="history-footer-text">
+          Showing {{ filteredHistoryRecords.length }} of {{ historyRecords.length }} historical records
+        </span>
+        <button type="button" class="btn-modal-secondary" (click)="closeHistoryModal()">Close</button>
+      </div>
+
+    </div>
   </div>
 
   <!-- ========================================================================== -->
@@ -210,7 +484,9 @@
         <div class="modal-student-title">
           <h3 class="modal-title-white">Filter Attendance Records</h3>
         </div>
-        <button class="modal-close-icon" (click)="closeFilterModal()">✕</button>
+        <button class="modal-close-icon" (click)="closeFilterModal()" aria-label="Close">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
       </div>
 
       <!-- FORM BODY FOR FILTER PARAMETERS -->
@@ -227,6 +503,9 @@
           <label class="form-label">Department / Course Program</label>
           <select [(ngModel)]="filterOptions.dept" class="modal-form-select">
             <option value="All">All Departments & Programs</option>
+            <option *ngFor="let course of coursesList" [value]="course.course_name || course.name">
+              {{ course.course_name || course.name }}
+            </option>
             <option value="Computer Science">Computer Science & Engineering</option>
             <option value="Data Science">Data Science & AI</option>
             <option value="Information Tech">Information Technology</option>
@@ -239,6 +518,9 @@
           <label class="form-label">{{ activeTab === 'student' ? 'Semester Level' : 'Faculty Role / Designation' }}</label>
           <select [(ngModel)]="filterOptions.subMeta" class="modal-form-select" *ngIf="activeTab === 'student'">
             <option value="All">All Semesters</option>
+            <option *ngFor="let sem of semestersList" [value]="sem.semester_name || sem.name">
+              {{ sem.semester_name || sem.name }}
+            </option>
             <option value="Semester 2">Semester 2</option>
             <option value="Semester 4">Semester 4</option>
             <option value="Semester 6">Semester 6</option>

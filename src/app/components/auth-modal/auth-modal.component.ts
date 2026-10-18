@@ -157,10 +157,16 @@ export class AuthModalComponent {
           this.isLoading = false;
           if (res.success) {
             this.successMessage = res.message;
-            setTimeout(() => {
-              this.closeModal();
-              this.authService.navigateToDashboard(res.user?.role);
-            }, 400);
+            if ((res as any).requiresApproval) {
+              this.authMode = 'signin';
+              this.password = '';
+              this.confirmPassword = '';
+            } else {
+              setTimeout(() => {
+                this.closeModal();
+                this.authService.navigateToDashboard(res.user?.role);
+              }, 400);
+            }
           } else {
             this.errorMessage = res.message || 'Registration failed.';
           }

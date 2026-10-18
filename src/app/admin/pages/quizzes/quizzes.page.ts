@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { HeaderComponent } from '../../components/header/header.component';
 
 export interface QuizItem {
   id: number;
@@ -22,7 +21,7 @@ export interface QuizItem {
   templateUrl: './quizzes.page.html',
   styleUrls: ['./quizzes.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, RouterModule, HeaderComponent]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule]
 })
 export class QuizzesPage implements OnInit {
 

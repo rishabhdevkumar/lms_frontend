@@ -36,9 +36,9 @@ export interface SearchResult {
 export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild('adminProfilePopover') adminProfilePopover?: IonPopover;
 
-  adminName = 'Dr. Rajeshwardat Sharma';
+  adminName = 'Dev Kumar';
   adminEmail = 'admin@lms-edu.com';
-  adminInitials = 'AD';
+  adminInitials = 'DK';
   adminRole = 'Admin';
   adminPhone = '+91 98000 11223';
   adminAvatarUrl: string | null = null;
@@ -330,7 +330,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.showProfileMenu = false;
       this.isNotificationsOpen = false;
       this.isAppsOpen = false;
+      setTimeout(() => {
+        const input = document.getElementById('header-circle-search-input');
+        if (input) input.focus();
+      }, 50);
+    } else {
+      this.headerSearchQuery = '';
     }
+  }
+
+  closeHeaderSearch() {
+    this.isSearchOpen = false;
+    this.headerSearchQuery = '';
   }
 
   filterSearchResults() {
@@ -531,7 +542,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   private getInitials(name: string): string {
-    if (!name) return 'RD';
+    if (!name) return 'DK';
     const cleanName = name.trim();
     const parts = cleanName.split(/\s+/);
     if (parts.length >= 2) {
@@ -541,10 +552,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   private extractNameFromEmail(email: string): string {
-    if (!email) return 'Rishabh Dev Kumar';
+    if (!email) return 'Dev Kumar';
     const lower = email.toLowerCase();
-    if (lower.includes('rishabh')) {
-      return 'Rishabh Dev Kumar';
+    if (lower.includes('dev')) {
+      return 'Dev Kumar';
     }
     const namePart = email.split('@')[0];
     const cleaned = namePart.replace(/[0-9]+$/g, '');
@@ -555,18 +566,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   private getUserDisplayName(userObj: any): string {
-    if (!userObj) return 'Rishabh Dev Kumar';
+    if (!userObj) return 'Dev Kumar';
     if (typeof userObj === 'string') {
-      if (userObj.toLowerCase().includes('rishabh')) return 'Rishabh Dev Kumar';
       const cleaned = userObj.replace(/[0-9]+$/g, '');
       return cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : userObj;
     }
     let candidate = userObj.name || userObj.fullName || userObj.username || userObj.displayName;
     if (candidate && typeof candidate === 'string' && candidate.trim()) {
       candidate = candidate.trim();
-      if (candidate.toLowerCase().includes('rishabh')) {
-        return 'Rishabh Dev Kumar';
-      }
       if (candidate.includes('@')) {
         return this.extractNameFromEmail(candidate);
       }
@@ -575,7 +582,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (userObj.email && typeof userObj.email === 'string') {
       return this.extractNameFromEmail(userObj.email);
     }
-    return 'Rishabh Dev Kumar';
+    return 'Dev Kumar';
   }
 
   private updateUserInfo(user: User | null) {
@@ -589,7 +596,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       resolvedName = this.getUserDisplayName(user);
       resolvedEmail = user.email || '';
       if (user.role) {
-        resolvedRole = user.role.toLowerCase() === 'admin' ? 'Admin' : (user.role.charAt(0).toUpperCase() + user.role.slice(1));
+        resolvedRole = user.role.charAt(0).toUpperCase() + user.role.slice(1);
       }
       if (user.phone) {
         resolvedPhone = user.phone;
@@ -604,7 +611,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           if (!resolvedName) resolvedName = this.getUserDisplayName(savedUser);
           if (!resolvedEmail) resolvedEmail = savedUser.email || '';
           if (!resolvedRole && savedUser.role) {
-            resolvedRole = savedUser.role.toLowerCase() === 'admin' ? 'Admin' : (savedUser.role.charAt(0).toUpperCase() + savedUser.role.slice(1));
+            resolvedRole = savedUser.role.charAt(0).toUpperCase() + savedUser.role.slice(1);
           }
           if (!resolvedPhone) {
             resolvedPhone = savedUser.phone || savedUser.phoneNumber || savedUser.phone_number || savedUser.mobile || '';
@@ -620,8 +627,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.settingsService.adminProfile.name = resolvedName;
       }
     } else {
-      this.adminName = 'Rishabh Dev Kumar';
-      this.adminInitials = 'RD';
+      this.adminName = 'Dev Kumar';
+      this.adminInitials = 'DK';
     }
 
     if (resolvedEmail) {
@@ -630,7 +637,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.settingsService.adminProfile.email = resolvedEmail;
       }
     } else {
-      this.adminEmail = 'rishabh.verma@lms-edu.com';
+      this.adminEmail = 'admin@lms-edu.com';
     }
 
     this.adminRole = resolvedRole || 'Admin';
@@ -641,6 +648,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.adminPhone = resolvedPhone || (this.settingsService?.adminProfile?.phone) || '+91 98000 11223';
     if (this.settingsService && this.settingsService.adminProfile) {
       this.settingsService.adminProfile.phone = this.adminPhone;
+    }
+
+    const savedAvatar = localStorage.getItem('lms_admin_avatar');
+    if (savedAvatar) {
+      this.adminAvatarUrl = savedAvatar;
     }
   }
 

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
-import { HeaderComponent } from '../../components/header/header.component';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
 
@@ -12,7 +11,7 @@ import { firstValueFrom } from 'rxjs';
   templateUrl: './academic.page.html',
   styleUrls: ['./academic.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonicModule, CommonModule, FormsModule]
 })
 export class AcademicPage implements OnInit {
   

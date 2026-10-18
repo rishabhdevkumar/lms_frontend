@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { HeaderComponent } from '../../components/header/header.component';
 import { toast } from 'ngx-sonner';
 
 export interface CertificateRecord {
@@ -21,7 +20,7 @@ export interface CertificateRecord {
   templateUrl: './certificates.page.html',
   styleUrls: ['./certificates.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, RouterModule, HeaderComponent]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule]
 })
 export class CertificatesPage implements OnInit {
 

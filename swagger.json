@@ -1,0 +1,1930 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/users": {
+      "post": {
+        "operationId": "UsersController_add",
+        "summary": "Add a new user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
+      "get": {
+        "operationId": "UsersController_getAll",
+        "summary": "Get all users",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
+      "put": {
+        "operationId": "UsersController_updateRoot",
+        "summary": "Update existing user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/add": {
+      "post": {
+        "operationId": "UsersController_add",
+        "summary": "Add a new user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/authenticate": {
+      "post": {
+        "operationId": "UsersController_authenticate",
+        "summary": "Authenticate user and return JWT token",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAuthTokenResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/getall": {
+      "get": {
+        "operationId": "UsersController_getAll",
+        "summary": "Get all users",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/update": {
+      "post": {
+        "operationId": "UsersController_update",
+        "summary": "Update existing user",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/status": {
+      "post": {
+        "operationId": "UsersController_changeStatus",
+        "summary": "Change user status (Active / Inactive / Deactive)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeUserStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User status updated successfully"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/change_status": {
+      "post": {
+        "operationId": "UsersController_changeStatus",
+        "summary": "Change user status (Active / Inactive / Deactive)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeUserStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User status updated successfully"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/toggle_status": {
+      "post": {
+        "operationId": "UsersController_changeStatus",
+        "summary": "Change user status (Active / Inactive / Deactive)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeUserStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User status updated successfully"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/details/{id}": {
+      "get": {
+        "operationId": "UsersController_details",
+        "summary": "Get user details by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "example": "1",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "operationId": "UsersController_details",
+        "summary": "Get user details by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "example": "1",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/get_self": {
+      "get": {
+        "operationId": "UsersController_getSelf",
+        "summary": "Get logged in user profile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current authenticated user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/users/update_password_self": {
+      "post": {
+        "operationId": "UsersController_updatePasswordSelf",
+        "summary": "Update password for authenticated user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePasswordSelfDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password update result"
+          }
+        },
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/users/change_password_self": {
+      "post": {
+        "operationId": "UsersController_updatePasswordSelf",
+        "summary": "Update password for authenticated user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePasswordSelfDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password update result"
+          }
+        },
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/category/add": {
+      "post": {
+        "operationId": "CategoryController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/category/getall": {
+      "post": {
+        "operationId": "CategoryController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/category/update": {
+      "post": {
+        "operationId": "CategoryController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/category/search": {
+      "post": {
+        "operationId": "CategoryController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/category/delete/{id}": {
+      "post": {
+        "operationId": "CategoryController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/sub_category/add": {
+      "post": {
+        "operationId": "SubCategoryController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/sub_category/getall": {
+      "post": {
+        "operationId": "SubCategoryController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/sub_category/update": {
+      "post": {
+        "operationId": "SubCategoryController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/sub_category/search": {
+      "post": {
+        "operationId": "SubCategoryController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/sub_category/delete/{id}": {
+      "post": {
+        "operationId": "SubCategoryController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/chapter/add": {
+      "post": {
+        "operationId": "ChapterController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/chapter/getall": {
+      "post": {
+        "operationId": "ChapterController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/chapter/update": {
+      "post": {
+        "operationId": "ChapterController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/chapter/search": {
+      "post": {
+        "operationId": "ChapterController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/chapter/delete/{id}": {
+      "post": {
+        "operationId": "ChapterController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/chapter/get_by_id/{id}": {
+      "post": {
+        "operationId": "ChapterController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/city/add": {
+      "post": {
+        "operationId": "CityController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/city/getall": {
+      "post": {
+        "operationId": "CityController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/city/update": {
+      "post": {
+        "operationId": "CityController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/city/delete/{id}": {
+      "post": {
+        "operationId": "CityController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/country/add": {
+      "post": {
+        "operationId": "CountryController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/country/getall": {
+      "post": {
+        "operationId": "CountryController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/country/update": {
+      "post": {
+        "operationId": "CountryController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/country/search": {
+      "post": {
+        "operationId": "CountryController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/country/delete/{id}": {
+      "post": {
+        "operationId": "CountryController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/state/add": {
+      "post": {
+        "operationId": "StateController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/state/getall": {
+      "post": {
+        "operationId": "StateController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/state/search": {
+      "post": {
+        "operationId": "StateController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/state/update": {
+      "post": {
+        "operationId": "StateController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/state/delete": {
+      "post": {
+        "operationId": "StateController_deleteBody",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/state/delete/{id}": {
+      "post": {
+        "operationId": "StateController_deleteParam",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/destrict/add": {
+      "post": {
+        "operationId": "DestrictController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/destrict/getall": {
+      "post": {
+        "operationId": "DestrictController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/destrict/search": {
+      "post": {
+        "operationId": "DestrictController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/destrict/update": {
+      "post": {
+        "operationId": "DestrictController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/destrict/delete": {
+      "post": {
+        "operationId": "DestrictController_deleteBody",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/destrict/delete/{id}": {
+      "post": {
+        "operationId": "DestrictController_deleteParam",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/course/add": {
+      "post": {
+        "operationId": "CourseController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/course/getall": {
+      "post": {
+        "operationId": "CourseController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/course/update": {
+      "post": {
+        "operationId": "CourseController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/course/search": {
+      "post": {
+        "operationId": "CourseController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/course/delete/{id}": {
+      "post": {
+        "operationId": "CourseController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/faculty_dep/add": {
+      "post": {
+        "operationId": "FacultyDepController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/faculty_dep/getall": {
+      "post": {
+        "operationId": "FacultyDepController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/language/getall": {
+      "post": {
+        "operationId": "LanguageController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/language/get_active": {
+      "post": {
+        "operationId": "LanguageController_getActive",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module/add": {
+      "post": {
+        "operationId": "ModuleController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module/getall": {
+      "post": {
+        "operationId": "ModuleController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module/update": {
+      "post": {
+        "operationId": "ModuleController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module/search": {
+      "post": {
+        "operationId": "ModuleController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module/delete/{id}": {
+      "post": {
+        "operationId": "ModuleController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module_tables/add": {
+      "post": {
+        "operationId": "ModuleTablesController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module_tables/getall": {
+      "post": {
+        "operationId": "ModuleTablesController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module_tables/update": {
+      "post": {
+        "operationId": "ModuleTablesController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module_tables/search": {
+      "post": {
+        "operationId": "ModuleTablesController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/module_tables/delete/{id}": {
+      "post": {
+        "operationId": "ModuleTablesController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/room/add": {
+      "post": {
+        "operationId": "RoomController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/room/getall": {
+      "post": {
+        "operationId": "RoomController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/semester/add": {
+      "post": {
+        "operationId": "SemesterController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/semester/getall": {
+      "post": {
+        "operationId": "SemesterController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/semester/update": {
+      "post": {
+        "operationId": "SemesterController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/semester/search": {
+      "post": {
+        "operationId": "SemesterController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/semester/delete/{id}": {
+      "post": {
+        "operationId": "SemesterController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/session/add": {
+      "post": {
+        "operationId": "SessionController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/session/getall": {
+      "post": {
+        "operationId": "SessionController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/session/update": {
+      "post": {
+        "operationId": "SessionController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/session/search": {
+      "post": {
+        "operationId": "SessionController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/session/delete/{id}": {
+      "post": {
+        "operationId": "SessionController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/subject/add": {
+      "post": {
+        "operationId": "SubjectController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/subject/getall": {
+      "post": {
+        "operationId": "SubjectController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/subject/update": {
+      "post": {
+        "operationId": "SubjectController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/subject/search": {
+      "post": {
+        "operationId": "SubjectController_search",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/subject/delete/{id}": {
+      "post": {
+        "operationId": "SubjectController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/syllabus/add": {
+      "post": {
+        "operationId": "SyllabusController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/syllabus/getall": {
+      "post": {
+        "operationId": "SyllabusController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/syllabus/update": {
+      "post": {
+        "operationId": "SyllabusController_update",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/syllabus/delete/{id}": {
+      "post": {
+        "operationId": "SyllabusController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/timetable/add": {
+      "post": {
+        "operationId": "TimetableController_add",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/timetable/getall": {
+      "post": {
+        "operationId": "TimetableController_getAll",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/notification/add": {
+      "post": {
+        "operationId": "NotificationController_add",
+        "summary": "Add a new notification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddNotificationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notification"
+        ]
+      }
+    },
+    "/notification/getall": {
+      "post": {
+        "operationId": "NotificationController_getAll",
+        "summary": "Get all notifications",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notification"
+        ]
+      }
+    },
+    "/notification/getbyid/{id}": {
+      "post": {
+        "operationId": "NotificationController_getById",
+        "summary": "Get notification by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notification"
+        ]
+      }
+    },
+    "/notification/getbyuserid/{userId}": {
+      "post": {
+        "operationId": "NotificationController_getByUserId",
+        "summary": "Get notifications by User ID",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notification"
+        ]
+      }
+    },
+    "/notification/mark-as-read": {
+      "post": {
+        "operationId": "NotificationController_markAsRead",
+        "summary": "Mark single notification as read",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkAsReadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notification"
+        ]
+      }
+    },
+    "/notification/mark-all-as-read": {
+      "post": {
+        "operationId": "NotificationController_markAllAsRead",
+        "summary": "Mark all notifications as read for a user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkAllAsReadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notification"
+        ]
+      }
+    },
+    "/notification/update": {
+      "post": {
+        "operationId": "NotificationController_update",
+        "summary": "Update notification details",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNotificationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notification"
+        ]
+      }
+    },
+    "/notification/delete/{id}": {
+      "post": {
+        "operationId": "NotificationController_delete",
+        "summary": "Delete a notification",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notification"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "LMS Backend API",
+    "description": "NestJS REST API documentation for LMS Backend Management System",
+    "version": "2.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "JWT-auth": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "name": "Authorization",
+        "description": "Enter JWT token",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "AddUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "Full name of the user"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "Email address of the user"
+          },
+          "password": {
+            "type": "string",
+            "example": "Pass@1234",
+            "description": "User password (at least 8 characters, one alphabet, one number, and one special character)"
+          },
+          "role": {
+            "type": "string",
+            "example": "student",
+            "enum": [
+              "student",
+              "faculty",
+              "admin"
+            ],
+            "description": "User role"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1",
+            "description": "Unique user identifier"
+          },
+          "roll_no": {
+            "type": "string",
+            "example": "STU001",
+            "description": "User roll number"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "User full name"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "User email"
+          },
+          "role": {
+            "type": "string",
+            "example": "admin",
+            "description": "User role"
+          }
+        },
+        "required": [
+          "id",
+          "roll_no",
+          "name",
+          "email"
+        ]
+      },
+      "AuthenticateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "User email or roll number"
+          },
+          "password": {
+            "type": "string",
+            "example": "Pass@1234",
+            "description": "User password"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "UserAuthTokenResponseDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "description": "JWT Authentication Bearer token"
+          },
+          "role": {
+            "type": "string",
+            "example": "admin",
+            "description": "User role"
+          },
+          "data": {
+            "description": "Authenticated user info",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserResponseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "token",
+          "data"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "object",
+            "example": 1,
+            "description": "User ID to update"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "Updated full name"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "Updated email address"
+          },
+          "password": {
+            "type": "string",
+            "example": "Pass@1234",
+            "description": "Updated password"
+          },
+          "phone": {
+            "type": "string",
+            "example": "9876543210",
+            "description": "10-digit mobile phone number"
+          },
+          "status": {
+            "type": "string",
+            "example": "Active",
+            "description": "User status (Active, Inactive, Deactive, Pending)"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ChangeUserStatusDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "object",
+            "example": 1,
+            "description": "User ID"
+          },
+          "status": {
+            "type": "string",
+            "example": "Active",
+            "description": "User status (Active, Inactive, Deactive, Pending)"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ]
+      },
+      "UpdatePasswordSelfDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "object",
+            "example": 1,
+            "description": "Optional user ID (extracted automatically from JWT token if logged in)"
+          },
+          "uid": {
+            "type": "object",
+            "example": 1,
+            "description": "Optional user ID alias"
+          },
+          "password": {
+            "type": "string",
+            "example": "Pass@1234",
+            "description": "New password (at least 8 characters, one alphabet, one number, and one special character)"
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "AddNotificationDto": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "number",
+            "example": 1,
+            "description": "Target user ID"
+          },
+          "title": {
+            "type": "string",
+            "example": "Assignment Reminder",
+            "description": "Notification title"
+          },
+          "message": {
+            "type": "string",
+            "example": "Your Math assignment is due tomorrow at 5 PM.",
+            "description": "Notification message text"
+          },
+          "type": {
+            "type": "string",
+            "example": "info",
+            "description": "Type of notification (e.g., info, warning, alert)"
+          }
+        },
+        "required": [
+          "user_id",
+          "title",
+          "message"
+        ]
+      },
+      "MarkAsReadDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1,
+            "description": "Notification ID to mark as read"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "MarkAllAsReadDto": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "number",
+            "example": 1,
+            "description": "User ID whose notifications to mark as read"
+          }
+        },
+        "required": [
+          "user_id"
+        ]
+      },
+      "UpdateNotificationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1,
+            "description": "Notification ID"
+          },
+          "title": {
+            "type": "string",
+            "example": "Updated Assignment Reminder",
+            "description": "Updated notification title"
+          },
+          "message": {
+            "type": "string",
+            "example": "Your Math assignment submission time has been extended.",
+            "description": "Updated message"
+          },
+          "type": {
+            "type": "string",
+            "example": "info",
+            "description": "Notification type"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "message"
+        ]
+      }
+    }
+  }
+}

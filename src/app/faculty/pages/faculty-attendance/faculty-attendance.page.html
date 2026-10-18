@@ -31,7 +31,7 @@
             <span>Course Module</span>
           </label>
           <div class="custom-select-wrapper">
-            <select id="course-select" class="custom-select-input" [(ngModel)]="selectedCourse">
+            <select id="course-select" class="custom-select-input" [(ngModel)]="selectedCourse" (ngModelChange)="onCourseChange()">
               <option *ngFor="let c of courses" [value]="c.code">
                 {{ c.name }} ({{ c.room }})
               </option>
@@ -53,7 +53,7 @@
             </div>
           </div>
           <div class="custom-input-wrapper">
-            <input id="date-input" type="date" class="custom-date-input" [(ngModel)]="selectedDate" />
+            <input id="date-input" type="date" class="custom-date-input" [(ngModel)]="selectedDate" (ngModelChange)="onDateChange()" />
           </div>
         </div>
 
@@ -64,7 +64,7 @@
             <span>Lecture Slot</span>
           </label>
           <div class="custom-select-wrapper">
-            <select id="session-select" class="custom-select-input" [(ngModel)]="selectedSession">
+            <select id="session-select" class="custom-select-input" [(ngModel)]="selectedSession" (ngModelChange)="onSlotChange()">
               <option *ngFor="let s of sessions" [value]="s">
                 {{ s }}
               </option>
@@ -193,9 +193,16 @@
 
           <!-- Student Identity -->
           <div class="student-profile">
-            <!-- Modern Avatar Badge with Roll Sequence -->
+            <!-- Modern Avatar Badge with Profile Photo / Fallback Initials -->
             <div class="avatar-badge" [ngClass]="'avatar-' + s.status.toLowerCase()">
-              <span class="roll-sequence">{{ s.rollNo.slice(-3) }}</span>
+              <img *ngIf="s.profile_image && !s.fallbackInitials"
+                   [src]="s.profile_image"
+                   [alt]="s.name"
+                   class="avatar-photo"
+                   (error)="onAvatarError($event, s)" />
+              <span *ngIf="!s.profile_image || s.fallbackInitials" class="roll-sequence">
+                {{ s.rollNo ? s.rollNo.slice(-3) : getInitials(s.name) }}
+              </span>
             </div>
 
             <div class="student-meta">
@@ -205,9 +212,37 @@
                   {{ s.status }}
                 </span>
               </div>
-              <div class="student-roll">
-                <span class="roll-label">Roll No:</span>
-                <span class="roll-value">{{ s.rollNo }}</span>
+              
+              <div class="student-meta-details">
+                <!-- Roll No -->
+                <div class="meta-item meta-roll">
+                  <span class="roll-label">Roll No:</span>
+                  <span class="roll-value">{{ s.rollNo }}</span>
+                </div>
+
+                <!-- Email -->
+                <div class="meta-item meta-email" [title]="s.email">
+                  <ion-icon name="mail-outline"></ion-icon>
+                  <span>{{ s.email }}</span>
+                </div>
+
+                <!-- Session -->
+                <div class="meta-item meta-badge meta-session" *ngIf="s.sessionName" [title]="'Academic Session: ' + s.sessionName">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <span>{{ s.sessionName }}</span>
+                </div>
+
+                <!-- Course -->
+                <div class="meta-item meta-badge meta-course" *ngIf="s.courseName" [title]="'Course: ' + s.courseName">
+                  <ion-icon name="book-outline"></ion-icon>
+                  <span>{{ s.courseName }}</span>
+                </div>
+
+                <!-- Semester -->
+                <div class="meta-item meta-badge meta-semester" *ngIf="s.semesterName" [title]="'Semester: ' + s.semesterName">
+                  <ion-icon name="layers-outline"></ion-icon>
+                  <span>{{ s.semesterName }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -233,6 +268,14 @@
               (click)="setStatus(s, 'Absent')" title="Mark as Absent">
               <ion-icon [name]="s.status === 'Absent' ? 'close-circle' : 'close-circle-outline'"></ion-icon>
               <span>Absent</span>
+            </button>
+
+            <!-- Attendance History Button -->
+            <button type="button" class="toggle-btn btn-history"
+              (click)="openAttendanceHistory(s); $event.stopPropagation()"
+              title="View Attendance History for {{ s.name }}">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>History</span>
             </button>
           </div>
         </div>
@@ -285,5 +328,605 @@
       </div>
     </section>
 
+  </div>
+
+  <!-- ========================================================================== -->
+  <!-- STUDENT ATTENDANCE HISTORY COMPREHENSIVE MODAL (7 SECTIONS) -->
+  <!-- ========================================================================== -->
+  <div class="history-modal-backdrop" *ngIf="isHistoryModalOpen" (click)="closeHistoryModal()">
+    <div class="history-modal-card light-silver-modal" (click)="$event.stopPropagation()">
+
+      <!-- MODAL TOP BAR -->
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon-badge">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </div>
+          <div>
+            <h3 class="modal-title">Attendance History & Analytics</h3>
+            <p class="modal-subtitle">Past lecture records & attendance performance</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeHistoryModal()" title="Close">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <!-- STUDENT HERO CARD (Real-time Course, Session, Semester) -->
+      <div class="student-profile-hero" *ngIf="selectedStudentForHistory">
+        <div class="hero-left">
+          <div class="hero-avatar-box">
+            <img *ngIf="selectedStudentForHistory.profile_image && !selectedStudentForHistory.fallbackInitials"
+                 [src]="selectedStudentForHistory.profile_image"
+                 [alt]="selectedStudentForHistory.name"
+                 class="hero-img"
+                 (error)="onAvatarError($event, selectedStudentForHistory)" />
+            <span *ngIf="!selectedStudentForHistory.profile_image || selectedStudentForHistory.fallbackInitials" class="hero-initials">
+              {{ getInitials(selectedStudentForHistory.name) }}
+            </span>
+          </div>
+          <div class="hero-meta">
+            <div class="hero-name-row">
+              <h4 class="hero-student-name">{{ selectedStudentForHistory.name }}</h4>
+              <span class="hero-roll-pill">{{ selectedStudentForHistory.rollNo }}</span>
+            </div>
+            <div class="hero-badges-row">
+              <!-- Real-time Course -->
+              <span class="hero-tag tag-course" *ngIf="selectedStudentForHistory.courseName">
+                <ion-icon name="book-outline"></ion-icon>
+                <span>{{ selectedStudentForHistory.courseName }}</span>
+              </span>
+              <span class="hero-tag tag-empty" *ngIf="!selectedStudentForHistory.courseName">
+                <ion-icon name="book-outline"></ion-icon>
+                <span>Course: Null</span>
+              </span>
+
+              <!-- Real-time Session -->
+              <span class="hero-tag tag-session" *ngIf="selectedStudentForHistory.sessionName">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span>{{ selectedStudentForHistory.sessionName }}</span>
+              </span>
+              <span class="hero-tag tag-empty" *ngIf="!selectedStudentForHistory.sessionName">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span>Session: Null</span>
+              </span>
+
+              <!-- Real-time Semester -->
+              <span class="hero-tag tag-semester" *ngIf="selectedStudentForHistory.semesterName">
+                <ion-icon name="layers-outline"></ion-icon>
+                <span>{{ selectedStudentForHistory.semesterName }}</span>
+              </span>
+              <span class="hero-tag tag-empty" *ngIf="!selectedStudentForHistory.semesterName">
+                <ion-icon name="layers-outline"></ion-icon>
+                <span>Semester: Null</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7-MODULE HORIZONTAL NAVIGATION TABS -->
+      <div class="modal-tabs-scroller">
+        <div class="modal-nav-tabs">
+          <button type="button" class="nav-tab-btn" [class.active]="activeModalTab === 'overview'" (click)="setModalTab('overview')">
+            <span class="tab-index">01</span>
+            <span class="tab-label">Overall</span>
+          </button>
+          <button type="button" class="nav-tab-btn" [class.active]="activeModalTab === 'year'" (click)="setModalTab('year')">
+            <span class="tab-index">02</span>
+            <span class="tab-label">Year-wise</span>
+          </button>
+          <button type="button" class="nav-tab-btn" [class.active]="activeModalTab === 'monthly'" (click)="setModalTab('monthly')">
+            <span class="tab-index">03</span>
+            <span class="tab-label">Monthly</span>
+          </button>
+          <button type="button" class="nav-tab-btn" [class.active]="activeModalTab === 'subjects'" (click)="setModalTab('subjects')">
+            <span class="tab-index">04</span>
+            <span class="tab-label">Subject-wise</span>
+          </button>
+          <button type="button" class="nav-tab-btn" [class.active]="activeModalTab === 'semesters'" (click)="setModalTab('semesters')">
+            <span class="tab-index">05</span>
+            <span class="tab-label">Semester-wise</span>
+          </button>
+          <button type="button" class="nav-tab-btn" [class.active]="activeModalTab === 'calendar'" (click)="setModalTab('calendar')">
+            <span class="tab-index">06</span>
+            <span class="tab-label">Calendar</span>
+          </button>
+          <button type="button" class="nav-tab-btn" [class.active]="activeModalTab === 'logs'" (click)="setModalTab('logs')">
+            <span class="tab-index">07</span>
+            <span class="tab-label">Detailed Logs</span>
+          </button>
+          <button type="button" class="nav-tab-btn tab-all" [class.active]="activeModalTab === 'all'" (click)="setModalTab('all')" title="View all sections together">
+            <ion-icon name="grid-outline"></ion-icon>
+            <span class="tab-label">All in One</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MODAL SCROLLABLE BODY CONTENT -->
+      <div class="modal-body-scroll">
+
+        <!-- ==================================================================== -->
+        <!-- 01. OVERALL ATTENDANCE (Matches User Screenshot 2)                   -->
+        <!-- ==================================================================== -->
+        <section class="module-section section-overview" *ngIf="activeModalTab === 'overview' || activeModalTab === 'all'">
+          <div class="module-card silver-card">
+            
+            <div class="module-header-row">
+              <div class="title-wrap">
+                <h3 class="card-main-title">Attendance Overview</h3>
+                <span class="card-sub-title">Academic Session: {{ selectedStudentForHistory?.sessionName || 'Not Assigned (Null)' }}</span>
+              </div>
+              <button type="button" class="icon-action-btn" (click)="setModalTab('calendar')" title="View Calendar">
+                <ion-icon name="calendar-outline"></ion-icon>
+              </button>
+            </div>
+
+            <!-- 4 Metrics Grid -->
+            <div class="overview-metrics-grid">
+              <!-- Total Lectures -->
+              <div class="metric-item metric-total">
+                <div class="metric-icon-wrap icon-total">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                </div>
+                <div class="metric-info">
+                  <span class="metric-label">Total Lectures</span>
+                  <div class="metric-value">{{ studentHistoryStats.total }}</div>
+                </div>
+              </div>
+
+              <!-- Total Present -->
+              <div class="metric-item metric-present">
+                <div class="metric-icon-wrap icon-present">
+                  <ion-icon name="checkmark-circle-outline"></ion-icon>
+                </div>
+                <div class="metric-info">
+                  <span class="metric-label">Total Present</span>
+                  <div class="metric-value text-emerald">{{ studentHistoryStats.present }}</div>
+                </div>
+              </div>
+
+              <!-- Total Absent -->
+              <div class="metric-item metric-absent">
+                <div class="metric-icon-wrap icon-absent">
+                  <ion-icon name="close-circle-outline"></ion-icon>
+                </div>
+                <div class="metric-info">
+                  <span class="metric-label">Total Absent</span>
+                  <div class="metric-value text-coral">{{ studentHistoryStats.absent }}</div>
+                </div>
+              </div>
+
+              <!-- Total Late -->
+              <div class="metric-item metric-late">
+                <div class="metric-icon-wrap icon-late">
+                  <ion-icon name="time-outline"></ion-icon>
+                </div>
+                <div class="metric-info">
+                  <span class="metric-label">Total Late</span>
+                  <div class="metric-value text-amber">{{ studentHistoryStats.late }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Overall Rate Bar -->
+            <div class="overall-rate-row">
+              <div class="rate-label-wrap">
+                <span class="rate-heading">Overall Attendance Rate</span>
+                <span class="rate-percentage text-emerald">{{ studentHistoryStats.percentage }}%</span>
+              </div>
+              <div class="silver-progress-track">
+                <div class="silver-progress-bar glow-emerald" [style.width.%]="studentHistoryStats.percentage"></div>
+              </div>
+              <p class="rate-footnote">Actual dynamic figures loaded from database & verified attendance logs.</p>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- 02. YEAR-WISE ATTENDANCE (Matches User Screenshot 3)                 -->
+        <!-- ==================================================================== -->
+        <section class="module-section section-yearwise" *ngIf="activeModalTab === 'year' || activeModalTab === 'all'">
+          <div class="module-card silver-card">
+            
+            <div class="module-header-row">
+              <div class="title-wrap">
+                <h3 class="card-main-title">Year-wise Attendance</h3>
+                <span class="card-sub-title">Har academic year ka performance</span>
+              </div>
+            </div>
+
+            <div class="year-rows-list">
+              <div class="year-row-item" *ngFor="let yr of yearWiseAttendance">
+                <div class="year-top-info">
+                  <div class="year-identity">
+                    <span class="year-name">{{ yr.yearLabel }}</span>
+                    <span class="year-range">{{ yr.academicYear }}</span>
+                    <span class="current-badge" *ngIf="yr.isCurrent">CURRENT</span>
+                  </div>
+                  <span class="year-percentage">{{ yr.percentage }}%</span>
+                </div>
+
+                <div class="silver-progress-track">
+                  <div class="silver-progress-bar"
+                       [class.glow-emerald]="yr.percentage >= 75"
+                       [class.bar-amber]="yr.percentage >= 50 && yr.percentage < 75"
+                       [class.bar-gray]="yr.percentage === 0"
+                       [style.width.%]="yr.percentage">
+                  </div>
+                </div>
+
+                <div class="year-sub-figures">
+                  <span class="fig-present">Present: {{ yr.present }}</span>
+                  <span class="fig-absent">Absent: {{ yr.absent }}</span>
+                  <span class="fig-late" *ngIf="yr.late > 0">Late: {{ yr.late }}</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="rate-footnote">Illustrative figures only; current/future years ke liye actual records ke according display karna.</p>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- 03. MONTHLY ATTENDANCE (Matches User Screenshot 4)                  -->
+        <!-- ==================================================================== -->
+        <section class="module-section section-monthly" *ngIf="activeModalTab === 'monthly' || activeModalTab === 'all'">
+          <div class="module-card silver-card">
+            
+            <div class="important-notice-banner">
+              <ion-icon name="information-circle"></ion-icon>
+              <span>Ye section bahut important hai. Student month select karke ya saare months dekhkar samajh sake ki kis month mein attendance kam thi.</span>
+            </div>
+
+            <!-- Dropdown Filters Bar -->
+            <div class="monthly-filter-controls">
+              <div class="control-box">
+                <label class="control-label">Academic year</label>
+                <div class="custom-select-box">
+                  <select [(ngModel)]="selectedMonthlyAcademicYear">
+                    <option value="2026–2027">2026–2027</option>
+                    <option value="2025–2026">2025–2026</option>
+                    <option value="2027–2028">2027–2028</option>
+                  </select>
+                  <ion-icon name="chevron-down-outline"></ion-icon>
+                </div>
+              </div>
+
+              <div class="control-box">
+                <label class="control-label">Month</label>
+                <div class="custom-select-box">
+                  <select [(ngModel)]="selectedMonthlyFilter">
+                    <option value="all">All Months</option>
+                    <option value="january">January</option>
+                    <option value="february">February</option>
+                    <option value="march">March</option>
+                    <option value="april">April</option>
+                    <option value="may">May</option>
+                    <option value="june">June</option>
+                    <option value="july">July</option>
+                    <option value="august">August</option>
+                    <option value="september">September</option>
+                    <option value="october">October</option>
+                  </select>
+                  <ion-icon name="chevron-down-outline"></ion-icon>
+                </div>
+              </div>
+            </div>
+
+            <!-- Monthly Multi-Colored Progress Bars List -->
+            <div class="monthly-bars-list">
+              <div class="monthly-item" *ngFor="let m of filteredMonthlyAttendance">
+                <div class="monthly-header-row">
+                  <span class="monthly-title">{{ m.monthName }}</span>
+                  <span class="monthly-pct">{{ m.percentage }}% present</span>
+                </div>
+
+                <!-- Multi-Colored Stacked Progress Bar (Green + Red + Amber) -->
+                <div class="stacked-progress-track">
+                  <div class="stacked-segment segment-present" [style.width.%]="m.presentWidth" title="Present: {{ m.present }}"></div>
+                  <div class="stacked-segment segment-absent" [style.width.%]="m.absentWidth" title="Absent: {{ m.absent }}"></div>
+                  <div class="stacked-segment segment-late" [style.width.%]="m.lateWidth" title="Late: {{ m.late }}"></div>
+                </div>
+
+                <!-- Detailed Subfigures -->
+                <div class="monthly-sub-stats">
+                  <span class="sub-present">Present {{ m.present }}</span>
+                  <span class="sub-absent">Absent {{ m.absent }}</span>
+                  <span class="sub-late">Late {{ m.late }}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- 04. SUBJECT-WISE ATTENDANCE                                         -->
+        <!-- ==================================================================== -->
+        <section class="module-section section-subjectwise" *ngIf="activeModalTab === 'subjects' || activeModalTab === 'all'">
+          <div class="module-card silver-card">
+            <div class="module-header-row">
+              <div class="title-wrap">
+                <h3 class="card-main-title">Subject-wise Attendance</h3>
+                <span class="card-sub-title">Har subject ka percentage aur lecture count</span>
+              </div>
+            </div>
+
+            <div class="subject-cards-grid">
+              <div class="subject-item-card" *ngFor="let sub of subjectWiseAttendance">
+                <div class="sub-card-header">
+                  <div>
+                    <span class="sub-code-badge">{{ sub.code }}</span>
+                    <h4 class="sub-name">{{ sub.name }}</h4>
+                    <span class="sub-faculty">Instructor: {{ sub.faculty }}</span>
+                  </div>
+                  <span class="sub-pct-badge" [class.badge-green]="sub.percentage >= 75" [class.badge-amber]="sub.percentage < 75">
+                    {{ sub.percentage }}%
+                  </span>
+                </div>
+
+                <div class="silver-progress-track">
+                  <div class="silver-progress-bar glow-emerald" [style.width.%]="sub.percentage"></div>
+                </div>
+
+                <div class="sub-card-footer">
+                  <span>Present: <strong>{{ sub.present }}</strong></span>
+                  <span>Absent: <strong class="text-coral">{{ sub.absent }}</strong></span>
+                  <span>Late: <strong class="text-amber">{{ sub.late }}</strong></span>
+                  <span>Total: <strong>{{ sub.total }}</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- 05. SEMESTER-WISE ATTENDANCE                                        -->
+        <!-- ==================================================================== -->
+        <section class="module-section section-semesterwise" *ngIf="activeModalTab === 'semesters' || activeModalTab === 'all'">
+          <div class="module-card silver-card">
+            <div class="module-header-row">
+              <div class="title-wrap">
+                <h3 class="card-main-title">Semester-wise Attendance</h3>
+                <span class="card-sub-title">Semester comparison and details</span>
+              </div>
+            </div>
+
+            <div class="semester-list">
+              <div class="semester-row" *ngFor="let sem of semesterWiseAttendance">
+                <div class="sem-info-col">
+                  <div class="sem-name-row">
+                    <span class="sem-name">{{ sem.semesterName }}</span>
+                    <span class="sem-badge-cur" *ngIf="sem.isCurrent">CURRENT</span>
+                  </div>
+                  <span class="sem-term">{{ sem.term }}</span>
+                </div>
+
+                <div class="sem-bar-col">
+                  <div class="silver-progress-track">
+                    <div class="silver-progress-bar"
+                         [class.glow-emerald]="sem.percentage >= 75"
+                         [class.bar-amber]="sem.percentage > 0 && sem.percentage < 75"
+                         [class.bar-gray]="sem.percentage === 0"
+                         [style.width.%]="sem.percentage">
+                    </div>
+                  </div>
+                  <div class="sem-counts">
+                    <span>Present: {{ sem.present }}</span>
+                    <span>Absent: {{ sem.absent }}</span>
+                    <span>Total: {{ sem.total }}</span>
+                  </div>
+                </div>
+
+                <div class="sem-pct-col">
+                  <span class="sem-pct-val">{{ sem.percentage }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- 06. ATTENDANCE CALENDAR                                             -->
+        <!-- ==================================================================== -->
+        <section class="module-section section-calendar" *ngIf="activeModalTab === 'calendar' || activeModalTab === 'all'">
+          <div class="module-card silver-card">
+            
+            <div class="module-header-row">
+              <div class="title-wrap">
+                <h3 class="card-main-title">Attendance Calendar</h3>
+                <span class="card-sub-title">Date-wise present/absent interactive calendar</span>
+              </div>
+
+              <!-- Month Nav Controls -->
+              <div class="calendar-nav-buttons">
+                <button type="button" class="btn-cal-nav" (click)="prevCalendarMonth()" title="Previous Month">
+                  <ion-icon name="chevron-back-outline"></ion-icon>
+                </button>
+                <span class="cal-current-label">{{ calendarMonthLabel }}</span>
+                <button type="button" class="btn-cal-nav" (click)="nextCalendarMonth()" title="Next Month">
+                  <ion-icon name="chevron-forward-outline"></ion-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Calendar Month Quick Stats -->
+            <div class="calendar-summary-pills">
+              <span class="cal-pill pill-present">
+                <span class="dot dot-green"></span>
+                <span>Present: {{ calendarStats.present }}</span>
+              </span>
+              <span class="cal-pill pill-absent">
+                <span class="dot dot-red"></span>
+                <span>Absent: {{ calendarStats.absent }}</span>
+              </span>
+              <span class="cal-pill pill-late">
+                <span class="dot dot-amber"></span>
+                <span>Late: {{ calendarStats.late }}</span>
+              </span>
+              <span class="cal-pill pill-total">
+                <span>Total Classes: {{ calendarStats.totalDays }}</span>
+              </span>
+            </div>
+
+            <!-- Calendar Days Grid -->
+            <div class="calendar-matrix">
+              <!-- Weekday Header -->
+              <div class="cal-weekdays">
+                <span>Sun</span>
+                <span>Mon</span>
+                <span>Tue</span>
+                <span>Wed</span>
+                <span>Thu</span>
+                <span>Fri</span>
+                <span>Sat</span>
+              </div>
+
+              <!-- Days Cells -->
+              <div class="cal-days-grid">
+                <div *ngFor="let cell of calendarDays"
+                     class="cal-day-cell"
+                     [class.outside-month]="!cell.isCurrentMonth"
+                     [class.is-today]="cell.isToday"
+                     [class.is-weekend]="cell.isWeekend"
+                     [class.day-present]="cell.status === 'present'"
+                     [class.day-absent]="cell.status === 'absent'"
+                     [class.day-late]="cell.status === 'late'">
+                  <span class="day-number">{{ cell.day }}</span>
+                  <div class="day-status-indicator" *ngIf="cell.status !== 'none'">
+                    <span class="status-marker" [ngClass]="'marker-' + cell.status"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calendar Legend -->
+            <div class="calendar-legend">
+              <span class="leg-item"><span class="leg-dot green"></span> Present</span>
+              <span class="leg-item"><span class="leg-dot red"></span> Absent</span>
+              <span class="leg-item"><span class="leg-dot amber"></span> Late</span>
+              <span class="leg-item"><span class="leg-dot muted"></span> Weekend / Off</span>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- 07. DETAILED HISTORY & DOWNLOAD                                      -->
+        <!-- ==================================================================== -->
+        <section class="module-section section-historylogs" *ngIf="activeModalTab === 'logs' || activeModalTab === 'all'">
+          <div class="module-card silver-card">
+            
+            <div class="module-header-row">
+              <div class="title-wrap">
+                <h3 class="card-main-title">Detailed History & Download</h3>
+                <span class="card-sub-title">Search, filter and export PDF / CSV</span>
+              </div>
+
+              <!-- Export / Download Buttons -->
+              <div class="export-actions-row">
+                <button type="button" class="btn-export btn-export-csv" (click)="downloadAttendanceCSV()" title="Download CSV Spreadsheet">
+                  <ion-icon name="cloud-download-outline"></ion-icon>
+                  <span>Export CSV</span>
+                </button>
+                <button type="button" class="btn-export btn-export-pdf" (click)="printAttendanceReport()" title="Print or save as PDF">
+                  <ion-icon name="print-outline"></ion-icon>
+                  <span>Print / PDF</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Search and Filter Toolbar -->
+            <div class="logs-toolbar">
+              <div class="logs-search-box">
+                <ion-icon name="search-outline"></ion-icon>
+                <input type="text" [(ngModel)]="historySearchQuery" placeholder="Search sessions by date, slot, instructor..." />
+                <button type="button" *ngIf="historySearchQuery" (click)="historySearchQuery = ''" class="clear-btn">
+                  <ion-icon name="close-circle"></ion-icon>
+                </button>
+              </div>
+
+              <div class="logs-filter-pills">
+                <button type="button" class="l-pill" [class.active]="studentHistoryFilter === 'all'" (click)="setHistoryFilter('all')">
+                  All ({{ studentHistoryRecords.length }})
+                </button>
+                <button type="button" class="l-pill pill-present" [class.active]="studentHistoryFilter === 'present'" (click)="setHistoryFilter('present')">
+                  Present ({{ studentHistoryStats.present }})
+                </button>
+                <button type="button" class="l-pill pill-late" [class.active]="studentHistoryFilter === 'late'" (click)="setHistoryFilter('late')">
+                  Late ({{ studentHistoryStats.late }})
+                </button>
+                <button type="button" class="l-pill pill-absent" [class.active]="studentHistoryFilter === 'absent'" (click)="setHistoryFilter('absent')">
+                  Absent ({{ studentHistoryStats.absent }})
+                </button>
+              </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="history-loading-box" *ngIf="isHistoryLoading">
+              <ion-spinner name="crescent" color="primary"></ion-spinner>
+              <span>Loading attendance history...</span>
+            </div>
+
+            <!-- Records List -->
+            <div class="history-records-list" *ngIf="!isHistoryLoading && searchedAndFilteredHistoryRecords.length > 0">
+              <div class="history-record-card" *ngFor="let rec of searchedAndFilteredHistoryRecords" [ngClass]="'status-' + rec.status">
+                <div class="record-date-col">
+                  <span class="day-abbr">{{ formatHistoryDay(rec.session_date || rec.marked_at) }}</span>
+                  <span class="date-full">{{ formatHistoryDate(rec.session_date || rec.marked_at) }}</span>
+                </div>
+
+                <div class="record-details-col">
+                  <div class="session-name">
+                    <ion-icon name="time-outline"></ion-icon>
+                    <span>{{ rec.session_name || 'Academic Session' }}</span>
+                  </div>
+                  <div class="session-faculty-row">
+                    <span class="inst-name">
+                      <ion-icon name="person-outline"></ion-icon>
+                      {{ rec.marked_by_name || 'Faculty Instructor' }}
+                    </span>
+                    <span class="time-stamp">
+                      <ion-icon name="alarm-outline"></ion-icon>
+                      {{ formatHistoryTime(rec.marked_at) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="record-badge-col">
+                  <span class="log-status-tag" [ngClass]="'tag-' + rec.status">
+                    <ion-icon [name]="rec.status === 'present' ? 'checkmark-circle' : (rec.status === 'late' ? 'time' : 'close-circle')"></ion-icon>
+                    <span>{{ rec.status | uppercase }}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="history-empty-box" *ngIf="!isHistoryLoading && searchedAndFilteredHistoryRecords.length === 0">
+              <ion-icon name="file-tray-outline"></ion-icon>
+              <p>No attendance records match your filter criteria.</p>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
+      <!-- MODAL BOTTOM FOOTER BAR -->
+      <div class="modal-footer">
+        <span class="footer-count-text">
+          Showing <strong>{{ searchedAndFilteredHistoryRecords.length }}</strong> of {{ studentHistoryRecords.length }} records
+        </span>
+        <div class="footer-buttons">
+          <button type="button" class="btn-footer-close" (click)="closeHistoryModal()">
+            Close
+          </button>
+        </div>
+      </div>
+
+    </div>
   </div>
 </ion-content>

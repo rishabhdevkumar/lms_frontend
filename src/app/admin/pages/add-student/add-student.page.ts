@@ -2,10 +2,10 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { HeaderComponent } from '../../components/header/header.component';
+import { ActivatedRoute, Router } from '@angular/router';
 import { student, Session, Course, Semester, Country, State, District, City } from 'src/app/interfaces';
 import { StudentService, DefaultService } from 'src/app/api';
-import { UserService } from 'src/app/services/user.service';
+import { UserService, AdminAddUserDto } from 'src/app/services/user.service';
 import { firstValueFrom } from 'rxjs';
 
 export interface UserRecord {
@@ -18,10 +18,11 @@ export interface UserRecord {
   phone: string;
   dob?: string | Date;
   gender?: string;
-  status: 'Active' | 'Suspended';
+  status: 'Active' | 'Deactive' | 'Pending';
   avatarBg?: string;
   father_name?: string;
   mother_name?: string;
+  course_id?: any;
   rawStudent?: student;
 }
 
@@ -30,15 +31,35 @@ export interface UserRecord {
   templateUrl: './add-student.page.html',
   styleUrls: ['./add-student.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonicModule, CommonModule, FormsModule]
 })
 export class AddStudentPage implements OnInit {
 
-  // SEARCH & STATUS FILTERS
   searchText = '';
   statusFilter = 'All';
+  isSearchOpen = false;
 
-  // 3-DOTS ACTION POPUP MENU STATE
+  openSearch() {
+    this.isSearchOpen = true;
+    setTimeout(() => {
+      const el = document.getElementById('student-compact-search-input');
+      if (el) el.focus();
+    }, 50);
+  }
+
+  closeSearch() {
+    this.isSearchOpen = false;
+    this.searchText = '';
+  }
+
+  toggleSearch() {
+    if (this.isSearchOpen) {
+      this.closeSearch();
+    } else {
+      this.openSearch();
+    }
+  }
+
   activeMenuUserId: string | null = null;
 
   // CHANGE PASSWORD MODAL STATES
@@ -54,6 +75,11 @@ export class AddStudentPage implements OnInit {
   isLoading = false;
   isSaving = false;
   formErrors: { [key: string]: string } = {};
+
+  // SERVER ALERTS & FORM CONTROLS
+  serverErrorMessage = '';
+  serverSuccessMessage = '';
+  showPassword = false;
 
   // MODAL STATES
   isViewModalOpen = false;
@@ -88,11 +114,26 @@ export class AddStudentPage implements OnInit {
   constructor(
     private studentApiService: StudentService,
     private defaultService: DefaultService,
-    private userService: UserService
+    private userService: UserService,
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit() {
     this.loadInitialDynamicData();
+    this.route.queryParams.subscribe(params => {
+      if (params['action'] === 'add' || this.router.url.includes('add-user')) {
+        this.openAddModal();
+      }
+    });
+  }
+
+  ionViewWillEnter() {
+    this.loadInitialDynamicData();
+  }
+
+  setRole(role: 'Student' | 'Faculty' | 'Admin') {
+    this.newUserRole = role;
   }
 
   async loadInitialDynamicData() {
@@ -105,10 +146,10 @@ export class AddStudentPage implements OnInit {
         this.fetchCountries(),
         this.fetchStates(),
         this.fetchDistricts(),
-        this.fetchCities(),
-        this.fetchUsersFromBackend(),
-        this.fetchStudentsList()
+        this.fetchCities()
       ]);
+      await this.fetchUsersFromBackend();
+      await this.fetchStudentsList();
     } catch (e) {
       console.error('Error loading dynamic real-time data:', e);
     } finally {
@@ -215,6 +256,16 @@ export class AddStudentPage implements OnInit {
     return strVal;
   }
 
+  normalizeStatus(val: any): 'Active' | 'Deactive' | 'Pending' {
+    if (val === null || val === undefined || val === '') return 'Active';
+    const s = String(val).trim().toLowerCase();
+    if (s === 'pending') return 'Pending';
+    if (s.includes('deact') || s.includes('inact') || s.includes('suspend') || val === false || s === '0') {
+      return 'Deactive';
+    }
+    return 'Active';
+  }
+
   async fetchUsersFromBackend() {
     try {
       const res: any = await firstValueFrom(this.userService.getAllUsers());
@@ -233,26 +284,51 @@ export class AddStudentPage implements OnInit {
           const rawGender = u.gender || u.sex;
           const formattedGender = rawGender ? String(rawGender).trim() : '';
 
+          const dept = u.department || u.departmentOrCourse || (u.course_id ? this.getCourseName(u.course_id) : (role === 'Student' ? 'Computer Science' : 'Academic Dept'));
+
           return {
             id: String(u.id || u.staffId || `USR-${idx + 1}`),
-            roll_no: String(u.roll_no || u.staffId || u.rollNo || (role === 'Admin' ? `ADM-2026-0${idx+1}` : (role === 'Faculty' ? `FAC-2026-0${idx+1}` : `STU-2026-0${idx+1}`))),
+            roll_no: String(u.roll_no || u.staffId || u.rollNo || (role === 'Admin' ? `ADM-2026-0${idx + 1}` : (role === 'Faculty' ? `FAC-2026-0${idx + 1}` : `STU-2026-0${idx + 1}`))),
             name: String(u.name || u.fullName || u.email?.split('@')[0] || 'User'),
             email: String(u.email || ''),
             role: role,
-            departmentOrCourse: String(u.department || u.departmentOrCourse || u.course || (role === 'Student' ? 'Computer Science' : 'Academic Dept')),
+            departmentOrCourse: String(dept),
             phone: String(u.phone || ''),
             dob: formattedDob,
             gender: formattedGender,
-            status: (u.status === false || u.status === 'Suspended') ? 'Suspended' : 'Active',
-            avatarBg: avatarBg
+            status: this.normalizeStatus(u.status),
+            avatarBg: avatarBg,
+            father_name: u.father_name || '',
+            mother_name: u.mother_name || '',
+            rawStudent: {
+              ...u,
+              id: u.id,
+              roll_no: u.roll_no,
+              name: u.name,
+              email: u.email,
+              phone: u.phone,
+              dob: formattedDob,
+              gender: formattedGender,
+              father_name: u.father_name,
+              mother_name: u.mother_name,
+              course_id: u.course_id,
+              session_id: u.session_id,
+              semester_id: u.semester_id,
+              aadhar_n: u.aadhar_no || u.aadhar_n,
+              board_10th: u.board_10th,
+              total_marks_10th: u.total_marks_10th,
+              percentage_10th: u.percentage_10th,
+              board_12th: u.board_12th,
+              total_marks_12th: u.total_marks_12th,
+              percentage_12th: u.percentage_12th,
+              blood_group: u.blood_group || '',
+              language: u.language || '',
+              status: this.normalizeStatus(u.status) === 'Active'
+            }
           };
         });
 
-        backendUsers.forEach(bu => {
-          if (bu.email && !this.usersList.some(existing => existing.email.toLowerCase() === bu.email.toLowerCase())) {
-            this.usersList.push(bu);
-          }
-        });
+        this.usersList = backendUsers;
       }
     } catch (e) {
       console.error('Error fetching users from backend:', e);
@@ -282,7 +358,8 @@ export class AddStudentPage implements OnInit {
               phone: s.phone || '',
               dob: formattedDob,
               gender: formattedGender,
-              status: Boolean(s.status) ? 'Active' : 'Suspended',
+              status: this.normalizeStatus(s.status),
+              course_id: s.course_id,
               father_name: s.father_name || '',
               mother_name: s.mother_name || '',
               avatarBg: 'av-student',
@@ -291,9 +368,20 @@ export class AddStudentPage implements OnInit {
           });
 
           studentRecords.forEach(sr => {
-            const existingIdx = this.usersList.findIndex(u => u.email && u.email.toLowerCase() === sr.email.toLowerCase());
+            const existingIdx = this.usersList.findIndex(u => (u.email && sr.email && u.email.toLowerCase() === sr.email.toLowerCase()) || (u.id && sr.id && u.id === sr.id));
             if (existingIdx !== -1) {
-              this.usersList[existingIdx] = { ...this.usersList[existingIdx], ...sr };
+              const existing = this.usersList[existingIdx];
+              this.usersList[existingIdx] = {
+                ...existing,
+                course_id: sr.course_id || (existing as any).course_id,
+                departmentOrCourse: existing.departmentOrCourse || sr.departmentOrCourse,
+                phone: existing.phone || sr.phone,
+                dob: existing.dob || sr.dob,
+                gender: existing.gender || sr.gender,
+                father_name: existing.father_name || sr.father_name,
+                mother_name: existing.mother_name || sr.mother_name,
+                rawStudent: sr.rawStudent || existing.rawStudent
+              };
             } else {
               this.usersList.push(sr);
             }
@@ -306,16 +394,14 @@ export class AddStudentPage implements OnInit {
   }
 
   createEmptyStudent(): student {
-    const nextNum = String(this.usersList.length + 1).padStart(4, '0');
-    const autoRollNo = `STU-2026-${nextNum}`;
     return {
-      roll_no: autoRollNo,
+      roll_no: '',
       name: '',
       email: '',
       password: '',
       phone: '',
       dob: '',
-      gender: '',
+      gender: 'Male',
       blood_group: '',
       language: 'English',
       aadhar_n: '',
@@ -366,19 +452,27 @@ export class AddStudentPage implements OnInit {
     return this.usersList.filter(u => u.status === 'Active').length;
   }
 
+  getPendingCount(): number {
+    return this.usersList.filter(u => u.status === 'Pending').length;
+  }
+
+  getDeactiveCount(): number {
+    return this.usersList.filter(u => u.status === 'Deactive').length;
+  }
+
   getAdminCount(): number {
     return this.usersList.filter(u => u.role === 'Admin').length;
   }
 
   getSuspendedCount(): number {
-    return this.usersList.filter(u => u.status === 'Suspended').length;
+    return this.usersList.filter(u => u.status === 'Deactive').length;
   }
 
   // FILTERED USERS FOR TABLE
   getFilteredUsers(): UserRecord[] {
     return this.usersList.filter(u => {
       const q = this.searchText.toLowerCase().trim();
-      
+
       const matchesSearch = !q ||
         (u.name && u.name.toLowerCase().includes(q)) ||
         (u.email && u.email.toLowerCase().includes(q)) ||
@@ -399,8 +493,10 @@ export class AddStudentPage implements OnInit {
         matchesFilter = u.role === 'Admin';
       } else if (this.statusFilter === 'Active') {
         matchesFilter = u.status === 'Active';
-      } else if (this.statusFilter === 'Suspended') {
-        matchesFilter = u.status === 'Suspended';
+      } else if (this.statusFilter === 'Pending') {
+        matchesFilter = u.status === 'Pending';
+      } else if (this.statusFilter === 'Deactive' || this.statusFilter === 'Suspended') {
+        matchesFilter = u.status === 'Deactive';
       }
 
       return matchesSearch && matchesFilter;
@@ -431,6 +527,9 @@ export class AddStudentPage implements OnInit {
     this.newUserRole = 'Student';
     this.activeFormTab = 'basic';
     this.formErrors = {};
+    this.serverErrorMessage = '';
+    this.serverSuccessMessage = '';
+    this.showPassword = false;
     this.formData = this.createEmptyStudent();
     this.isAddEditModalOpen = true;
   }
@@ -440,6 +539,9 @@ export class AddStudentPage implements OnInit {
     this.newUserRole = usr.role;
     this.activeFormTab = 'basic';
     this.formErrors = {};
+    this.serverErrorMessage = '';
+    this.serverSuccessMessage = '';
+    this.showPassword = false;
     this.selectedUser = usr;
     if (usr.rawStudent) {
       this.formData = { ...usr.rawStudent };
@@ -450,7 +552,7 @@ export class AddStudentPage implements OnInit {
       this.formData.email = usr.email;
       this.formData.phone = usr.phone;
       this.formData.dob = usr.dob ? String(usr.dob) : '';
-      this.formData.gender = usr.gender || '';
+      this.formData.gender = usr.gender || 'Male';
       this.formData.father_name = usr.father_name || '';
       this.formData.mother_name = usr.mother_name || '';
     }
@@ -461,108 +563,187 @@ export class AddStudentPage implements OnInit {
     this.isAddEditModalOpen = false;
     this.selectedUser = null;
     this.formErrors = {};
+    this.serverErrorMessage = '';
+    this.serverSuccessMessage = '';
   }
 
   // SAVE USER
   async saveUser() {
-    if (!this.formData.name || !this.formData.name.trim()) {
+    this.serverErrorMessage = '';
+    this.serverSuccessMessage = '';
+    this.formErrors = {};
+
+    const name = String(this.formData.name || '').trim();
+    const email = String(this.formData.email || '').trim();
+    const password = String(this.formData.password || '').trim();
+    const phone = String(this.formData.phone || '').trim();
+
+    // 1. Client-Side Validations
+    if (!name) {
       this.formErrors['name'] = 'Full Name is required.';
+      this.activeFormTab = 'basic';
       return;
     }
-    if (!this.formData.email || !this.formData.email.trim()) {
+
+    if (!email) {
       this.formErrors['email'] = 'Email Address is required.';
+      this.activeFormTab = 'basic';
       return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.formErrors['email'] = 'Please enter a valid email address.';
+      this.activeFormTab = 'basic';
+      return;
+    }
+
+    if (this.modalMode === 'add') {
+      if (!password) {
+        this.formErrors['password'] = 'Password is required.';
+        this.activeFormTab = 'basic';
+        return;
+      }
+      if (password.length < 8) {
+        this.formErrors['password'] = 'Password must be at least 8 characters long.';
+        this.activeFormTab = 'basic';
+        return;
+      }
+      if (!/^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(password)) {
+        this.formErrors['password'] = 'Password must contain at least 1 alphabet, 1 number, and 1 special character.';
+        this.activeFormTab = 'basic';
+        return;
+      }
+    }
+
+    if (!phone) {
+      this.formErrors['phone'] = 'Phone number is required.';
+      this.activeFormTab = 'basic';
+      return;
+    }
+    if (!/^[0-9]{10}$/.test(phone)) {
+      this.formErrors['phone'] = 'Phone number must contain exactly 10 digits.';
+      this.activeFormTab = 'basic';
+      return;
+    }
+
+    if (this.formData.aadhar_n && String(this.formData.aadhar_n).trim()) {
+      const aadhar = String(this.formData.aadhar_n).trim();
+      if (!/^[0-9]{12}$/.test(aadhar)) {
+        this.formErrors['aadhar_n'] = 'Aadhar number must contain exactly 12 digits.';
+        this.activeFormTab = 'basic';
+        return;
+      }
     }
 
     this.isSaving = true;
 
     try {
       if (this.modalMode === 'add') {
-        const rolePayload = this.newUserRole.toLowerCase();
+        const payload: AdminAddUserDto = {
+          roll_no: this.formData.roll_no ? String(this.formData.roll_no).trim() : null,
+          name: name,
+          email: email,
+          password: password,
+          language: this.formData.language ? String(this.formData.language).trim() : null,
+          phone: phone,
+          dob: this.formData.dob ? String(this.formData.dob).trim() : null,
+          gender: this.formData.gender ? String(this.formData.gender).trim() : 'Male',
+          role: String(this.newUserRole || 'Student').toLowerCase(),
+          session_id: this.formData.session_id ? Number(this.formData.session_id) : null,
+          course_id: this.formData.course_id ? Number(this.formData.course_id) : null,
+          semester_id: this.formData.semester_id ? Number(this.formData.semester_id) : null,
+          aadhar_no: this.formData.aadhar_n ? String(this.formData.aadhar_n).trim() : null,
+          father_name: this.formData.father_name ? String(this.formData.father_name).trim() : null,
+          mother_name: this.formData.mother_name ? String(this.formData.mother_name).trim() : null,
+          board_10th: this.formData.board_10th ? String(this.formData.board_10th).trim() : null,
+          total_marks_10th: this.formData.total_marks_10th !== undefined && this.formData.total_marks_10th !== null && String(this.formData.total_marks_10th) !== '' ? Number(this.formData.total_marks_10th) : null,
+          percentage_10th: this.formData.percentage_10th !== undefined && this.formData.percentage_10th !== null && String(this.formData.percentage_10th) !== '' ? Number(this.formData.percentage_10th) : null,
+          board_12th: this.formData.board_12th ? String(this.formData.board_12th).trim() : null,
+          total_marks_12th: this.formData.total_marks_12th !== undefined && this.formData.total_marks_12th !== null && String(this.formData.total_marks_12th) !== '' ? Number(this.formData.total_marks_12th) : null,
+          percentage_12th: this.formData.percentage_12th !== undefined && this.formData.percentage_12th !== null && String(this.formData.percentage_12th) !== '' ? Number(this.formData.percentage_12th) : null,
+        };
 
-        // 1. Post to Backend UserService
-        try {
-          await firstValueFrom(this.userService.addUser({
-            name: this.formData.name,
-            fullName: this.formData.name,
-            email: this.formData.email,
-            phone: this.formData.phone,
-            role: rolePayload,
-            department: this.newUserRole === 'Student' 
-              ? this.getCourseName(this.formData.course_id) 
-              : (this.newUserRole === 'Faculty' ? 'Computer Science & Engg' : 'Central Admin Ops')
-          }));
-        } catch (e) {
-          console.warn('Backend addUser API call:', e);
+        const res: any = await firstValueFrom(this.userService.adminAddUser(payload));
+
+        if (res && res.ok === false) {
+          this.serverErrorMessage = res.msg || 'Failed to add user.';
+          const lowerMsg = (res.msg || '').toLowerCase();
+          if (lowerMsg.includes('phone')) {
+            this.formErrors['phone'] = res.msg;
+            this.activeFormTab = 'basic';
+          } else if (lowerMsg.includes('email')) {
+            this.formErrors['email'] = res.msg;
+            this.activeFormTab = 'basic';
+          } else if (lowerMsg.includes('roll')) {
+            this.formErrors['roll_no'] = res.msg;
+            this.activeFormTab = 'basic';
+          } else if (lowerMsg.includes('password')) {
+            this.formErrors['password'] = res.msg;
+            this.activeFormTab = 'basic';
+          } else if (lowerMsg.includes('aadhar')) {
+            this.formErrors['aadhar_n'] = res.msg;
+            this.activeFormTab = 'basic';
+          }
+          this.isSaving = false;
+          return;
         }
 
-        // 2. If student role, also quick-add via StudentService
-        if (this.newUserRole === 'Student') {
-          try {
-            await firstValueFrom(this.studentApiService.studentControllerQuickAdd({
-              name: this.formData.name,
-              email: this.formData.email,
-              phone: this.formData.phone
-            }));
-          } catch (e) {}
-        }
+        // Successfully registered user via backend sp_admin_users_add API
+        this.serverSuccessMessage = res?.msg || `${this.newUserRole} added successfully!`;
 
-        // 3. Re-fetch live real-time data from backend APIs
+        // Re-fetch users from backend
         await this.fetchUsersFromBackend();
-        await this.fetchStudentsList();
 
-        // 4. Ensure local record exists if backend mock fallback
-        const existing = this.usersList.find(u => u.email && u.email.toLowerCase() === this.formData.email.toLowerCase());
-        if (!existing) {
-          const idPrefix = this.newUserRole === 'Admin' ? 'ADM' : (this.newUserRole === 'Faculty' ? 'FAC' : 'CS');
-          const newId = `${idPrefix}-2026-${Math.floor(100 + Math.random() * 900)}`;
-          
-          const newUser: UserRecord = {
-            id: newId,
-            roll_no: newId,
-            name: this.formData.name,
-            email: this.formData.email,
-            role: this.newUserRole,
-            departmentOrCourse: this.newUserRole === 'Student' 
-              ? this.getCourseName(this.formData.course_id) 
-              : (this.newUserRole === 'Faculty' ? 'Computer Science & Engg' : 'Central Admin Ops'),
-            phone: this.formData.phone || '',
-            dob: this.formData.dob ? this.formatDateDisplay(this.formData.dob) : '',
-            gender: this.formData.gender || '',
-            status: 'Active',
-            avatarBg: this.newUserRole === 'Admin' ? 'av-admin' : (this.newUserRole === 'Faculty' ? 'av-faculty' : 'av-student'),
-            father_name: this.formData.father_name,
-            mother_name: this.formData.mother_name
-          };
+        setTimeout(() => {
+          this.isSaving = false;
+          this.closeAddEditModal();
+        }, 1100);
 
-          this.usersList.unshift(newUser);
-        }
       } else if (this.modalMode === 'edit' && this.selectedUser) {
-        this.selectedUser.name = this.formData.name;
-        this.selectedUser.email = this.formData.email;
-        this.selectedUser.phone = this.formData.phone || '';
-        this.selectedUser.role = this.newUserRole;
-        this.selectedUser.dob = this.formData.dob ? this.formatDateDisplay(this.formData.dob) : '';
-        this.selectedUser.gender = this.formData.gender || '';
-        this.selectedUser.father_name = this.formData.father_name || '';
-        this.selectedUser.mother_name = this.formData.mother_name || '';
+        const updatePayload: any = {
+          id: this.selectedUser.id,
+          name: name,
+          email: email,
+          phone: phone
+        };
+        if (password) {
+          updatePayload.password = password;
+        }
+
+        const updateRes: any = await firstValueFrom(this.userService.updateUser(updatePayload));
+        if (updateRes && updateRes.ok === false) {
+          this.serverErrorMessage = updateRes.msg || 'Failed to update user.';
+          this.isSaving = false;
+          return;
+        }
+
+        this.serverSuccessMessage = updateRes?.msg || 'User updated successfully!';
+        await this.fetchUsersFromBackend();
+
+        setTimeout(() => {
+          this.isSaving = false;
+          this.closeAddEditModal();
+        }, 1100);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error saving user:', e);
-    } finally {
+      this.serverErrorMessage = e?.message || 'Server error occurred while saving user.';
       this.isSaving = false;
-      this.closeAddEditModal();
     }
   }
 
   // TOGGLE STATUS
-  toggleUserStatus(usr: UserRecord) {
-    const currentStatus = usr.status === 'Active';
-    const newStatus = !currentStatus;
-    const actionText = newStatus ? 'activate' : 'suspend';
+  async toggleUserStatus(usr: UserRecord) {
+    const isCurrentlyActive = usr.status === 'Active';
+    const targetStatus: 'Active' | 'Deactive' = isCurrentlyActive ? 'Deactive' : 'Active';
+    const actionText = isCurrentlyActive ? 'deactivate' : 'activate';
 
     if (confirm(`Are you sure you want to ${actionText} ${usr.name}?`)) {
-      usr.status = newStatus ? 'Active' : 'Suspended';
+      usr.status = targetStatus;
+      try {
+        await firstValueFrom(this.userService.updateUserStatus(usr.id, targetStatus));
+      } catch (e) {
+        console.error('Error updating status in backend:', e);
+      }
     }
   }
 
