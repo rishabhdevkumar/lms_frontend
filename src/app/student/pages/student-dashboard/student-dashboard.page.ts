@@ -6,6 +6,7 @@ import { IonicModule } from '@ionic/angular';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { AuthService, User } from '../../../services/auth.service';
+import { PaymentService } from '../../../services/payment.service';
 import { Subscription } from 'rxjs';
 
 export interface EnrolledCourse {
@@ -29,6 +30,17 @@ export interface StudentAssignment {
   score?: string;
 }
 
+export interface StudentPaymentOrder {
+  id: number;
+  orderNumber: string;
+  gatewayOrderId: string;
+  courseTitle: string;
+  amount: number;
+  currency: string;
+  status: string;
+  createdAt: string;
+}
+
 @Component({
   selector: 'app-student-dashboard',
   templateUrl: './student-dashboard.page.html',
@@ -45,6 +57,10 @@ export class StudentDashboardPage implements OnInit, OnDestroy {
   attendancePercentage: number = 94;
   assignmentsPending: number = 2;
   certificatesEarned: number = 3;
+
+  showPaymentHistoryModal: boolean = false;
+  paymentOrders: StudentPaymentOrder[] = [];
+  isLoadingPayments: boolean = false;
 
   enrolledCourses: EnrolledCourse[] = [
     {
@@ -118,12 +134,28 @@ export class StudentDashboardPage implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(private authService: AuthService) {}
+  courseMap: Record<number, string> = {
+    1: 'Full-Stack Web Development Mastery (Angular & Node.js)',
+    2: 'Python for Data Science, AI & Machine Learning Specialization',
+    3: 'UI/UX Design Systems, Figma & Modern Product Interface Design',
+    4: 'Data Structures, Algorithms & System Design Interview Bootcamp',
+    5: 'Cloud Architecture & DevOps with AWS, Docker & Kubernetes',
+    6: 'Financial Analysis, Corporate Valuation & Financial Modeling 2026',
+    100: 'Pro Scholar Masterclass Membership',
+  };
+
+  constructor(
+    private authService: AuthService,
+    private paymentService: PaymentService
+  ) {}
 
   ngOnInit() {
     this.subs.add(
       this.authService.currentUser$.subscribe((user) => {
         this.currentUser = user;
+        if (user && user.id) {
+          this.loadStudentPaymentsAndEnrollments();
+        }
       })
     );
   }
@@ -132,7 +164,68 @@ export class StudentDashboardPage implements OnInit, OnDestroy {
     this.subs.unsubscribe();
   }
 
+  loadStudentPaymentsAndEnrollments() {
+    if (!this.currentUser || !this.currentUser.id) return;
+    const numericUserId = parseInt(String(this.currentUser.id).replace(/\D/g, ''), 10) || 1;
+
+    // Load active enrollments
+    this.paymentService.getUserEnrollments(numericUserId).subscribe({
+      next: (enrollments) => {
+        if (Array.isArray(enrollments) && enrollments.length > 0) {
+          const paidEnrollments = enrollments.filter(
+            (e: any) => e.payment_status === 'paid' || e.payment_status === 'Completed'
+          );
+          if (paidEnrollments.length > 0) {
+            this.enrolledCount = paidEnrollments.length;
+          }
+        }
+      },
+      error: (err) => console.warn('[StudentDashboard] Error loading enrollments:', err),
+    });
+
+    // Load payment orders
+    this.isLoadingPayments = true;
+    this.paymentService.getUserOrders(numericUserId).subscribe({
+      next: (orders) => {
+        this.isLoadingPayments = false;
+        if (Array.isArray(orders)) {
+          this.paymentOrders = orders.map((o: any, idx: number) => {
+            const courseId = Number(o.course_id || o.courseId || 1);
+            const dateStr = o.created_at || new Date().toISOString();
+            return {
+              id: o.id || idx + 1,
+              orderNumber: o.order_number || `ORD-${String(o.id || idx + 1).padStart(6, '0')}`,
+              gatewayOrderId: o.gateway_order_id || 'N/A',
+              courseTitle: this.courseMap[courseId] || `Enrolled Course #${courseId}`,
+              amount: Number(o.amount || 0),
+              currency: o.currency || 'INR',
+              status: String(o.status || 'paid').toLowerCase(),
+              createdAt: new Date(dateStr).toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+              }),
+            };
+          });
+        }
+      },
+      error: (err) => {
+        this.isLoadingPayments = false;
+        console.warn('[StudentDashboard] Error loading orders:', err);
+      },
+    });
+  }
+
   getStudentName(): string {
     return this.currentUser?.name || 'Student';
+  }
+
+  openPaymentHistory() {
+    this.showPaymentHistoryModal = true;
+    this.loadStudentPaymentsAndEnrollments();
+  }
+
+  closePaymentHistory() {
+    this.showPaymentHistoryModal = false;
   }
 }

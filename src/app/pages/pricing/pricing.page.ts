@@ -5,6 +5,8 @@ import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { AuthService } from '../../services/auth.service';
+import { PaymentService } from '../../services/payment.service';
+import { Router } from '@angular/router';
 import { toast } from 'ngx-sonner';
 
 export interface PlanTier {
@@ -113,7 +115,13 @@ export class PricingPage implements OnInit {
     }
   ];
 
-  constructor(private authService: AuthService) {}
+  isProcessingPayment: boolean = false;
+
+  constructor(
+    private authService: AuthService,
+    private paymentService: PaymentService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     window.scrollTo(0, 0);
@@ -127,7 +135,7 @@ export class PricingPage implements OnInit {
     faq.open = !faq.open;
   }
 
-  selectPlan(plan: PlanTier) {
+  async selectPlan(plan: PlanTier) {
     if (plan.id === 'starter') {
       toast.success('Starter Plan Activated', {
         description: 'Welcome to LearnSphere! Your free starter plan is ready.'
@@ -135,15 +143,43 @@ export class PricingPage implements OnInit {
       return;
     }
 
-    if (this.authService.isLoggedInValue) {
-      const price = this.isAnnual ? plan.annualMonthlyPrice * 12 : plan.monthlyPrice;
-      toast.success(`Plan Selected: ${plan.name}`, {
-        description: `${this.isAnnual ? 'Annual' : 'Monthly'} Subscription • Total: $${price}. Redirecting...`
-      });
-    } else {
+    if (!this.authService.isLoggedInValue) {
       toast.info('Sign In Required', {
-        description: `Please sign in to subscribe to the "${plan.name}" plan.`
+        description: `Please sign in or register to subscribe to the "${plan.name}" plan.`
       });
+      this.router.navigate(['/login'], { queryParams: { returnUrl: '/pricing' } });
+      return;
+    }
+
+    if (this.isProcessingPayment) return;
+    this.isProcessingPayment = true;
+
+    try {
+      const usdPrice = this.isAnnual ? plan.annualMonthlyPrice * 12 : plan.monthlyPrice;
+      const inrAmount = Math.round(usdPrice * 80);
+
+      const res = await this.paymentService.checkoutCourse({
+        courseId: 100, // Subscription membership tier
+        courseTitle: `LearnSphere ${plan.name} (${this.isAnnual ? 'Annual' : 'Monthly'})`,
+        amount: inrAmount,
+        notes: {
+          plan_id: plan.id,
+          billing_cycle: this.isAnnual ? 'annual' : 'monthly',
+        },
+      });
+
+      if (res.success) {
+        toast.success(`Subscription Activated! 🎉`, {
+          description: `You are now subscribed to ${plan.name}. Opening your dashboard...`,
+        });
+        setTimeout(() => {
+          this.router.navigate(['/student-dashboard']);
+        }, 1500);
+      }
+    } catch (err: any) {
+      console.error('[PricingPage] Payment error:', err);
+    } finally {
+      this.isProcessingPayment = false;
     }
   }
 

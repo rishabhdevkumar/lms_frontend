@@ -5,6 +5,7 @@ import { RouterModule, Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { AuthService } from '../../services/auth.service';
+import { PaymentService } from '../../services/payment.service';
 import { toast } from 'ngx-sonner';
 
 export interface Course {
@@ -175,13 +176,42 @@ export class CoursesPage implements OnInit {
     }
   ];
 
+  enrolledCourseIds: Set<number> = new Set<number>();
+  isProcessingPayment: boolean = false;
+
   constructor(
     private authService: AuthService,
+    private paymentService: PaymentService,
     private router: Router
   ) {}
 
   ngOnInit() {
     window.scrollTo(0, 0);
+    this.loadUserEnrollments();
+  }
+
+  loadUserEnrollments() {
+    const user = this.authService.currentUserValue;
+    if (user && user.id) {
+      const numericUserId = parseInt(String(user.id).replace(/\D/g, ''), 10) || 1;
+      this.paymentService.getUserEnrollments(numericUserId).subscribe({
+        next: (enrollments) => {
+          if (Array.isArray(enrollments)) {
+            enrollments.forEach((e: any) => {
+              const courseId = Number(e.course_id || e.courseId);
+              if (courseId && (e.payment_status === 'paid' || e.payment_status === 'Completed')) {
+                this.enrolledCourseIds.add(courseId);
+              }
+            });
+          }
+        },
+        error: (err) => console.warn('[CoursesPage] Could not load user enrollments:', err),
+      });
+    }
+  }
+
+  isCourseEnrolled(courseId: number): boolean {
+    return this.enrolledCourseIds.has(courseId);
   }
 
   get filteredCourses(): Course[] {
@@ -200,18 +230,50 @@ export class CoursesPage implements OnInit {
     this.selectedCategory = catId;
   }
 
-  enrollCourse(course: Course) {
-    if (this.authService.isLoggedInValue) {
-      toast.success('Enrollment Successful', {
-        description: `Successfully enrolled in "${course.title}"! Redirecting to student portal...`
+  async enrollCourse(course: Course) {
+    if (!this.authService.isLoggedInValue) {
+      toast.info('Sign In Required', {
+        description: `Please sign in or create an account to enroll in "${course.title}".`,
+      });
+      this.router.navigate(['/login'], { queryParams: { returnUrl: '/courses' } });
+      return;
+    }
+
+    if (this.isCourseEnrolled(course.id)) {
+      toast.success('Already Enrolled', {
+        description: `You already have active paid access to "${course.title}". Redirecting to your student portal...`,
       });
       setTimeout(() => {
-        this.authService.navigateToDashboard();
-      }, 1500);
-    } else {
-      toast.info('Sign In Required', {
-        description: `Please sign in to enroll in "${course.title}".`
+        this.router.navigate(['/student-dashboard']);
+      }, 1200);
+      return;
+    }
+
+    if (this.isProcessingPayment) return;
+    this.isProcessingPayment = true;
+
+    try {
+      // Calculate amount in INR (course.price * 80 or direct INR fee)
+      const inrAmount = Math.round(course.price * 80);
+      const res = await this.paymentService.checkoutCourse({
+        courseId: course.id,
+        courseTitle: course.title,
+        amount: inrAmount,
       });
+
+      if (res.success) {
+        this.enrolledCourseIds.add(course.id);
+        toast.success('Enrollment Activated! 🎉', {
+          description: `You have successfully enrolled in "${course.title}". Opening Student Dashboard...`,
+        });
+        setTimeout(() => {
+          this.router.navigate(['/student-dashboard']);
+        }, 1500);
+      }
+    } catch (err: any) {
+      console.error('[CoursesPage] Payment error:', err);
+    } finally {
+      this.isProcessingPayment = false;
     }
   }
 

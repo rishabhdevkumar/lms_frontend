@@ -143,7 +143,10 @@
           <div class="section-card quick-links-card">
             <h2 class="section-title">Quick Actions</h2>
             <div class="quick-buttons-grid">
-              <a routerLink="/home" class="quick-btn">
+              <button type="button" class="quick-btn" (click)="openPaymentHistory()">
+                <span>💳</span> Invoices & Receipts
+              </button>
+              <a routerLink="/courses" class="quick-btn">
                 <span>📚</span> Course Catalog
               </a>
               <a routerLink="/home" class="quick-btn">
@@ -152,9 +155,6 @@
               <a routerLink="/home" class="quick-btn">
                 <span>📊</span> My Grades
               </a>
-              <a routerLink="/home" class="quick-btn">
-                <span>💬</span> Doubt Q&A Forum
-              </a>
             </div>
           </div>
 
@@ -162,6 +162,73 @@
 
       </div>
 
+    </div>
+  </div>
+
+  <!-- PAYMENT HISTORY & RECEIPTS MODAL -->
+  <div class="modal-backdrop-custom" *ngIf="showPaymentHistoryModal" (click)="closePaymentHistory()">
+    <div class="modal-card-custom" (click)="$event.stopPropagation()">
+      <div class="modal-header-custom">
+        <div class="modal-title-group">
+          <span class="modal-icon">💳</span>
+          <div>
+            <h3 class="modal-title">Payment Receipts & Orders</h3>
+            <p class="modal-subtitle">Your Razorpay transaction ledger and course purchase history</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closePaymentHistory()">✕</button>
+      </div>
+
+      <div class="modal-body-custom">
+        <div *ngIf="isLoadingPayments" class="loading-state">
+          <span>⏳</span> Loading your payment records...
+        </div>
+
+        <div *ngIf="!isLoadingPayments && paymentOrders.length === 0" class="empty-payments-state">
+          <span class="empty-icon">🧾</span>
+          <h4>No Payment Orders Found</h4>
+          <p>You haven't made any course purchases yet. Explore our course catalog to get started!</p>
+          <a routerLink="/courses" (click)="closePaymentHistory()" class="btn-browse-courses">Browse Courses</a>
+        </div>
+
+        <div class="payments-table-container" *ngIf="!isLoadingPayments && paymentOrders.length > 0">
+          <table class="receipts-table">
+            <thead>
+              <tr>
+                <th>ORDER NO.</th>
+                <th>COURSE TITLE</th>
+                <th>AMOUNT</th>
+                <th>DATE</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of paymentOrders">
+                <td>
+                  <span class="order-id-badge">{{ order.orderNumber }}</span>
+                </td>
+                <td class="course-col">
+                  <strong>{{ order.courseTitle }}</strong>
+                  <div class="gateway-text">Gateway ID: {{ order.gatewayOrderId }}</div>
+                </td>
+                <td>
+                  <span class="amount-badge">₹{{ order.amount | number }}</span>
+                </td>
+                <td class="date-col">{{ order.createdAt }}</td>
+                <td>
+                  <span class="status-pill" [class.paid]="order.status === 'paid' || order.status === 'completed'">
+                    {{ order.status | uppercase }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer-custom">
+        <button class="btn-modal-close" (click)="closePaymentHistory()">Close</button>
+      </div>
     </div>
   </div>
 

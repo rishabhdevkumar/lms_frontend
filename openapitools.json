@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
   "spaces": 2,
   "generator-cli": {
@@ -8,6 +8,7 @@
         "generatorName": "typescript-angular",
         "inputSpec": "../lms_backend/swagger.json",
         "output": "#{cwd}/src/app/api",
+        "skipValidateSpec": true,
         "additionalProperties": {
           "providedInRoot": true,
           "stringEnums": true
