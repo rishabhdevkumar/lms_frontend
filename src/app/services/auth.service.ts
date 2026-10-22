@@ -187,8 +187,9 @@ export class AuthService {
           finalRole = role || 'student';
         }
 
+        const userId = resUser?.users_id || resUser?.user_id || resUser?.id || resUser?._id || 'usr-' + Date.now();
         const user: User = {
-          id: resUser?.id || resUser?._id || 'usr-' + Date.now(),
+          id: String(userId),
           name: resUser?.name || resUser?.fullName || resUser?.username || this.extractNameFromEmail(email),
           email: resUser?.email || email,
           role: finalRole,

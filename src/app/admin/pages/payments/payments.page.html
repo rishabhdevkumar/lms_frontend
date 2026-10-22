@@ -5,12 +5,17 @@
     <div class="page-title-row">
       <div class="title-group">
         <h1 class="page-title">Payments & Fee Transactions</h1>
-        <span class="count-badge font-mono-code">${{ getTotalRevenue() }} Total Revenue</span>
+        <span class="count-badge font-mono-code">₹{{ getTotalRevenue() | number }} Total Revenue</span>
       </div>
 
-      <button class="btn-light-primary">
-        <span>💳</span> Export Financial Ledger
-      </button>
+      <div class="header-actions-group" style="display: flex; gap: 0.75rem;">
+        <button class="btn-light-primary" (click)="refreshTransactions()" [disabled]="isLoading">
+          <span>🔄</span> Refresh
+        </button>
+        <button class="btn-light-primary" (click)="exportFinancialLedger()">
+          <span>💳</span> Export Financial Ledger
+        </button>
+      </div>
     </div>
 
     <!-- 3 STAT CARDS -->
@@ -18,7 +23,7 @@
       <div class="stat-mini-card">
         <div class="stat-info">
           <span class="stat-label">SUCCESSFUL PAYMENTS</span>
-          <h3 class="stat-value">${{ getTotalRevenue() }}</h3>
+          <h3 class="stat-value">₹{{ getTotalRevenue() | number }}</h3>
         </div>
         <div class="stat-icon-badge green-badge">💰</div>
       </div>
@@ -26,7 +31,7 @@
       <div class="stat-mini-card">
         <div class="stat-info">
           <span class="stat-label">PENDING FEES DUE</span>
-          <h3 class="stat-value">$450</h3>
+          <h3 class="stat-value">₹{{ getPendingAmount() | number }}</h3>
         </div>
         <div class="stat-icon-badge amber-badge">⏳</div>
       </div>
@@ -34,7 +39,7 @@
       <div class="stat-mini-card">
         <div class="stat-info">
           <span class="stat-label">REFUNDS PROCESSED</span>
-          <h3 class="stat-value">$350</h3>
+          <h3 class="stat-value">₹{{ getRefundedAmount() | number }}</h3>
         </div>
         <div class="stat-icon-badge coral-badge">↩️</div>
       </div>
@@ -97,7 +102,7 @@
                 <span class="course-text">{{ txn.courseName }}</span>
               </td>
               <td>
-                <span class="amount-val">${{ txn.amount }}</span>
+                <span class="amount-val">₹{{ txn.amount | number }}</span>
               </td>
               <td>
                 <span class="method-text">💳 {{ txn.paymentMethod }}</span>

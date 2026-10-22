@@ -446,6 +446,20 @@
             transform: translateY(-1px);
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
           }
+
+          &.enrolled-btn {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+
+            &:hover {
+              box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+            }
+          }
+
+          &:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+          }
         }
       }
     }

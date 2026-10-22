@@ -11,7 +11,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "openapi": "openapi-generator-cli",
-    "generate:api": "openapi-generator-cli generate"
+    "generate:api": "openapi-generator-cli generate --skip-validate-spec"
   },
   "private": true,
   "dependencies": {
