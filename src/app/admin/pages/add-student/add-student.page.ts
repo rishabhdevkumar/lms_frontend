@@ -1,11 +1,11 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { student, Session, Course, Semester, Country, State, District, City } from 'src/app/interfaces';
 import { StudentService, DefaultService } from 'src/app/api';
-import { UserService, AdminAddUserDto } from 'src/app/services/user.service';
+import { UserService, AdminAddUserDto, AdminUpdateUserDto } from 'src/app/services/user.service';
 import { firstValueFrom } from 'rxjs';
 
 export interface UserRecord {
@@ -23,7 +23,7 @@ export interface UserRecord {
   father_name?: string;
   mother_name?: string;
   course_id?: any;
-  rawStudent?: student;
+  rawStudent?: any;
 }
 
 @Component({
@@ -85,11 +85,15 @@ export class AddStudentPage implements OnInit {
   isViewModalOpen = false;
   isAddEditModalOpen = false;
   modalMode: 'add' | 'edit' = 'add';
+  get isEditMode(): boolean {
+    return this.modalMode === 'edit';
+  }
   newUserRole: 'Student' | 'Faculty' | 'Admin' = 'Student';
 
   // DYNAMIC MODAL TAB CONTROL
   activeFormTab: 'basic' | 'academic' | 'parent' = 'basic';
   activeViewTab: 'basic' | 'academic' | 'parent' = 'basic';
+  completedSteps = { basic: false, academic: false };
 
   selectedUser: UserRecord | null = null;
 
@@ -116,7 +120,8 @@ export class AddStudentPage implements OnInit {
     private defaultService: DefaultService,
     private userService: UserService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -132,8 +137,39 @@ export class AddStudentPage implements OnInit {
     this.loadInitialDynamicData();
   }
 
+  generateAutoRollNo(role: 'Student' | 'Faculty' | 'Admin'): string {
+    const prefix = role === 'Admin' ? 'ADM' : (role === 'Faculty' ? 'FAC' : 'STU');
+    let maxNum = 0;
+
+    for (const u of this.usersList) {
+      const rollStr = String(u.roll_no || '').trim().toUpperCase();
+      if (rollStr.startsWith(prefix)) {
+        const afterPrefix = rollStr.slice(prefix.length).replace(/[^0-9]/g, '');
+        if (afterPrefix) {
+          const num = parseInt(afterPrefix, 10);
+          if (!isNaN(num) && num > maxNum) {
+            maxNum = num;
+          }
+        }
+      }
+    }
+
+    const nextNum = maxNum + 1;
+    return `${prefix}${String(nextNum).padStart(3, '0')}`;
+  }
+
   setRole(role: 'Student' | 'Faculty' | 'Admin') {
     this.newUserRole = role;
+    if (this.modalMode === 'add') {
+      this.formData.roll_no = this.generateAutoRollNo(role);
+    }
+  }
+
+  onRoleChange(newRole: 'Student' | 'Faculty' | 'Admin') {
+    this.setRole(newRole);
+    if (newRole !== 'Student' && this.activeFormTab === 'academic') {
+      this.activeFormTab = 'parent';
+    }
   }
 
   async loadInitialDynamicData() {
@@ -234,6 +270,27 @@ export class AddStudentPage implements OnInit {
     }
   }
 
+  toInputDateFormat(val: any): string {
+    if (!val) return '';
+    const s = String(val).trim();
+    if (!s || s === 'null' || s === 'undefined') return '';
+    if (s.includes('T')) {
+      return s.split('T')[0];
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+      return s;
+    }
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
+      const parts = s.split('/');
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    if (/^\d{2}-\d{2}-\d{4}$/.test(s)) {
+      const parts = s.split('-');
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return s;
+  }
+
   formatDateDisplay(val: any): string {
     if (!val) return '';
     const strVal = String(val).trim();
@@ -244,6 +301,10 @@ export class AddStudentPage implements OnInit {
       if (parts.length === 3) {
         return `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(strVal)) {
+      const parts = strVal.split('-');
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
     if (strVal.includes('-')) {
       const parts = strVal.split('-');
@@ -256,11 +317,12 @@ export class AddStudentPage implements OnInit {
     return strVal;
   }
 
-  normalizeStatus(val: any): 'Active' | 'Deactive' | 'Pending' {
+  normalizeStatus(val: any, isActiveVal?: any): 'Active' | 'Deactive' | 'Pending' {
+    if (isActiveVal === 0 || isActiveVal === '0' || isActiveVal === false) return 'Deactive';
     if (val === null || val === undefined || val === '') return 'Active';
     const s = String(val).trim().toLowerCase();
     if (s === 'pending') return 'Pending';
-    if (s.includes('deact') || s.includes('inact') || s.includes('suspend') || val === false || s === '0') {
+    if (s.includes('deact') || s.includes('inact') || s.includes('suspend') || s.includes('lock') || val === false || s === '0') {
       return 'Deactive';
     }
     return 'Active';
@@ -280,6 +342,7 @@ export class AddStudentPage implements OnInit {
 
           const rawDob = u.dob || u.dateOfBirth || u.birth_date;
           const formattedDob = rawDob ? this.formatDateDisplay(rawDob) : '';
+          const inputDob = rawDob ? this.toInputDateFormat(rawDob) : '';
 
           const rawGender = u.gender || u.sex;
           const formattedGender = rawGender ? String(rawGender).trim() : '';
@@ -288,7 +351,7 @@ export class AddStudentPage implements OnInit {
 
           return {
             id: String(u.id || u.staffId || `USR-${idx + 1}`),
-            roll_no: String(u.roll_no || u.staffId || u.rollNo || (role === 'Admin' ? `ADM-2026-0${idx + 1}` : (role === 'Faculty' ? `FAC-2026-0${idx + 1}` : `STU-2026-0${idx + 1}`))),
+            roll_no: String(u.roll_no || u.staffId || u.rollNo || (role === 'Admin' ? `ADM${String(idx + 1).padStart(3, '0')}` : (role === 'Faculty' ? `FAC${String(idx + 1).padStart(3, '0')}` : `STU${String(idx + 1).padStart(3, '0')}`))),
             name: String(u.name || u.fullName || u.email?.split('@')[0] || 'User'),
             email: String(u.email || ''),
             role: role,
@@ -296,10 +359,11 @@ export class AddStudentPage implements OnInit {
             phone: String(u.phone || ''),
             dob: formattedDob,
             gender: formattedGender,
-            status: this.normalizeStatus(u.status),
+            status: this.normalizeStatus(u.status, u.is_active),
             avatarBg: avatarBg,
             father_name: u.father_name || '',
             mother_name: u.mother_name || '',
+            course_id: u.course_id,
             rawStudent: {
               ...u,
               id: u.id,
@@ -307,18 +371,18 @@ export class AddStudentPage implements OnInit {
               name: u.name,
               email: u.email,
               phone: u.phone,
-              dob: formattedDob,
+              dob: inputDob,
               gender: formattedGender,
-              father_name: u.father_name,
-              mother_name: u.mother_name,
+              father_name: u.father_name || '',
+              mother_name: u.mother_name || '',
               course_id: u.course_id,
               session_id: u.session_id,
               semester_id: u.semester_id,
-              aadhar_n: u.aadhar_no || u.aadhar_n,
-              board_10th: u.board_10th,
+              aadhar_n: u.aadhar_no || u.aadhar_n || '',
+              board_10th: u.board_10th || '',
               total_marks_10th: u.total_marks_10th,
               percentage_10th: u.percentage_10th,
-              board_12th: u.board_12th,
+              board_12th: u.board_12th || '',
               total_marks_12th: u.total_marks_12th,
               percentage_12th: u.percentage_12th,
               blood_group: u.blood_group || '',
@@ -328,7 +392,8 @@ export class AddStudentPage implements OnInit {
           };
         });
 
-        this.usersList = backendUsers;
+        this.usersList = [...backendUsers];
+        this.cdr.detectChanges();
       }
     } catch (e) {
       console.error('Error fetching users from backend:', e);
@@ -521,16 +586,20 @@ export class AddStudentPage implements OnInit {
     this.selectedUser = null;
   }
 
-  // ADD / EDIT MODALS
-  openAddModal() {
+  async openAddModal() {
     this.modalMode = 'add';
     this.newUserRole = 'Student';
     this.activeFormTab = 'basic';
+    this.completedSteps = { basic: false, academic: false };
     this.formErrors = {};
     this.serverErrorMessage = '';
     this.serverSuccessMessage = '';
     this.showPassword = false;
     this.formData = this.createEmptyStudent();
+    if (!this.usersList || this.usersList.length === 0) {
+      await this.fetchUsersFromBackend();
+    }
+    this.formData.roll_no = this.generateAutoRollNo('Student');
     this.isAddEditModalOpen = true;
   }
 
@@ -538,24 +607,39 @@ export class AddStudentPage implements OnInit {
     this.modalMode = 'edit';
     this.newUserRole = usr.role;
     this.activeFormTab = 'basic';
+    this.completedSteps = { basic: true, academic: true };
     this.formErrors = {};
     this.serverErrorMessage = '';
     this.serverSuccessMessage = '';
     this.showPassword = false;
     this.selectedUser = usr;
-    if (usr.rawStudent) {
-      this.formData = { ...usr.rawStudent };
-    } else {
-      this.formData = this.createEmptyStudent();
-      this.formData.roll_no = usr.roll_no || usr.id;
-      this.formData.name = usr.name;
-      this.formData.email = usr.email;
-      this.formData.phone = usr.phone;
-      this.formData.dob = usr.dob ? String(usr.dob) : '';
-      this.formData.gender = usr.gender || 'Male';
-      this.formData.father_name = usr.father_name || '';
-      this.formData.mother_name = usr.mother_name || '';
-    }
+
+    const raw = usr.rawStudent || ({} as any);
+    this.formData = {
+      ...this.createEmptyStudent(),
+      ...raw,
+      roll_no: usr.roll_no || raw.roll_no || usr.id,
+      name: usr.name || raw.name || '',
+      email: usr.email || raw.email || '',
+      phone: usr.phone || raw.phone || '',
+      gender: usr.gender || raw.gender || 'Male',
+      dob: this.toInputDateFormat(raw.dob || usr.dob),
+      blood_group: raw.blood_group || '',
+      language: raw.language || '',
+      session_id: raw.session_id || (usr as any).session_id || '',
+      course_id: raw.course_id || usr.course_id || '',
+      semester_id: raw.semester_id || (usr as any).semester_id || '',
+      aadhar_n: raw.aadhar_no || raw.aadhar_n || (usr as any).aadhar_no || '',
+      father_name: usr.father_name || raw.father_name || '',
+      mother_name: usr.mother_name || raw.mother_name || '',
+      board_10th: raw.board_10th || '',
+      total_marks_10th: raw.total_marks_10th,
+      percentage_10th: raw.percentage_10th,
+      board_12th: raw.board_12th || '',
+      total_marks_12th: raw.total_marks_12th,
+      percentage_12th: raw.percentage_12th,
+      password: ''
+    };
     this.isAddEditModalOpen = true;
   }
 
@@ -612,6 +696,12 @@ export class AddStudentPage implements OnInit {
         this.activeFormTab = 'basic';
         return;
       }
+    } else if (this.modalMode === 'edit' && password) {
+      if (password.length < 8 || !/^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(password)) {
+        this.formErrors['password'] = 'Password must contain at least 1 alphabet, 1 number, and 1 special character.';
+        this.activeFormTab = 'basic';
+        return;
+      }
     }
 
     if (!phone) {
@@ -629,7 +719,7 @@ export class AddStudentPage implements OnInit {
       const aadhar = String(this.formData.aadhar_n).trim();
       if (!/^[0-9]{12}$/.test(aadhar)) {
         this.formErrors['aadhar_n'] = 'Aadhar number must contain exactly 12 digits.';
-        this.activeFormTab = 'basic';
+        this.activeFormTab = 'parent';
         return;
       }
     }
@@ -645,7 +735,7 @@ export class AddStudentPage implements OnInit {
           password: password,
           language: this.formData.language ? String(this.formData.language).trim() : null,
           phone: phone,
-          dob: this.formData.dob ? String(this.formData.dob).trim() : null,
+          dob: this.formData.dob ? this.toInputDateFormat(this.formData.dob) : null,
           gender: this.formData.gender ? String(this.formData.gender).trim() : 'Male',
           role: String(this.newUserRole || 'Student').toLowerCase(),
           session_id: this.formData.session_id ? Number(this.formData.session_id) : null,
@@ -664,24 +754,25 @@ export class AddStudentPage implements OnInit {
 
         const res: any = await firstValueFrom(this.userService.adminAddUser(payload));
 
-        if (res && res.ok === false) {
-          this.serverErrorMessage = res.msg || 'Failed to add user.';
-          const lowerMsg = (res.msg || '').toLowerCase();
+        if (!res || !res.ok) {
+          const errText = res?.msg || res?.message || 'Failed to add user.';
+          this.serverErrorMessage = errText;
+          const lowerMsg = errText.toLowerCase();
           if (lowerMsg.includes('phone')) {
-            this.formErrors['phone'] = res.msg;
+            this.formErrors['phone'] = errText;
             this.activeFormTab = 'basic';
           } else if (lowerMsg.includes('email')) {
-            this.formErrors['email'] = res.msg;
+            this.formErrors['email'] = errText;
             this.activeFormTab = 'basic';
           } else if (lowerMsg.includes('roll')) {
-            this.formErrors['roll_no'] = res.msg;
+            this.formErrors['roll_no'] = errText;
             this.activeFormTab = 'basic';
           } else if (lowerMsg.includes('password')) {
-            this.formErrors['password'] = res.msg;
+            this.formErrors['password'] = errText;
             this.activeFormTab = 'basic';
           } else if (lowerMsg.includes('aadhar')) {
-            this.formErrors['aadhar_n'] = res.msg;
-            this.activeFormTab = 'basic';
+            this.formErrors['aadhar_n'] = errText;
+            this.activeFormTab = 'parent';
           }
           this.isSaving = false;
           return;
@@ -690,39 +781,130 @@ export class AddStudentPage implements OnInit {
         // Successfully registered user via backend sp_admin_users_add API
         this.serverSuccessMessage = res?.msg || `${this.newUserRole} added successfully!`;
 
-        // Re-fetch users from backend
-        await this.fetchUsersFromBackend();
+        // Real-time optimistic insertion for instant UI responsiveness
+        const newId = res?.data?.id || (typeof res?.data === 'string' ? JSON.parse(res.data)?.id : null) || `NEW-${Date.now()}`;
+        const newRecord: UserRecord = {
+          id: String(newId),
+          roll_no: payload.roll_no || `STU${newId}`,
+          name: payload.name,
+          email: payload.email,
+          role: this.newUserRole,
+          departmentOrCourse: payload.course_id ? this.getCourseName(payload.course_id) : (this.newUserRole === 'Student' ? 'Computer Science' : 'Academic Dept'),
+          phone: payload.phone,
+          dob: payload.dob ? this.formatDateDisplay(payload.dob) : '',
+          gender: payload.gender || 'Male',
+          status: 'Active',
+          avatarBg: this.newUserRole === 'Admin' ? 'av-admin' : (this.newUserRole === 'Faculty' ? 'av-faculty' : 'av-student'),
+          father_name: payload.father_name || '',
+          mother_name: payload.mother_name || '',
+          course_id: payload.course_id,
+          rawStudent: {
+            ...this.createEmptyStudent(),
+            ...payload,
+            id: newId,
+            aadhar_n: payload.aadhar_no || ''
+          }
+        };
+
+        this.usersList = [newRecord, ...this.usersList];
+        this.cdr.detectChanges();
+
+        // Background sync to ensure full consistency with backend database
+        this.fetchUsersFromBackend();
 
         setTimeout(() => {
           this.isSaving = false;
           this.closeAddEditModal();
-        }, 1100);
+        }, 900);
 
       } else if (this.modalMode === 'edit' && this.selectedUser) {
         const updatePayload: any = {
-          id: this.selectedUser.id,
+          id: Number(this.selectedUser.id) || this.selectedUser.id,
+          roll_no: this.formData.roll_no ? String(this.formData.roll_no).trim() : (this.selectedUser.roll_no || null),
           name: name,
           email: email,
-          phone: phone
+          phone: phone,
+          role: String(this.newUserRole || this.selectedUser.role || 'Student').toLowerCase(),
+          gender: this.formData.gender ? String(this.formData.gender).trim() : (this.selectedUser.gender || 'Male'),
+          dob: this.formData.dob ? this.toInputDateFormat(this.formData.dob) : null,
+          language: this.formData.language ? String(this.formData.language).trim() : null,
+          session_id: this.formData.session_id ? Number(this.formData.session_id) : null,
+          course_id: this.formData.course_id ? Number(this.formData.course_id) : null,
+          semester_id: this.formData.semester_id ? Number(this.formData.semester_id) : null,
+          aadhar_no: this.formData.aadhar_n ? String(this.formData.aadhar_n).trim() : null,
+          father_name: this.formData.father_name ? String(this.formData.father_name).trim() : null,
+          mother_name: this.formData.mother_name ? String(this.formData.mother_name).trim() : null,
+          board_10th: this.formData.board_10th ? String(this.formData.board_10th).trim() : null,
+          total_marks_10th: this.formData.total_marks_10th !== undefined && this.formData.total_marks_10th !== null && String(this.formData.total_marks_10th) !== '' ? Number(this.formData.total_marks_10th) : null,
+          percentage_10th: this.formData.percentage_10th !== undefined && this.formData.percentage_10th !== null && String(this.formData.percentage_10th) !== '' ? Number(this.formData.percentage_10th) : null,
+          board_12th: this.formData.board_12th ? String(this.formData.board_12th).trim() : null,
+          total_marks_12th: this.formData.total_marks_12th !== undefined && this.formData.total_marks_12th !== null && String(this.formData.total_marks_12th) !== '' ? Number(this.formData.total_marks_12th) : null,
+          percentage_12th: this.formData.percentage_12th !== undefined && this.formData.percentage_12th !== null && String(this.formData.percentage_12th) !== '' ? Number(this.formData.percentage_12th) : null,
+          status: this.selectedUser.status === 'Active' ? 'Active' : (this.selectedUser.status === 'Pending' ? 'Pending' : 'Deactive')
         };
         if (password) {
           updatePayload.password = password;
         }
 
         const updateRes: any = await firstValueFrom(this.userService.updateUser(updatePayload));
-        if (updateRes && updateRes.ok === false) {
-          this.serverErrorMessage = updateRes.msg || 'Failed to update user.';
+        if (!updateRes || !updateRes.ok) {
+          const errText = updateRes?.msg || updateRes?.message || 'Failed to update user.';
+          this.serverErrorMessage = errText;
+          const lowerMsg = errText.toLowerCase();
+          if (lowerMsg.includes('phone')) {
+            this.formErrors['phone'] = errText;
+            this.activeFormTab = 'basic';
+          } else if (lowerMsg.includes('email')) {
+            this.formErrors['email'] = errText;
+            this.activeFormTab = 'basic';
+          } else if (lowerMsg.includes('roll')) {
+            this.formErrors['roll_no'] = errText;
+            this.activeFormTab = 'basic';
+          } else if (lowerMsg.includes('password')) {
+            this.formErrors['password'] = errText;
+            this.activeFormTab = 'basic';
+          } else if (lowerMsg.includes('aadhar')) {
+            this.formErrors['aadhar_n'] = errText;
+            this.activeFormTab = 'parent';
+          }
           this.isSaving = false;
           return;
         }
 
         this.serverSuccessMessage = updateRes?.msg || 'User updated successfully!';
-        await this.fetchUsersFromBackend();
+
+        // Real-time optimistic update for instant UI feedback
+        const targetIdx = this.usersList.findIndex(u => u.id === this.selectedUser!.id);
+        if (targetIdx !== -1) {
+          this.usersList[targetIdx] = {
+            ...this.usersList[targetIdx],
+            name: updatePayload.name,
+            email: updatePayload.email,
+            phone: updatePayload.phone,
+            role: this.newUserRole,
+            gender: updatePayload.gender,
+            dob: updatePayload.dob ? this.formatDateDisplay(updatePayload.dob) : '',
+            father_name: updatePayload.father_name || '',
+            mother_name: updatePayload.mother_name || '',
+            course_id: updatePayload.course_id,
+            departmentOrCourse: updatePayload.course_id ? this.getCourseName(updatePayload.course_id) : this.usersList[targetIdx].departmentOrCourse,
+            rawStudent: {
+              ...this.usersList[targetIdx].rawStudent,
+              ...updatePayload,
+              aadhar_n: updatePayload.aadhar_no || ''
+            }
+          };
+          this.usersList = [...this.usersList];
+          this.cdr.detectChanges();
+        }
+
+        // Background sync to ensure full consistency with backend database
+        this.fetchUsersFromBackend();
 
         setTimeout(() => {
           this.isSaving = false;
           this.closeAddEditModal();
-        }, 1100);
+        }, 900);
       }
     } catch (e: any) {
       console.error('Error saving user:', e);
@@ -733,16 +915,32 @@ export class AddStudentPage implements OnInit {
 
   // TOGGLE STATUS
   async toggleUserStatus(usr: UserRecord) {
+    if (usr.role === 'Admin' || String(usr.role).toLowerCase() === 'admin') {
+      alert('Administrator status cannot be deactivated.');
+      return;
+    }
     const isCurrentlyActive = usr.status === 'Active';
     const targetStatus: 'Active' | 'Deactive' = isCurrentlyActive ? 'Deactive' : 'Active';
-    const actionText = isCurrentlyActive ? 'deactivate' : 'activate';
+    const targetIsActive = isCurrentlyActive ? 0 : 1;
+    const actionText = isCurrentlyActive ? 'deactivate (lock)' : 'activate';
 
     if (confirm(`Are you sure you want to ${actionText} ${usr.name}?`)) {
+      const prevStatus = usr.status;
       usr.status = targetStatus;
+      this.cdr.detectChanges();
       try {
-        await firstValueFrom(this.userService.updateUserStatus(usr.id, targetStatus));
-      } catch (e) {
-        console.error('Error updating status in backend:', e);
+        const res: any = await firstValueFrom(this.userService.updateUserStatus(usr.id, targetIsActive));
+        if (!res || !res.ok) {
+          usr.status = prevStatus;
+          this.cdr.detectChanges();
+          alert(res?.msg || res?.message || 'Failed to update user status');
+          return;
+        }
+        this.fetchUsersFromBackend();
+      } catch (e: any) {
+        usr.status = prevStatus;
+        this.cdr.detectChanges();
+        alert(e?.message || 'Error updating status in backend');
       }
     }
   }
@@ -765,17 +963,125 @@ export class AddStudentPage implements OnInit {
   }
 
   selectFormTab(tab: 'basic' | 'academic' | 'parent') {
-    this.activeFormTab = tab;
+    this.goToStep(tab);
   }
 
-  goToPreviousStep() {
-    if (this.activeFormTab === 'parent') this.activeFormTab = 'academic';
-    else if (this.activeFormTab === 'academic') this.activeFormTab = 'basic';
+  isStepCompleted(step: 'basic' | 'academic' | 'parent'): boolean {
+    if (step === 'basic') return this.completedSteps.basic;
+    if (step === 'academic') return this.completedSteps.academic;
+    return false;
+  }
+
+  canAccessStep(step: 'basic' | 'academic' | 'parent'): boolean {
+    if (step === 'basic') return true;
+    if (step === 'academic') return this.newUserRole === 'Student' && this.completedSteps.basic;
+    if (step === 'parent') {
+      if (this.newUserRole === 'Student') {
+        return this.completedSteps.basic && this.completedSteps.academic;
+      }
+      return this.completedSteps.basic;
+    }
+    return false;
   }
 
   goToNextStep() {
-    if (this.activeFormTab === 'basic') this.activeFormTab = 'academic';
-    else if (this.activeFormTab === 'academic') this.activeFormTab = 'parent';
+    this.formErrors = {};
+
+    if (this.activeFormTab === 'basic') {
+      const name = String(this.formData.name || '').trim();
+      const email = String(this.formData.email || '').trim();
+      const password = String(this.formData.password || '').trim();
+      const phone = String(this.formData.phone || '').trim();
+
+      let hasError = false;
+      if (!name) {
+        this.formErrors['name'] = 'Full Name is required.';
+        hasError = true;
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        this.formErrors['email'] = 'Valid email address is required.';
+        hasError = true;
+      }
+      if (this.modalMode === 'add') {
+        if (!password || password.length < 8 || !/^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(password)) {
+          this.formErrors['password'] = 'Min 8 chars (1 letter, 1 number & 1 special character).';
+          hasError = true;
+        }
+      } else if (this.modalMode === 'edit' && password) {
+        if (password.length < 8 || !/^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(password)) {
+          this.formErrors['password'] = 'Min 8 chars (1 letter, 1 number & 1 special character).';
+          hasError = true;
+        }
+      }
+      if (!phone || !/^[0-9]{10}$/.test(phone)) {
+        this.formErrors['phone'] = '10-digit phone number is required.';
+        hasError = true;
+      }
+
+      if (hasError) {
+        this.completedSteps.basic = false;
+        return;
+      }
+
+      this.completedSteps.basic = true;
+      if (this.newUserRole === 'Student') {
+        this.activeFormTab = 'academic';
+      } else {
+        this.activeFormTab = 'parent';
+      }
+      return;
+    }
+
+    if (this.activeFormTab === 'academic') {
+      if (!this.completedSteps.basic) {
+        this.activeFormTab = 'basic';
+        return;
+      }
+      this.completedSteps.academic = true;
+      this.activeFormTab = 'parent';
+      return;
+    }
+  }
+
+  goToPreviousStep() {
+    this.formErrors = {};
+    if (this.activeFormTab === 'parent') {
+      if (this.newUserRole === 'Student') {
+        this.activeFormTab = 'academic';
+      } else {
+        this.activeFormTab = 'basic';
+      }
+    } else if (this.activeFormTab === 'academic') {
+      this.activeFormTab = 'basic';
+    }
+  }
+
+  goToStep(tab: 'basic' | 'academic' | 'parent') {
+    if (tab === 'basic') {
+      this.activeFormTab = 'basic';
+      return;
+    }
+    if (tab === 'academic') {
+      if (this.newUserRole !== 'Student') return;
+      if (!this.completedSteps.basic) {
+        this.goToNextStep();
+        return;
+      }
+      this.activeFormTab = 'academic';
+      return;
+    }
+    if (tab === 'parent') {
+      if (!this.completedSteps.basic) {
+        this.goToNextStep();
+        return;
+      }
+      if (this.newUserRole === 'Student' && !this.completedSteps.academic) {
+        this.activeFormTab = 'academic';
+        return;
+      }
+      this.activeFormTab = 'parent';
+      return;
+    }
   }
 
   async saveStudent() {
@@ -847,8 +1153,12 @@ export class AddStudentPage implements OnInit {
   }
 
   async submitChangePassword() {
-    if (!this.newPasswordInput || this.newPasswordInput.trim().length < 6) {
-      this.changePasswordError = 'Password must be at least 6 characters long.';
+    if (!this.newPasswordInput || this.newPasswordInput.trim().length < 8) {
+      this.changePasswordError = 'Password must be at least 8 characters long.';
+      return;
+    }
+    if (!/^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(this.newPasswordInput.trim())) {
+      this.changePasswordError = 'Password must contain at least 1 alphabet, 1 number, and 1 special character.';
       return;
     }
     if (this.newPasswordInput !== this.confirmPasswordInput) {
@@ -856,16 +1166,33 @@ export class AddStudentPage implements OnInit {
       return;
     }
 
+    const targetUser = this.changePasswordUser;
+    if (!targetUser) return;
+
     this.isChangingPassword = true;
     this.changePasswordError = '';
 
     try {
-      this.changePasswordSuccess = `Password for ${this.changePasswordUser?.name} updated successfully!`;
+      const res: any = await firstValueFrom(this.userService.updateUser({
+        id: targetUser.id,
+        name: targetUser.name,
+        email: targetUser.email,
+        phone: targetUser.phone,
+        password: this.newPasswordInput.trim()
+      }));
+
+      if (!res || !res.ok) {
+        this.changePasswordError = res?.msg || 'Failed to update password. Please try again.';
+        this.isChangingPassword = false;
+        return;
+      }
+
+      this.changePasswordSuccess = res?.msg || `Password for ${targetUser.name} updated successfully!`;
       setTimeout(() => {
         this.closeChangePasswordModal();
-      }, 1300);
-    } catch (e) {
-      this.changePasswordError = 'Failed to update password. Please try again.';
+      }, 1000);
+    } catch (e: any) {
+      this.changePasswordError = e?.message || 'Failed to update password. Please try again.';
     } finally {
       this.isChangingPassword = false;
     }

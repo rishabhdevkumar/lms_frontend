@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { StudentService } from '../api/api/student.service';
 import { FacultyService } from '../api/api/faculty.service';
@@ -20,6 +20,8 @@ export interface User {
   rollNo?: string;
   phone?: string;
   token?: string;
+  status?: string;
+  is_active?: number | boolean;
 }
 
 @Injectable({
@@ -59,6 +61,23 @@ export class AuthService {
     if (savedUser && token) {
       try {
         const user: User = JSON.parse(savedUser);
+        const userStatus = String(user?.status || '').trim().toLowerCase();
+        const isActiveVal = user?.is_active;
+
+        if (
+          isActiveVal === 0 ||
+          isActiveVal === false ||
+          Number(isActiveVal) === 0 ||
+          userStatus.includes('deact') ||
+          userStatus.includes('inact') ||
+          userStatus.includes('lock') ||
+          userStatus.includes('suspend') ||
+          (userStatus !== '' && userStatus !== 'active')
+        ) {
+          this.clearStorage();
+          return;
+        }
+
         user.token = token;
         this.apiConfig.accessToken = token;
         this.currentUserSubject.next(user);
@@ -84,8 +103,41 @@ export class AuthService {
     return this.userRoleSubject.value;
   }
 
-  private getBasePath(): string {
-    return environment.api_url || this.apiConfig.basePath || 'http://localhost:3000';
+  private readonly baseUrl = environment.api_url;
+
+  private extractErrorMessage(err: any, fallback: string): string {
+    if (!err) return fallback;
+    if (err.status === 0 || err.statusText === 'Unknown Error') {
+      return `Unable to reach backend server at ${this.baseUrl}. Please ensure the backend server is running and reachable.`;
+    }
+    const backendMsg = err?.error?.msg || err?.error?.message || err?.error?.error;
+    if (backendMsg) {
+      if (Array.isArray(backendMsg)) {
+        return backendMsg.join(', ');
+      }
+      if (typeof backendMsg === 'string' && backendMsg.trim() && backendMsg !== 'Unknown Error') {
+        return backendMsg;
+      }
+    }
+    if (err.status === 401) {
+      return 'Invalid credentials. Please verify your email and password.';
+    }
+    if (err.status === 403) {
+      return 'Access denied. Your account may be pending approval or deactivated.';
+    }
+    if (err.status === 404) {
+      return 'The requested authentication service endpoint was not found on server.';
+    }
+    if (err.status === 409) {
+      return 'An account with this email already exists.';
+    }
+    if (err.status >= 500) {
+      return 'Internal server error. Please check the backend server logs.';
+    }
+    if (err?.statusText && err.statusText !== 'Unknown Error') {
+      return err.statusText;
+    }
+    return fallback;
   }
 
   /**
@@ -114,7 +166,7 @@ export class AuthService {
     password: string,
     role: UserRole = 'student'
   ): Observable<{ success: boolean; message: string; user?: User }> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     const loginPayload = { email, username: email, password, role };
 
     const loginObs$ = this.httpClient.post(`${basePath}/users/authenticate`, loginPayload).pipe(
@@ -136,83 +188,149 @@ export class AuthService {
     );
 
     return loginObs$.pipe(
-      map((res: any) => {
+      switchMap((res: any) => {
         // 1. Strict validation: check if backend returned failure (e.g., { ok: false, msg: 'Wrong password' })
         if (!res || res.ok === false || res.ok === 0 || res.success === false) {
           const failureMsg = res?.msg || res?.message || 'Invalid email or password.';
-          return { success: false, message: failureMsg };
+          this.clearStorage();
+          return of({ success: false, message: failureMsg });
         }
 
         const resUser = this.unwrapUserData(res) || {};
-        const userStatus = String(resUser?.status || resUser?.Status || '').toLowerCase();
-        if (userStatus && userStatus !== 'active') {
-          if (userStatus === 'pending') {
-            return {
-              success: false,
-              message: 'Your account is pending admin approval. Only active accounts can login.'
-            };
-          } else {
-            return {
-              success: false,
-              message: 'Your account has been deactivated. Only active accounts can login.'
-            };
-          }
+        const rawStatus = resUser?.status ?? resUser?.Status ?? res?.status ?? res?.Status ?? res?.data?.status;
+        const rawIsActive = resUser?.is_active ?? resUser?.isActive ?? res?.is_active ?? res?.isActive ?? res?.data?.is_active;
+
+        const userStatus = rawStatus !== undefined && rawStatus !== null ? String(rawStatus).trim().toLowerCase() : '';
+        const isDeactivated =
+          rawIsActive === 0 ||
+          rawIsActive === '0' ||
+          rawIsActive === false ||
+          userStatus.includes('deact') ||
+          userStatus.includes('inact') ||
+          userStatus.includes('lock') ||
+          userStatus.includes('suspend') ||
+          (userStatus !== '' && userStatus !== 'active' && userStatus !== 'pending');
+
+        const isPending = userStatus === 'pending';
+
+        if (isPending) {
+          this.clearStorage();
+          return of({
+            success: false,
+            message: 'Your account is pending admin approval. Only active accounts can login.'
+          });
+        }
+
+        if (isDeactivated) {
+          this.clearStorage();
+          return of({
+            success: false,
+            message: 'Your account has been deactivated. Only active accounts can login.'
+          });
         }
 
         const token = res?.token || res?.accessToken || res?.data?.token || resUser?.token;
         if (!token) {
-          return {
+          this.clearStorage();
+          return of({
             success: false,
             message: res?.msg || 'Authentication failed: No access token received from server.'
-          };
+          });
         }
 
-        const rawRole = String(
-          resUser?.role || 
-          resUser?.Role || 
-          resUser?.user_role || 
-          resUser?.userRole || 
-          resUser?.type || 
-          ''
-        ).toLowerCase();
+        const userId = resUser?.users_id || resUser?.user_id || resUser?.id || resUser?._id;
 
-        let finalRole: UserRole = 'student';
-        if (rawRole === 'admin' || rawRole.includes('admin')) {
-          finalRole = 'admin';
-        } else if (rawRole === 'faculty' || rawRole.includes('faculty')) {
-          finalRole = 'faculty';
-        } else if (rawRole === 'student' || rawRole.includes('student')) {
-          finalRole = 'student';
-        } else {
-          finalRole = role || 'student';
+        // Fallback: If neither status nor is_active was in login payload, query live details from DB
+        if (!userStatus && rawIsActive === undefined && userId) {
+          return this.httpClient.get<any>(`${basePath}/users/details/${userId}`).pipe(
+            map((detailRes: any) => {
+              const u = detailRes?.data || detailRes || {};
+              const detailStatus = String(u.status || '').trim().toLowerCase();
+              const detailActive = u.is_active;
+              if (
+                detailActive === 0 ||
+                detailActive === '0' ||
+                detailActive === false ||
+                detailStatus.includes('deact') ||
+                detailStatus.includes('inact') ||
+                detailStatus.includes('lock') ||
+                (detailStatus && detailStatus !== 'active')
+              ) {
+                this.clearStorage();
+                return {
+                  success: false,
+                  message: detailStatus === 'pending'
+                    ? 'Your account is pending admin approval. Only active accounts can login.'
+                    : 'Your account has been deactivated. Only active accounts can login.'
+                };
+              }
+              return this.finalizeLoginSuccess(res, resUser, token, email, role, u.status || 'Active', detailActive ?? 1);
+            }),
+            catchError(() => {
+              return of(this.finalizeLoginSuccess(res, resUser, token, email, role, 'Active', 1));
+            })
+          );
         }
 
-        const userId = resUser?.users_id || resUser?.user_id || resUser?.id || resUser?._id || 'usr-' + Date.now();
-        const user: User = {
-          id: String(userId),
-          name: resUser?.name || resUser?.fullName || resUser?.username || this.extractNameFromEmail(email),
-          email: resUser?.email || email,
-          role: finalRole,
-          rollNo: resUser?.rollNo || resUser?.roll_no,
-          phone: resUser?.phone || resUser?.phoneNumber || resUser?.phone_number || resUser?.mobile || '',
-          token: token,
-        };
-        this.setCurrentUser(user);
-        return { success: true, message: res?.msg || `Signed in successfully as ${this.capitalize(user.role)}`, user };
+        return of(this.finalizeLoginSuccess(res, resUser, token, email, role, rawStatus || 'Active', rawIsActive ?? 1));
       }),
       catchError((err: any) => {
-        const errorMsg =
-          err?.error?.msg ||
-          err?.error?.message ||
-          err?.statusText ||
-          err?.message ||
-          'Authentication failed. Please verify your email and password.';
+        this.clearStorage();
+        const errorMsg = this.extractErrorMessage(
+          err,
+          'Authentication failed. Please verify your email and password.'
+        );
         return of({
           success: false,
-          message: Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg
+          message: errorMsg
         });
       })
     );
+  }
+
+  private finalizeLoginSuccess(
+    res: any,
+    resUser: any,
+    token: string,
+    email: string,
+    role: UserRole,
+    status: string,
+    isActive: number | boolean
+  ): { success: boolean; message: string; user?: User } {
+    const rawRole = String(
+      resUser?.role ||
+      resUser?.Role ||
+      resUser?.user_role ||
+      resUser?.userRole ||
+      resUser?.type ||
+      ''
+    ).toLowerCase();
+
+    let finalRole: UserRole = 'student';
+    if (rawRole === 'admin' || rawRole.includes('admin')) {
+      finalRole = 'admin';
+    } else if (rawRole === 'faculty' || rawRole.includes('faculty')) {
+      finalRole = 'faculty';
+    } else if (rawRole === 'student' || rawRole.includes('student')) {
+      finalRole = 'student';
+    } else {
+      finalRole = role || 'student';
+    }
+
+    const userId = resUser?.users_id || resUser?.user_id || resUser?.id || resUser?._id || 'usr-' + Date.now();
+    const user: User = {
+      id: String(userId),
+      name: resUser?.name || resUser?.fullName || resUser?.username || this.extractNameFromEmail(email),
+      email: resUser?.email || email,
+      role: finalRole,
+      rollNo: resUser?.rollNo || resUser?.roll_no,
+      phone: resUser?.phone || resUser?.phoneNumber || resUser?.phone_number || resUser?.mobile || '',
+      token: token,
+      status: status || 'Active',
+      is_active: isActive !== undefined ? isActive : 1
+    };
+    this.setCurrentUser(user);
+    return { success: true, message: res?.msg || `Signed in successfully as ${this.capitalize(user.role)}`, user };
   }
 
   /**
@@ -224,7 +342,7 @@ export class AuthService {
     password: string,
     role: UserRole = 'student'
   ): Observable<{ success: boolean; message: string; user?: User }> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     const signupRole: UserRole = (email.toLowerCase().includes('admin') || email.toLowerCase() === 'rishabh1234@gmail.com') 
       ? 'admin' 
       : (role || 'student');
@@ -293,15 +411,13 @@ export class AuthService {
         return { success: true, message: `Account registered successfully as ${this.capitalize(user.role)}`, user };
       }),
       catchError((err: any) => {
-        const errorMsg =
-          err?.error?.msg ||
-          err?.error?.message ||
-          err?.statusText ||
-          err?.message ||
-          'Registration failed. Please check your inputs or connection.';
+        const errorMsg = this.extractErrorMessage(
+          err,
+          'Registration failed. Please check your inputs or connection.'
+        );
         return of({
           success: false,
-          message: Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg
+          message: errorMsg
         });
       })
     );

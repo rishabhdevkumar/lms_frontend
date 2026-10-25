@@ -463,18 +463,12 @@ ion-input[fill="outline"]:focus-within ion-icon[slot="start"],
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 
-    &:hover {
+    &:hover:not(:disabled):not(.readonly-input) {
       border-color: #94a3b8;
     }
 
-    &:focus,
-    &:not(:placeholder-shown),
-    &:valid {
-      border-color: #2563eb;
-      border-width: 1.8px;
-    }
-
     &:focus {
+      border-color: #2563eb;
       border-width: 2px;
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
       background-color: #ffffff;
@@ -516,9 +510,16 @@ ion-input[fill="outline"]:focus-within ion-icon[slot="start"],
     top: 0;
     transform: translateY(-50%) scale(0.85);
     transform-origin: left top;
-    color: #2563eb;
+    color: #64748b;
     font-weight: 700;
     background-color: #ffffff;
+  }
+
+  /* When input is ACTIVELY FOCUSED / TYPING -> Label is BLUE */
+  .floating-input:focus~.floating-label,
+  .floating-select:focus~.floating-label,
+  .floating-textarea:focus~.floating-label {
+    color: #2563eb !important;
   }
 
   /* Left Icon inside floating input */

@@ -147,7 +147,8 @@ export class AuthModalComponent {
         },
         error: (err) => {
           this.isLoading = false;
-          const backendError = err?.error?.message || err?.statusText || err?.message || 'Authentication failed. Please check backend connection.';
+          const statusText = err?.statusText && err.statusText !== 'Unknown Error' ? err.statusText : null;
+          const backendError = err?.error?.msg || err?.error?.message || statusText || 'Authentication failed. Please verify credentials or connection.';
           this.errorMessage = Array.isArray(backendError) ? backendError.join(', ') : backendError;
         }
       });
@@ -173,7 +174,8 @@ export class AuthModalComponent {
         },
         error: (err) => {
           this.isLoading = false;
-          const backendError = err?.error?.message || err?.statusText || err?.message || 'Sign up failed. Please check backend connection.';
+          const statusText = err?.statusText && err.statusText !== 'Unknown Error' ? err.statusText : null;
+          const backendError = err?.error?.msg || err?.error?.message || statusText || 'Sign up failed. Please check backend connection.';
           this.errorMessage = Array.isArray(backendError) ? backendError.join(', ') : backendError;
         }
       });

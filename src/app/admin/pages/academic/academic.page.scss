@@ -297,7 +297,39 @@
   padding: 2.5rem !important;
 }
 
-/* ACTION BUTTONS (EDIT & DELETE) */
+/* ACTION BUTTONS (VIEW, EDIT & DELETE) */
+.btn-action-view {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: #0284c7;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 0.45rem 0.95rem;
+  border-radius: 0.45rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.08);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+
+  ion-icon {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background-color: #0284c7;
+    color: #ffffff;
+    border-color: #0284c7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.22);
+  }
+}
+
 .btn-action-edit {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.75rem;
@@ -496,3 +528,826 @@
   from { opacity: 0; transform: scale(0.94); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* ==========================================================================
+   SYLLABUS SPECIFIC STYLES (TABLE & PDF UPLOAD ZONE)
+   ========================================================================== */
+
+.table-cell-title {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.88rem;
+}
+
+.table-cell-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.syllabus-desc-cell {
+  max-width: 260px;
+  min-width: 160px;
+
+  .desc-text-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.8rem;
+    color: #475569;
+    line-height: 1.35;
+  }
+}
+
+.pdf-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  max-width: 220px;
+  user-select: text;
+
+  .pdf-tag-icon {
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 0.62rem;
+    padding: 0.12rem 0.38rem;
+    border-radius: 4px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .pdf-tag-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #991b1b;
+  }
+}
+
+.btn-pdf-pill {
+  @extend .pdf-tag-pill;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #fee2e2;
+    border-color: #f87171;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(220, 38, 38, 0.18);
+  }
+}
+
+.no-pdf-badge {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: #f1f5f9;
+}
+
+/* MODAL PDF UPLOAD CONTAINER */
+.pdf-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+  width: 100%;
+
+  &.has-error {
+    .pdf-dropzone-box {
+      border-color: #ef4444 !important;
+      background: #fef2f2 !important;
+    }
+    .pdf-file-card {
+      border-color: #ef4444 !important;
+    }
+  }
+
+  .pdf-upload-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+
+    .pdf-upload-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .pdf-format-hint {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+  }
+
+  .pdf-dropzone-box {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem 1.15rem;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    &.drag-over {
+      border-color: #2563eb;
+      background: #dbeafe;
+      transform: scale(1.01);
+    }
+
+    .dropzone-icon-circle {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .dropzone-text-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+
+      .dropzone-main-text {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      .dropzone-sub-text {
+        font-size: 0.72rem;
+        color: #64748b;
+      }
+    }
+  }
+
+  .pdf-file-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+
+    .pdf-file-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      overflow: hidden;
+
+      .pdf-file-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+
+      .pdf-file-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        overflow: hidden;
+
+        .pdf-file-title {
+          font-size: 0.82rem;
+          font-weight: 700;
+          color: #0f172a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 240px;
+        }
+
+        .pdf-file-sub {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+
+          .pdf-badge-tag {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+
+            &.success {
+              background: #dcfce7;
+              color: #15803d;
+            }
+
+            &.existing {
+              background: #f1f5f9;
+              color: #475569;
+            }
+          }
+        }
+      }
+    }
+
+    .pdf-file-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+
+      .btn-pdf-action {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.35rem 0.65rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        border: 1px solid transparent;
+
+        &.view {
+          background: #eff6ff;
+          color: #2563eb;
+          border-color: #bfdbfe;
+
+          &:hover {
+            background: #dbeafe;
+          }
+        }
+
+        &.change {
+          background: #f8fafc;
+          color: #475569;
+          border-color: #cbd5e1;
+
+          &:hover {
+            background: #f1f5f9;
+          }
+        }
+
+        &.remove {
+          background: #fef2f2;
+          color: #ef4444;
+          border-color: #fecaca;
+          padding: 0.35rem 0.5rem;
+
+          &:hover {
+            background: #fee2e2;
+          }
+        }
+      }
+    }
+  }
+
+  .pdf-error-msg {
+    font-size: 0.75rem;
+    color: #ef4444;
+    font-weight: 600;
+    margin-top: 0.15rem;
+  }
+}
+
+.floating-textarea {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.empty-syllabus-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+
+  .empty-state-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.75;
+  }
+
+  .empty-state-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.35rem;
+  }
+
+  .empty-state-desc {
+    font-size: 0.825rem;
+    color: #64748b;
+    max-width: 400px;
+    line-height: 1.4;
+  }
+}
+
+/* UPLOAD SYLLABUS INPUT FIELD STYLES */
+.upload-syllabus-field {
+  margin-bottom: 1.15rem;
+
+  .upload-file-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .upload-display-text {
+      width: 100%;
+      padding-right: 7.5rem;
+      cursor: pointer;
+      background-color: #ffffff;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+
+      &:focus {
+        border-color: #2563eb;
+      }
+    }
+
+    .btn-browse-pdf {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #2563eb;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+
+      &:hover {
+        background: #dbeafe;
+        border-color: #93c5fd;
+      }
+    }
+  }
+
+  .pdf-file-card-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.85rem;
+    margin-top: 0.45rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    .card-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow: hidden;
+
+      .pdf-emoji {
+        font-size: 1.15rem;
+      }
+
+      .file-title-text {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #0f172a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+      }
+
+      .file-size-badge {
+        font-size: 0.68rem;
+        font-weight: 600;
+        padding: 0.1rem 0.4rem;
+        background: #e2e8f0;
+        color: #475569;
+        border-radius: 4px;
+      }
+    }
+
+    .card-right {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+
+      .btn-action-view {
+        background: #eff6ff;
+        color: #2563eb;
+        border: 1px solid #bfdbfe;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.25rem 0.55rem;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+          background: #dbeafe;
+        }
+      }
+
+      .btn-action-remove {
+        background: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.25rem 0.55rem;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+          background: #fee2e2;
+        }
+      }
+    }
+  }
+
+  .upload-format-hint {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin-top: 0.35rem;
+    display: block;
+  }
+}
+
+// ============================================================================
+// DEDICATED SYLLABUS PDF VIEWER MODAL
+// ============================================================================
+.pdf-viewer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+  padding: 1.25rem;
+}
+
+.pdf-viewer-modal-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 680px;
+  max-height: 84vh;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pdf-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  gap: 0.75rem;
+
+  .pdf-viewer-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    overflow: hidden;
+
+    .pdf-viewer-badge-icon {
+      font-size: 1.5rem;
+      color: #f87171;
+      flex-shrink: 0;
+    }
+
+    .pdf-viewer-text-meta {
+      overflow: hidden;
+
+      .pdf-viewer-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin: 0;
+        color: #f8fafc;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .pdf-viewer-tags {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-top: 0.25rem;
+        flex-wrap: wrap;
+
+        .p-tag {
+          font-size: 0.68rem;
+          font-weight: 700;
+          padding: 0.1rem 0.45rem;
+          border-radius: 9999px;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.25rem;
+
+          &.tag-course {
+            background: rgba(14, 165, 233, 0.2);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+          }
+
+          &.tag-sem {
+            background: rgba(168, 85, 247, 0.2);
+            color: #c084fc;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+          }
+
+          &.tag-file {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(252, 165, 165, 0.3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+
+            ion-icon {
+              font-size: 0.75rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .pdf-viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+
+    .btn-viewer-ctrl {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.2s ease;
+
+      ion-icon {
+        font-size: 0.85rem;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.22);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-1px);
+      }
+
+      &.btn-download {
+        background: #2563eb;
+        border-color: #3b82f6;
+
+        &:hover {
+          background: #1d4ed8;
+        }
+      }
+
+      &.btn-expand {
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    .pdf-modal-close-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      color: #cbd5e1;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #ef4444;
+        color: #ffffff;
+        transform: rotate(90deg);
+      }
+    }
+  }
+}
+
+.pdf-viewer-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  overflow-y: auto;
+  position: relative;
+  max-height: calc(84vh - 65px);
+
+  .pdf-loading-box {
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: #64748b;
+
+    .loading-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  .pdf-frame-wrapper {
+    width: 100%;
+    height: 68vh;
+    min-height: 480px;
+    display: flex;
+
+    .pdf-native-object,
+    .pdf-native-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      flex: 1;
+      background: #ffffff;
+    }
+
+    .unsupported-msg {
+      padding: 1.5rem;
+      color: #64748b;
+      text-align: center;
+      font-size: 0.85rem;
+
+      .btn-fallback-dl {
+        margin-left: 0.5rem;
+        background: #2563eb;
+        color: #ffffff;
+        border: none;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+    }
+  }
+
+  .pdf-missing-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+
+    .pdf-missing-inner {
+      max-width: 480px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 1.5rem 1.75rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      text-align: center;
+
+      .missing-graphic {
+        margin-bottom: 0.5rem;
+
+        ion-icon {
+          font-size: 2.5rem;
+          color: #3b82f6;
+        }
+      }
+
+      .missing-file-name {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 0.4rem 0;
+        word-break: break-all;
+      }
+
+      .missing-explanation {
+        font-size: 0.82rem;
+        color: #64748b;
+        line-height: 1.45;
+        margin: 0 0 1rem 0;
+      }
+
+      .syllabus-summary-card {
+        background: #f1f5f9;
+        border-radius: 8px;
+        padding: 0.65rem 0.85rem;
+        text-align: left;
+        margin-bottom: 1.15rem;
+        border-left: 3px solid #2563eb;
+
+        .summary-card-label {
+          font-size: 0.68rem;
+          font-weight: 800;
+          color: #475569;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          display: block;
+          margin-bottom: 0.2rem;
+        }
+
+        .summary-card-text {
+          font-size: 0.8rem;
+          color: #1e293b;
+          line-height: 1.4;
+          margin: 0;
+        }
+      }
+
+      .attach-file-cta {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+
+        .btn-attach-now {
+          background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+          color: #ffffff;
+          border: none;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 0.82rem;
+          font-weight: 800;
+          padding: 0.65rem 1.25rem;
+          border-radius: 10px;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          transition: all 0.2s ease;
+          box-shadow: 0 3px 10px rgba(37, 99, 235, 0.3);
+
+          ion-icon {
+            font-size: 1rem;
+          }
+
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+          }
+        }
+
+        .attach-notice {
+          font-size: 0.7rem;
+          color: #94a3b8;
+          max-width: 380px;
+        }
+      }
+    }
+  }
+}
+
+
+

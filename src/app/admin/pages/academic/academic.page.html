@@ -38,7 +38,7 @@
           <h2 class="management-title">
             {{ activeTab | titlecase }} Management
           </h2>
-          <span class="count-badge">{{ getFilteredItems().length }} Total {{ activeTab | titlecase }}s</span>
+          <span class="count-badge">{{ getFilteredItems().length }} Total {{ activeTab === 'syllabus' ? 'Syllabi' : (activeTab | titlecase) + 's' }}</span>
         </div>
         
         <div class="header-actions-subrow">
@@ -159,10 +159,12 @@
           <thead>
             <tr>
               <th>SL.NO</th>
-              <th>SESSION</th>
               <th>COURSE</th>
               <th>SEMESTER</th>
-              <th>SYLLABUS TITLE</th>
+              <th>SYLLABUS NAME</th>
+              <th>SYLLABUS OUTLINE</th>
+              <th>PDF FILE</th>
+              <th class="text-center">VIEW</th>
               <th class="text-center">UPDATE</th>
               <th class="text-center">DELETE</th>
             </tr>
@@ -170,15 +172,49 @@
           <tbody>
             <tr *ngFor="let item of getFilteredItems(); let i = index">
               <td><span class="sl-pill">{{ i + 1 }}</span></td>
-              <td>{{ item.session }}</td>
-              <td>{{ item.course }}</td>
+              <td>
+                <div class="table-cell-title">{{ item.course }}</div>
+                <div class="table-cell-sub" *ngIf="item.session">{{ item.session }}</div>
+              </td>
               <td>{{ item.semester }}</td>
-              <td class="font-bold cell-primary">{{ item.syllabusTitle }}</td>
+              <td class="font-bold cell-primary">{{ item.syllabus_name || item.syllabusTitle }}</td>
+              <td class="syllabus-desc-cell" [title]="item.syllabus">
+                <span class="desc-text-clamp">{{ item.syllabus || '—' }}</span>
+              </td>
+              <td>
+                <div class="pdf-tag-pill" *ngIf="item.syllabus_pdf" [title]="item.syllabus_pdf">
+                  <span class="pdf-tag-icon">PDF</span>
+                  <span class="pdf-tag-name">{{ getPdfDisplayName(item.syllabus_pdf) }}</span>
+                </div>
+                <span *ngIf="!item.syllabus_pdf" class="no-pdf-badge">No PDF</span>
+              </td>
+              <td class="text-center">
+                <button
+                  type="button"
+                  class="btn-action-view"
+                  *ngIf="item.syllabus_pdf"
+                  (click)="openPdfViewerModal(item)"
+                  title="Click to view uploaded PDF in modal"
+                >
+                  <ion-icon name="eye-outline"></ion-icon>
+                  <span>View</span>
+                </button>
+                <span *ngIf="!item.syllabus_pdf" class="no-pdf-badge">—</span>
+              </td>
               <td class="text-center">
                 <button class="btn-action-edit" (click)="openEditModal(item)">Edit</button>
               </td>
               <td class="text-center">
                 <button class="btn-action-delete" (click)="deleteItem(item.id)">Delete</button>
+              </td>
+            </tr>
+            <tr *ngIf="getFilteredItems().length === 0">
+              <td colspan="9" class="text-center py-5">
+                <div class="empty-syllabus-state">
+                  <div class="empty-state-icon">📂</div>
+                  <div class="empty-state-title">No Syllabus Available</div>
+                  <div class="empty-state-desc">Currently there is no syllabus record in the system. Use "+ Add New Syllabus" to create one.</div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -333,24 +369,88 @@
 
         <!-- SYLLABUS FIELDS -->
         <ng-container *ngIf="activeTab === 'syllabus'">
-          <div class="floating-field">
-            <select [(ngModel)]="formData.course_id" id="acad_syl_course" class="floating-input">
-              <option value="" disabled>-- Select Course --</option>
+          <div class="floating-field" [class.has-error]="!!formErrors['course_id']">
+            <select [(ngModel)]="formData.course_id" id="acad_syl_course" class="floating-input" (change)="onCourseChangeForSyllabus()">
+              <option value="" disabled selected>-- Select Course --</option>
               <option *ngFor="let c of coursesList" [value]="c.id">{{ c.courseName }}</option>
             </select>
             <label for="acad_syl_course" class="floating-label select-label">Select Course *</label>
+            <span class="field-error-text" *ngIf="formErrors['course_id']">⚠️ {{ formErrors['course_id'] }}</span>
           </div>
-          <div class="floating-field">
-            <select [(ngModel)]="formData.semester_id" id="acad_syl_sem" class="floating-input">
-              <option value="" disabled>-- Select Semester --</option>
-              <option *ngFor="let s of semestersList" [value]="s.id">{{ s.semesterName }} ({{ s.course }})</option>
+
+          <div class="floating-field" [class.has-error]="!!formErrors['semester_id']">
+            <select [(ngModel)]="formData.semester_id" id="acad_syl_sem" class="floating-input" [disabled]="!formData.course_id">
+              <option value="" disabled selected *ngIf="!formData.course_id">-- Please Select Course First --</option>
+              <option value="" disabled selected *ngIf="formData.course_id && getFilteredSemestersForCourse(formData.course_id).length === 0">-- No Semester Available for this Course --</option>
+              <option value="" disabled selected *ngIf="formData.course_id && getFilteredSemestersForCourse(formData.course_id).length > 0">-- Select Semester --</option>
+              <option *ngFor="let s of getFilteredSemestersForCourse(formData.course_id)" [value]="s.id">{{ s.semesterName }}</option>
             </select>
             <label for="acad_syl_sem" class="floating-label select-label">Select Semester *</label>
+            <span class="field-error-text" *ngIf="formErrors['semester_id']">⚠️ {{ formErrors['semester_id'] }}</span>
           </div>
-          <div class="floating-field" [class.has-error]="!!formErrors['syllabusTitle']">
-            <input type="text" [(ngModel)]="formData.syllabusTitle" id="acad_syl" placeholder=" " class="floating-input" />
-            <label for="acad_syl" class="floating-label">Syllabus Title *</label>
-            <span class="field-error-text" *ngIf="formErrors['syllabusTitle']">⚠️ {{ formErrors['syllabusTitle'] }}</span>
+
+          <div class="floating-field" [class.has-error]="!!formErrors['syllabus_name']">
+            <input type="text" [(ngModel)]="formData.syllabus_name" id="acad_syl_name" placeholder=" " class="floating-input" maxlength="100" />
+            <label for="acad_syl_name" class="floating-label">Syllabus Name (max 100 chars) *</label>
+            <span class="field-error-text" *ngIf="formErrors['syllabus_name']">⚠️ {{ formErrors['syllabus_name'] }}</span>
+          </div>
+
+          <div class="floating-field textarea-field" [class.has-error]="!!formErrors['syllabus']">
+            <textarea [(ngModel)]="formData.syllabus" id="acad_syl_content" placeholder=" " class="floating-input floating-textarea" rows="3"></textarea>
+            <label for="acad_syl_content" class="floating-label">Syllabus Content / Outline *</label>
+            <span class="field-error-text" *ngIf="formErrors['syllabus']">⚠️ {{ formErrors['syllabus'] }}</span>
+          </div>
+
+          <!-- UPLOAD SYLLABUS PDF INPUT FIELD -->
+          <div class="floating-field upload-syllabus-field" [class.has-error]="!!formErrors['syllabus_pdf']">
+            <div class="upload-file-input-wrapper">
+              <input
+                type="text"
+                readonly
+                class="floating-input upload-display-text"
+                id="acad_syl_pdf"
+                [value]="formData.syllabus_pdf ? getPdfDisplayName(formData.syllabus_pdf) : ''"
+                placeholder=" "
+                (click)="pdfFileInput.click()"
+              />
+              <label for="acad_syl_pdf" class="floating-label select-label">Upload Syllabus (PDF)</label>
+              
+              <button type="button" class="btn-browse-pdf" (click)="pdfFileInput.click()">
+                <span>📄 Choose PDF</span>
+              </button>
+            </div>
+
+            <!-- Hidden Native File Input -->
+            <input
+              type="file"
+              #pdfFileInput
+              id="pdfFileInput"
+              accept=".pdf,application/pdf"
+              (change)="onPdfFileSelected($event)"
+              style="display: none;"
+            />
+
+            <!-- Selected File Status & Preview Bar -->
+            <div *ngIf="formData.syllabus_pdf || selectedPdfFile" class="pdf-file-card-compact">
+              <div class="card-left">
+                <span class="pdf-emoji">📕</span>
+                <span class="file-title-text" [title]="formData.syllabus_pdf">{{ getPdfDisplayName(formData.syllabus_pdf) }}</span>
+                <span *ngIf="selectedPdfFile" class="file-size-badge">{{ formatFileSize(selectedPdfFile.size) }}</span>
+              </div>
+              <div class="card-right">
+                <button type="button" class="btn-action-view" (click)="viewOrDownloadPdf(formData.syllabus_pdf)">
+                  <ion-icon name="eye-outline"></ion-icon>
+                  <span>Preview</span>
+                </button>
+                <button type="button" class="btn-action-remove" (click)="removeSelectedPdf()">
+                  ✕ Remove
+                </button>
+              </div>
+            </div>
+
+            <!-- Validation Error / Format Hint -->
+            <span class="upload-format-hint" *ngIf="!formErrors['syllabus_pdf']">Supports .pdf documents only (Max size: 10 MB)</span>
+            <span class="field-error-text" *ngIf="formErrors['syllabus_pdf']">⚠️ {{ formErrors['syllabus_pdf'] }}</span>
           </div>
         </ng-container>
 
@@ -411,6 +511,128 @@
         <button class="btn-modal-primary btn-amber" (click)="saveItem()">
           {{ modalMode === 'add' ? 'Save Record' : 'Update Record' }}
         </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================== -->
+  <!-- DEDICATED SYLLABUS PDF VIEWER MODAL POPUP -->
+  <!-- ========================================================================== -->
+  <div class="custom-modal-backdrop pdf-viewer-backdrop" *ngIf="isPdfViewerModalOpen" (click)="closePdfViewerModal()">
+    <div class="pdf-viewer-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- MODAL HEADER -->
+      <div class="pdf-viewer-header">
+        <div class="pdf-viewer-title-group">
+          <ion-icon name="document-text" class="pdf-viewer-badge-icon"></ion-icon>
+          <div class="pdf-viewer-text-meta">
+            <h3 class="pdf-viewer-title">{{ activePdfItem?.syllabus_name || activePdfItem?.syllabusTitle || 'Syllabus PDF Document' }}</h3>
+            <div class="pdf-viewer-tags">
+              <span class="p-tag tag-course">{{ activePdfItem?.course || getCourseName(activePdfItem?.course_id) || 'Course' }}</span>
+              <span class="p-tag tag-sem">{{ activePdfItem?.semester || getSemesterName(activePdfItem?.semester_id) || 'Semester' }}</span>
+              <span class="p-tag tag-file" *ngIf="activePdfItem?.syllabus_pdf">
+                <ion-icon name="document-outline"></ion-icon>
+                <span>{{ getPdfDisplayName(activePdfItem?.syllabus_pdf) }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pdf-viewer-actions">
+          <button
+            type="button"
+            class="btn-viewer-ctrl btn-download"
+            *ngIf="currentPdfRawUrl"
+            (click)="downloadPdfFile(activePdfItem)"
+            title="Download PDF"
+          >
+            <ion-icon name="download-outline"></ion-icon>
+            <span>Download</span>
+          </button>
+          <button
+            type="button"
+            class="btn-viewer-ctrl btn-expand"
+            *ngIf="currentPdfRawUrl"
+            (click)="openPdfInNewTab()"
+            title="Open in Full Screen / New Tab"
+          >
+            <ion-icon name="open-outline"></ion-icon>
+            <span>New Tab</span>
+          </button>
+          <button
+            type="button"
+            class="pdf-modal-close-btn"
+            (click)="closePdfViewerModal()"
+            title="Close Viewer"
+          >
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- MODAL BODY -->
+      <div class="pdf-viewer-body">
+        
+        <!-- Loading Indicator -->
+        <div class="pdf-loading-box" *ngIf="pdfViewerLoading">
+          <ion-spinner name="crescent" color="primary"></ion-spinner>
+          <p class="loading-label">Loading PDF Document Preview...</p>
+        </div>
+
+        <!-- Embedded PDF Viewer (Iframe & Object) -->
+        <div class="pdf-frame-wrapper" *ngIf="!pdfViewerLoading && currentPdfSafeUrl">
+          <object
+            [data]="currentPdfSafeUrl"
+            type="application/pdf"
+            class="pdf-native-object"
+          >
+            <iframe
+              [src]="currentPdfSafeUrl"
+              class="pdf-native-iframe"
+              title="Syllabus PDF Document"
+            >
+              <p class="unsupported-msg">
+                Your browser could not embed this PDF directly.
+                <button type="button" class="btn-fallback-dl" (click)="downloadPdfFile(activePdfItem)">Download PDF to view</button>
+              </p>
+            </iframe>
+          </object>
+        </div>
+
+        <!-- Fallback if PDF binary needs local attachment -->
+        <div class="pdf-missing-box" *ngIf="!pdfViewerLoading && !currentPdfSafeUrl">
+          <div class="pdf-missing-inner">
+            <div class="missing-graphic">
+              <ion-icon name="document-attach-outline"></ion-icon>
+            </div>
+            <h4 class="missing-file-name">{{ getPdfDisplayName(activePdfItem?.syllabus_pdf) }}</h4>
+            <p class="missing-explanation">
+              This syllabus record has <strong>{{ getPdfDisplayName(activePdfItem?.syllabus_pdf) }}</strong> attached. Select this file from your device to view and save it in your browser viewer.
+            </p>
+
+            <div class="syllabus-summary-card" *ngIf="activePdfItem?.syllabus">
+              <span class="summary-card-label">Syllabus Outline:</span>
+              <p class="summary-card-text">{{ activePdfItem?.syllabus }}</p>
+            </div>
+
+            <div class="attach-file-cta">
+              <input
+                type="file"
+                #missingPdfPicker
+                accept=".pdf,application/pdf"
+                (change)="onAttachPdfToActiveItem($event)"
+                style="display: none;"
+              />
+              <button type="button" class="btn-attach-now" (click)="missingPdfPicker.click()">
+                <ion-icon name="folder-open-outline"></ion-icon>
+                <span>Select '{{ getPdfDisplayName(activePdfItem?.syllabus_pdf) }}' to View</span>
+              </button>
+              <span class="attach-notice">Selected PDF will immediately open in this viewer and remain cached for future viewings.</span>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </div>

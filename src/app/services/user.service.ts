@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Configuration } from '../api/configuration';
 import { environment } from '../../environments/environment';
 
 export interface UserPayload {
@@ -44,25 +43,74 @@ export interface AdminAddUserDto {
   [key: string]: any;
 }
 
+export interface AdminUpdateUserDto {
+  id: string | number;
+  roll_no?: string | null;
+  name: string;
+  email: string;
+  password?: string | null;
+  language?: string | null;
+  phone: string;
+  dob?: string | null;
+  gender?: string | null;
+  role?: string | null;
+  session_id?: number | null;
+  course_id?: number | null;
+  semester_id?: number | null;
+  aadhar_no?: string | null;
+  father_name?: string | null;
+  mother_name?: string | null;
+  board_10th?: string | null;
+  total_marks_10th?: number | null;
+  percentage_10th?: number | null;
+  board_12th?: string | null;
+  total_marks_12th?: number | null;
+  percentage_12th?: number | null;
+  status?: string | null;
+  [key: string]: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  private readonly baseUrl = environment.api_url;
 
   constructor(
-    private httpClient: HttpClient,
-    private apiConfig: Configuration
+    private httpClient: HttpClient
   ) { }
 
-  private getBasePath(): string {
-    return environment.api_url || this.apiConfig.basePath || 'http://localhost:3000';
+  private normalizeResponse(res: any): { ok: boolean; msg: string; data?: any; [key: string]: any } {
+    if (!res) {
+      return { ok: false, msg: 'No response from server' };
+    }
+    if (res.statusCode && res.statusCode >= 400) {
+      const msg = Array.isArray(res.message) ? res.message.join(', ') : (res.message || res.error || 'Request failed');
+      return { ...res, ok: false, msg };
+    }
+    const okVal = res.ok !== undefined
+      ? (res.ok === true || res.ok === 1 || res.ok === '1' || res.ok === 'true')
+      : (!res.error && !res.statusCode);
+    return {
+      ...res,
+      ok: Boolean(okVal),
+      msg: res.msg || res.message || (okVal ? 'Success' : 'Operation failed')
+    };
+  }
+
+  private handleHttpError(err: any): Observable<any> {
+    const errBody = err?.error || {};
+    const msg = Array.isArray(errBody.message)
+      ? errBody.message.join(', ')
+      : (errBody.message || errBody.msg || err?.message || 'Server connection error');
+    return of({ ok: false, msg, statusCode: err?.status || 500, ...errBody });
   }
 
   /**
    * Login strictly via /users/login or /users/authenticate
    */
   public loginUser(credentials: { email: string; password: string; role?: string }): Observable<any> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     const payload = {
       email: credentials.email,
       password: credentials.password,
@@ -71,7 +119,9 @@ export class UserService {
 
     return this.httpClient.post(`${basePath}/users/login`, payload).pipe(
       catchError(() => this.httpClient.post(`${basePath}/users/authenticate`, payload)),
-      catchError(() => this.httpClient.post(`${basePath}/user/login`, payload))
+      catchError(() => this.httpClient.post(`${basePath}/user/login`, payload)),
+      map(res => this.normalizeResponse(res)),
+      catchError(err => this.handleHttpError(err))
     );
   }
 
@@ -79,7 +129,7 @@ export class UserService {
    * Add User strictly via /users/add or /user/add (Self-signup)
    */
   public addUser(user: UserPayload): Observable<any> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     const payload = {
       name: String(user.name || user.fullName || '').trim(),
       email: String(user.email || '').trim(),
@@ -88,7 +138,9 @@ export class UserService {
     };
 
     return this.httpClient.post(`${basePath}/users/add`, payload).pipe(
-      catchError(() => this.httpClient.post(`${basePath}/user/add`, payload))
+      catchError(() => this.httpClient.post(`${basePath}/user/add`, payload)),
+      map(res => this.normalizeResponse(res)),
+      catchError(err => this.handleHttpError(err))
     );
   }
 
@@ -97,7 +149,7 @@ export class UserService {
    * Supports all 21 database columns with sp_admin_users_add
    */
   public adminAddUser(dto: AdminAddUserDto): Observable<any> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     const payload: AdminAddUserDto = {
       roll_no: dto.roll_no ? String(dto.roll_no).trim() : null,
       name: String(dto.name || '').trim(),
@@ -123,45 +175,86 @@ export class UserService {
     };
 
     return this.httpClient.post(`${basePath}/users/admin_add`, payload).pipe(
-      catchError(() => this.httpClient.post(`${basePath}/users/admin/add`, payload)),
-      catchError(() => this.httpClient.post(`${basePath}/user/admin_add`, payload)),
-      catchError((err) => {
-        if (err?.error) return of(err.error);
-        return of({ ok: false, msg: err?.message || 'Failed to connect to backend server' });
-      })
+      map(res => this.normalizeResponse(res)),
+      catchError(err => this.handleHttpError(err))
     );
   }
 
   /**
-   * Update User via /users/update
+   * Update User via /users/update (all 22 fields for sp_users_update)
    */
-  public updateUser(dto: { id: string | number; name?: string; email?: string; password?: string; phone?: string; [key: string]: any }): Observable<any> {
-    const basePath = this.getBasePath();
-    return this.httpClient.post(`${basePath}/users/update`, dto).pipe(
-      catchError(() => this.httpClient.put(`${basePath}/users/update`, dto)),
-      catchError(() => this.httpClient.put(`${basePath}/users/${dto.id}`, dto)),
-      catchError((err) => {
-        if (err?.error) return of(err.error);
-        return of({ ok: false, msg: err?.message || 'Failed to update user' });
-      })
+  public updateUser(dto: AdminUpdateUserDto): Observable<any> {
+    const basePath = this.baseUrl;
+    const payload: any = {
+      id: Number(dto.id) || dto.id,
+      name: String(dto.name || '').trim(),
+      email: String(dto.email || '').trim(),
+      phone: String(dto.phone || '').trim(),
+    };
+
+    if (dto.roll_no !== undefined && dto.roll_no !== null) payload.roll_no = String(dto.roll_no).trim();
+    if (dto.password && String(dto.password).trim() !== '') payload.password = String(dto.password).trim();
+    if (dto.role) payload.role = String(dto.role).toLowerCase();
+    if (dto.gender) payload.gender = String(dto.gender).trim();
+    if (dto.dob !== undefined) payload.dob = dto.dob ? String(dto.dob).trim() : null;
+    if (dto.language !== undefined) payload.language = dto.language ? String(dto.language).trim() : null;
+    if (dto.session_id !== undefined) payload.session_id = dto.session_id ? Number(dto.session_id) : null;
+    if (dto.course_id !== undefined) payload.course_id = dto.course_id ? Number(dto.course_id) : null;
+    if (dto.semester_id !== undefined) payload.semester_id = dto.semester_id ? Number(dto.semester_id) : null;
+    if (dto.aadhar_no !== undefined) payload.aadhar_no = dto.aadhar_no ? String(dto.aadhar_no).trim() : null;
+    if (dto.father_name !== undefined) payload.father_name = dto.father_name ? String(dto.father_name).trim() : null;
+    if (dto.mother_name !== undefined) payload.mother_name = dto.mother_name ? String(dto.mother_name).trim() : null;
+    if (dto.board_10th !== undefined) payload.board_10th = dto.board_10th ? String(dto.board_10th).trim() : null;
+    if (dto.total_marks_10th !== undefined) payload.total_marks_10th = dto.total_marks_10th !== null && String(dto.total_marks_10th) !== '' ? Number(dto.total_marks_10th) : null;
+    if (dto.percentage_10th !== undefined) payload.percentage_10th = dto.percentage_10th !== null && String(dto.percentage_10th) !== '' ? Number(dto.percentage_10th) : null;
+    if (dto.board_12th !== undefined) payload.board_12th = dto.board_12th ? String(dto.board_12th).trim() : null;
+    if (dto.total_marks_12th !== undefined) payload.total_marks_12th = dto.total_marks_12th !== null && String(dto.total_marks_12th) !== '' ? Number(dto.total_marks_12th) : null;
+    if (dto.percentage_12th !== undefined) payload.percentage_12th = dto.percentage_12th !== null && String(dto.percentage_12th) !== '' ? Number(dto.percentage_12th) : null;
+    if (dto.status !== undefined) payload.status = String(dto.status);
+
+    return this.httpClient.post(`${basePath}/users/update`, payload).pipe(
+      map(res => this.normalizeResponse(res)),
+      catchError(err => this.handleHttpError(err))
     );
   }
 
   /**
-   * Change User Status (Active / Inactive / Deactive) via /users/status or /users/change_status
+   * Change User Status via /users/status using sp_users_toggle_status (is_active 0 or 1)
    */
-  public updateUserStatus(id: string | number, status: string): Observable<any> {
-    const basePath = this.getBasePath();
-    const payload = { id, status };
+  public updateUserStatus(id: string | number, status: string | number | boolean): Observable<any> {
+    const basePath = this.baseUrl;
+    const userId = Number(id) || id;
+
+    let isActive = 1;
+    let statusStr = 'Active';
+
+    if (typeof status === 'number') {
+      isActive = status === 1 ? 1 : 0;
+      statusStr = isActive === 1 ? 'Active' : 'Deactive';
+    } else if (typeof status === 'boolean') {
+      isActive = status ? 1 : 0;
+      statusStr = isActive === 1 ? 'Active' : 'Deactive';
+    } else {
+      const lower = String(status || '').trim().toLowerCase();
+      if (lower === '0' || lower === 'false' || lower.includes('deact') || lower.includes('inact') || lower.includes('lock')) {
+        isActive = 0;
+        statusStr = 'Deactive';
+      } else {
+        isActive = 1;
+        statusStr = 'Active';
+      }
+    }
+
+    const payload = {
+      id: userId,
+      user_id: userId,
+      is_active: isActive,
+      status: statusStr
+    };
 
     return this.httpClient.post(`${basePath}/users/status`, payload).pipe(
-      catchError(() => this.httpClient.post(`${basePath}/users/change_status`, payload)),
-      catchError(() => this.httpClient.put(`${basePath}/users/status`, payload)),
-      catchError(() => this.httpClient.post(`${basePath}/users/update`, payload)),
-      catchError((err) => {
-        if (err?.error) return of(err.error);
-        return of({ ok: false, msg: err?.message || 'Failed to update user status' });
-      })
+      map(res => this.normalizeResponse(res)),
+      catchError(err => this.handleHttpError(err))
     );
   }
 
@@ -169,7 +262,7 @@ export class UserService {
    * Get All Users strictly via /users/getall or /user/getall
    */
   public getAllUsers(): Observable<UserPayload[]> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
 
     return this.httpClient.get(`${basePath}/users`).pipe(
       catchError(() => this.httpClient.post(`${basePath}/users/getall`, {})),

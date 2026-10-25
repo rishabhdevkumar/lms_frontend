@@ -150,11 +150,20 @@ export class DashboardPage implements OnInit, OnDestroy {
             : cleanName.slice(0, 2).toUpperCase();
 
           const rawSt = String(s.status || '').trim().toLowerCase();
+          const rawIsActive = s.is_active;
           let studentStatus = 'Active';
-          if (rawSt === 'pending') {
-            studentStatus = 'Pending';
-          } else if (rawSt.includes('deact') || rawSt.includes('inact') || rawSt === 'suspended') {
+          if (
+            rawIsActive === 0 ||
+            rawIsActive === '0' ||
+            rawIsActive === false ||
+            rawSt.includes('deact') ||
+            rawSt.includes('inact') ||
+            rawSt.includes('lock') ||
+            rawSt === 'suspended'
+          ) {
             studentStatus = 'Deactive';
+          } else if (rawSt === 'pending') {
+            studentStatus = 'Pending';
           } else {
             studentStatus = 'Active';
           }

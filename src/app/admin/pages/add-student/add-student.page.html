@@ -236,7 +236,7 @@
                       <ion-icon name="create-outline" class="item-ion-icon"></ion-icon>
                       <span class="item-label">Edit</span>
                     </button>
-                    <button class="dropdown-item" (click)="onMenuAction('toggle-status', usr)" [class.suspend]="usr.status === 'Active'" [class.activate]="usr.status !== 'Active'">
+                    <button class="dropdown-item" *ngIf="usr.role !== 'Admin'" (click)="onMenuAction('toggle-status', usr)" [class.suspend]="usr.status === 'Active'" [class.activate]="usr.status !== 'Active'">
                       <ion-icon [name]="usr.status === 'Active' ? 'pause-circle-outline' : 'checkmark-circle-outline'" class="item-ion-icon"></ion-icon>
                       <span class="item-label">{{ usr.status === 'Active' ? 'Deactivate' : 'Activate' }}</span>
                     </button>
@@ -395,11 +395,48 @@
         <button class="modal-close-icon" (click)="closeAddEditModal()">✕</button>
       </div>
 
-      <!-- DYNAMIC FORM STEPPER TABS -->
-      <div class="modal-tab-bar">
-        <button class="tab-btn" [class.active]="activeFormTab === 'basic'" (click)="selectFormTab('basic')">1. Personal & Account Details</button>
-        <button *ngIf="newUserRole === 'Student'" class="tab-btn" [class.active]="activeFormTab === 'academic'" (click)="selectFormTab('academic')">2. Course & Academic</button>
-        <button *ngIf="newUserRole === 'Student'" class="tab-btn" [class.active]="activeFormTab === 'parent'" (click)="selectFormTab('parent')">3. Parent & Emergency Info</button>
+      <!-- CIRCLE STEPPER BAR -->
+      <div class="circle-stepper-container">
+        <!-- STEP 1: BASIC INFO -->
+        <div class="stepper-item" 
+             [class.active]="activeFormTab === 'basic'" 
+             [class.completed]="isStepCompleted('basic')"
+             (click)="goToStep('basic')">
+          <div class="step-circle">
+            <span *ngIf="isStepCompleted('basic')" class="check-icon">✓</span>
+            <span *ngIf="!isStepCompleted('basic')">1</span>
+          </div>
+          <span class="step-label">Basic Info</span>
+        </div>
+
+        <div class="stepper-line" [class.filled]="isStepCompleted('basic')" *ngIf="newUserRole === 'Student'"></div>
+
+        <!-- STEP 2: ACADEMIC INFO (FOR STUDENT ONLY) -->
+        <div class="stepper-item" 
+             *ngIf="newUserRole === 'Student'"
+             [class.active]="activeFormTab === 'academic'" 
+             [class.completed]="isStepCompleted('academic')"
+             [class.disabled]="!canAccessStep('academic')"
+             (click)="goToStep('academic')">
+          <div class="step-circle">
+            <span *ngIf="isStepCompleted('academic')" class="check-icon">✓</span>
+            <span *ngIf="!isStepCompleted('academic')">2</span>
+          </div>
+          <span class="step-label">Academic Info</span>
+        </div>
+
+        <div class="stepper-line" [class.filled]="newUserRole === 'Student' ? isStepCompleted('academic') : isStepCompleted('basic')"></div>
+
+        <!-- STEP 3: PARENT & ADDITIONAL INFO -->
+        <div class="stepper-item" 
+             [class.active]="activeFormTab === 'parent'"
+             [class.disabled]="!canAccessStep('parent')"
+             (click)="goToStep('parent')">
+          <div class="step-circle">
+            <span>{{ newUserRole === 'Student' ? '3' : '2' }}</span>
+          </div>
+          <span class="step-label">{{ newUserRole === 'Student' ? 'Parent & Info' : 'Additional Info' }}</span>
+        </div>
       </div>
 
       <!-- FORM BODY CONTAINER -->
@@ -421,38 +458,27 @@
           </div>
         </div>
         
-        <!-- STEP 1: PERSONAL DETAILS (MATCHING DB USERS SCHEMA) -->
-        <div *ngIf="activeFormTab === 'basic'" class="form-step-section">
+        <!-- ================================================================== -->
+        <!-- STEP 1: PERSONAL & ACCOUNT DETAILS (1 ROW 2 COLUMNS) -->
+        <!-- ================================================================== -->
+        <div class="form-step-section" *ngIf="activeFormTab === 'basic'">
           
-          <!-- USER ROLE SELECTOR (IN ADD MODE) -->
-          <div class="role-selector-bar" *ngIf="modalMode === 'add'">
-            <label class="role-selector-label">SELECT USER ROLE *</label>
-            <div class="role-pills-selector">
-              <button 
-                type="button" 
-                class="role-pill-btn" 
-                [class.active]="newUserRole === 'Student'" 
-                (click)="setRole('Student')">
-                🎓 Student
-              </button>
-              <button 
-                type="button" 
-                class="role-pill-btn faculty" 
-                [class.active]="newUserRole === 'Faculty'" 
-                (click)="setRole('Faculty')">
-                👨‍🏫 Faculty
-              </button>
-              <button 
-                type="button" 
-                class="role-pill-btn admin" 
-                [class.active]="newUserRole === 'Admin'" 
-                (click)="setRole('Admin')">
-                🛡️ Administrator
-              </button>
-            </div>
-          </div>
-
+          <!-- ROW 1: USER ROLE & FULL NAME -->
           <div class="form-row-2">
+            <div class="floating-field">
+              <select 
+                [(ngModel)]="newUserRole" 
+                (ngModelChange)="onRoleChange($event)"
+                id="stu_role_select"
+                class="floating-select"
+              >
+                <option value="Student">🎓 Student</option>
+                <option value="Faculty">👨‍🏫 Faculty</option>
+                <option value="Admin">🛡️ Administrator</option>
+              </select>
+              <label for="stu_role_select" class="floating-label">User Role *</label>
+            </div>
+
             <div class="floating-field" [class.has-error]="!!formErrors['name']">
               <input 
                 type="text" 
@@ -464,20 +490,9 @@
               <label for="stu_name" class="floating-label">Full Name *</label>
               <span class="field-error-text" *ngIf="formErrors['name']">⚠️ {{ formErrors['name'] }}</span>
             </div>
-
-            <div class="floating-field" [class.has-error]="!!formErrors['roll_no']">
-              <input 
-                type="text" 
-                [(ngModel)]="formData.roll_no" 
-                id="stu_roll"
-                placeholder=" " 
-                class="floating-input" 
-              />
-              <label for="stu_roll" class="floating-label">Roll Number (Optional - Auto if empty)</label>
-              <span class="field-error-text" *ngIf="formErrors['roll_no']">⚠️ {{ formErrors['roll_no'] }}</span>
-            </div>
           </div>
 
+          <!-- ROW 2: EMAIL ADDRESS & GENDER -->
           <div class="form-row-2">
             <div class="floating-field" [class.has-error]="!!formErrors['email']">
               <input 
@@ -491,54 +506,6 @@
               <span class="field-error-text" *ngIf="formErrors['email']">⚠️ {{ formErrors['email'] }}</span>
             </div>
 
-            <div class="floating-field" [class.has-error]="!!formErrors['password']">
-              <div class="password-field-wrap">
-                <input 
-                  [type]="showPassword ? 'text' : 'password'" 
-                  [(ngModel)]="formData.password" 
-                  id="stu_password"
-                  placeholder=" " 
-                  class="floating-input"
-                />
-                <button type="button" class="btn-toggle-eye" (click)="showPassword = !showPassword" tabindex="-1">
-                  {{ showPassword ? '🙈' : '👁️' }}
-                </button>
-              </div>
-              <label for="stu_password" class="floating-label">Account Password *</label>
-              <span class="field-error-text" *ngIf="formErrors['password']">⚠️ {{ formErrors['password'] }}</span>
-              <span class="field-hint-text" *ngIf="!formErrors['password']">Min 8 chars (1 letter, 1 number & 1 special character)</span>
-            </div>
-          </div>
-
-          <div class="form-row-2">
-            <div class="floating-field" [class.has-error]="!!formErrors['phone']">
-              <input 
-                type="text" 
-                [(ngModel)]="formData.phone" 
-                id="stu_phone"
-                placeholder=" " 
-                maxlength="10"
-                class="floating-input"
-              />
-              <label for="stu_phone" class="floating-label">Phone Number (10 Digits) *</label>
-              <span class="field-error-text" *ngIf="formErrors['phone']">⚠️ {{ formErrors['phone'] }}</span>
-              <span class="field-hint-text" *ngIf="!formErrors['phone']">Exactly 10 numeric digits</span>
-            </div>
-
-            <div class="floating-field" [class.has-error]="!!formErrors['dob']">
-              <input 
-                type="date" 
-                [(ngModel)]="formData.dob" 
-                id="stu_dob"
-                placeholder=" " 
-                class="floating-input" 
-              />
-              <label for="stu_dob" class="floating-label">Date of Birth</label>
-              <span class="field-error-text" *ngIf="formErrors['dob']">⚠️ {{ formErrors['dob'] }}</span>
-            </div>
-          </div>
-
-          <div class="form-row-2">
             <div class="floating-field" [class.has-error]="!!formErrors['gender']">
               <select 
                 [(ngModel)]="formData.gender" 
@@ -551,6 +518,21 @@
               </select>
               <label for="stu_gender" class="floating-label">Gender</label>
               <span class="field-error-text" *ngIf="formErrors['gender']">⚠️ {{ formErrors['gender'] }}</span>
+            </div>
+          </div>
+
+          <!-- ROW 3: DATE OF BIRTH & BLOOD GROUP -->
+          <div class="form-row-2">
+            <div class="floating-field" [class.has-error]="!!formErrors['dob']">
+              <input 
+                type="date" 
+                [(ngModel)]="formData.dob" 
+                id="stu_dob"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_dob" class="floating-label">Date of Birth</label>
+              <span class="field-error-text" *ngIf="formErrors['dob']">⚠️ {{ formErrors['dob'] }}</span>
             </div>
 
             <div class="floating-field">
@@ -573,8 +555,222 @@
             </div>
           </div>
 
+          <!-- ROW 4: PASSWORD & PHONE NUMBER (BOTTOM ROW) -->
+          <div class="form-row-2">
+            <div class="floating-field has-password-toggle" [class.has-error]="!!formErrors['password']">
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                [(ngModel)]="formData.password" 
+                id="stu_password"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_password" class="floating-label">{{ isEditMode ? 'Account Password (Leave blank to keep)' : 'Account Password *' }}</label>
+              <button type="button" class="btn-toggle-eye" (click)="showPassword = !showPassword" tabindex="-1" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+                <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+              <span class="field-error-text" *ngIf="formErrors['password']">⚠️ {{ formErrors['password'] }}</span>
+            </div>
+
+            <div class="floating-field" [class.has-error]="!!formErrors['phone']">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.phone" 
+                id="stu_phone"
+                placeholder=" " 
+                maxlength="10"
+                class="floating-input" 
+              />
+              <label for="stu_phone" class="floating-label">Phone Number (10 Digits) *</label>
+              <span class="field-error-text" *ngIf="formErrors['phone']">⚠️ {{ formErrors['phone'] }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================== -->
+        <!-- STEP 2: COURSE & ACADEMIC (FOR STUDENT ONLY) - 1 ROW 2 COLUMNS -->
+        <!-- ================================================================== -->
+        <div *ngIf="newUserRole === 'Student' && activeFormTab === 'academic'" class="form-step-section">
+          <div class="form-section-title">
+            <span class="section-badge">🎓</span> Course & Academic Information
+          </div>
+
+          <!-- ROW 1: ROLL NUMBER & ACADEMIC SESSION -->
           <div class="form-row-2">
             <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.roll_no" 
+                id="stu_roll"
+                placeholder=" " 
+                readonly
+                tabindex="-1"
+                class="floating-input readonly-input" 
+              />
+              <label for="stu_roll" class="floating-label">Roll Number (Auto-Generated)</label>
+              <span class="field-hint-text">🔒 Auto-generated & non-editable</span>
+            </div>
+
+            <div class="floating-field" [class.has-error]="!!formErrors['session_id']">
+              <select 
+                [(ngModel)]="formData.session_id" 
+                (change)="onSessionChange()"
+                id="stu_session"
+                class="floating-select"
+              >
+                <option value="" disabled selected></option>
+                <option *ngFor="let s of sessions" [value]="s.id">{{ s.session_name }}</option>
+              </select>
+              <label for="stu_session" class="floating-label">Academic Session</label>
+              <span class="field-error-text" *ngIf="formErrors['session_id']">⚠️ {{ formErrors['session_id'] }}</span>
+            </div>
+          </div>
+
+          <!-- ROW 2: COURSE PROGRAM & SEMESTER -->
+          <div class="form-row-2">
+            <div class="floating-field" [class.has-error]="!!formErrors['course_id']">
+              <select 
+                [(ngModel)]="formData.course_id" 
+                (change)="onCourseChange()"
+                [disabled]="!formData.session_id"
+                id="stu_course"
+                class="floating-select"
+              >
+                <option value="" disabled selected></option>
+                <option *ngFor="let c of courses" [value]="c.id">{{ c.course_name }}</option>
+              </select>
+              <label for="stu_course" class="floating-label">Course Program</label>
+              <span class="field-error-text" *ngIf="formErrors['course_id']">⚠️ {{ formErrors['course_id'] }}</span>
+            </div>
+
+            <div class="floating-field" [class.has-error]="!!formErrors['semester_id']">
+              <select 
+                [(ngModel)]="formData.semester_id" 
+                [disabled]="!formData.course_id"
+                id="stu_semester"
+                class="floating-select"
+              >
+                <option value="" disabled selected></option>
+                <option *ngFor="let sem of semesters" [value]="sem.id">{{ sem.semester_name }}</option>
+              </select>
+              <label for="stu_semester" class="floating-label">Semester</label>
+              <span class="field-error-text" *ngIf="formErrors['semester_id']">⚠️ {{ formErrors['semester_id'] }}</span>
+            </div>
+          </div>
+
+          <!-- ROW 3: 10TH BOARD & 10TH PERCENTAGE -->
+          <div class="form-row-2">
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.board_10th" 
+                id="stu_board10"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_board10" class="floating-label">10th Board Name</label>
+            </div>
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.percentage_10th" 
+                id="stu_perc10"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_perc10" class="floating-label">10th Percentage (%)</label>
+            </div>
+          </div>
+
+          <!-- ROW 4: 12TH BOARD & 12TH PERCENTAGE -->
+          <div class="form-row-2">
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.board_12th" 
+                id="stu_board12"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_board12" class="floating-label">12th Board Name</label>
+            </div>
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.percentage_12th" 
+                id="stu_perc12"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_perc12" class="floating-label">12th Percentage (%)</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================== -->
+        <!-- STEP 3: PARENT & ADDITIONAL INFORMATION (1 ROW 2 COLUMNS) -->
+        <!-- ================================================================== -->
+        <div *ngIf="activeFormTab === 'parent'" class="form-step-section">
+          <div class="form-section-title">
+            <span class="section-badge">{{ newUserRole === 'Student' ? '👨‍👩‍👧' : '📋' }}</span> 
+            {{ newUserRole === 'Student' ? 'Parent & Additional Information' : 'Additional Information' }}
+          </div>
+
+          <!-- ROLL NUMBER (IF FACULTY / ADMIN) & LANGUAGE -->
+          <div class="form-row-2" *ngIf="newUserRole !== 'Student'">
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.roll_no" 
+                id="stu_roll_fac"
+                placeholder=" " 
+                readonly
+                tabindex="-1"
+                class="floating-input readonly-input" 
+              />
+              <label for="stu_roll_fac" class="floating-label">Employee / Admin ID (Auto-Generated)</label>
+              <span class="field-hint-text">🔒 Auto-generated & non-editable</span>
+            </div>
+
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.language" 
+                id="stu_lang_fac"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_lang_fac" class="floating-label">Language (e.g. English)</label>
+            </div>
+          </div>
+
+          <!-- PARENTS INFORMATION (STUDENTS ONLY) -->
+          <div class="form-row-2" *ngIf="newUserRole === 'Student'">
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.father_name" 
+                id="stu_father"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_father" class="floating-label">Father's Name</label>
+            </div>
+            <div class="floating-field">
+              <input 
+                type="text" 
+                [(ngModel)]="formData.mother_name" 
+                id="stu_mother"
+                placeholder=" " 
+                class="floating-input" 
+              />
+              <label for="stu_mother" class="floating-label">Mother's Name</label>
+            </div>
+          </div>
+
+          <!-- LANGUAGE & AADHAR CARD NUMBER (FOR STUDENT) / AADHAR CARD FOR FACULTY/ADMIN -->
+          <div class="form-row-2">
+            <div class="floating-field" *ngIf="newUserRole === 'Student'">
               <input 
                 type="text" 
                 [(ngModel)]="formData.language" 
@@ -600,149 +796,30 @@
           </div>
         </div>
 
-        <!-- STEP 2: COURSE & ACADEMIC (MATCHING DB USERS SCHEMA) -->
-        <div *ngIf="activeFormTab === 'academic'" class="form-step-section">
-          <!-- 1. ACADEMIC SESSION -->
-          <div class="floating-field" [class.has-error]="!!formErrors['session_id']">
-            <select 
-              [(ngModel)]="formData.session_id" 
-              (change)="onSessionChange()"
-              id="stu_session"
-              class="floating-select"
-            >
-              <option value="" disabled selected></option>
-              <option *ngFor="let s of sessions" [value]="s.id">{{ s.session_name }}</option>
-            </select>
-            <label for="stu_session" class="floating-label">Academic Session</label>
-            <span class="field-error-text" *ngIf="formErrors['session_id']">⚠️ {{ formErrors['session_id'] }}</span>
-          </div>
-
-          <!-- 2. COURSE PROGRAM (ENABLED ONLY AFTER SESSION IS SELECTED) -->
-          <div class="floating-field" [class.has-error]="!!formErrors['course_id']">
-            <select 
-              [(ngModel)]="formData.course_id" 
-              (change)="onCourseChange()"
-              [disabled]="!formData.session_id"
-              id="stu_course"
-              class="floating-select"
-            >
-              <option value="" disabled selected></option>
-              <option *ngFor="let c of courses" [value]="c.id">{{ c.course_name }}</option>
-            </select>
-            <label for="stu_course" class="floating-label">Course Program</label>
-            <span class="field-error-text" *ngIf="formErrors['course_id']">⚠️ {{ formErrors['course_id'] }}</span>
-          </div>
-
-          <!-- 3. SEMESTER (ENABLED ONLY AFTER COURSE IS SELECTED) -->
-          <div class="floating-field" [class.has-error]="!!formErrors['semester_id']">
-            <select 
-              [(ngModel)]="formData.semester_id" 
-              [disabled]="!formData.course_id"
-              id="stu_semester"
-              class="floating-select"
-            >
-              <option value="" disabled selected></option>
-              <option *ngFor="let sem of semesters" [value]="sem.id">{{ sem.semester_name }}</option>
-            </select>
-            <label for="stu_semester" class="floating-label">Semester</label>
-            <span class="field-error-text" *ngIf="formErrors['semester_id']">⚠️ {{ formErrors['semester_id'] }}</span>
-          </div>
-
-          <div class="form-row-2">
-            <div class="floating-field">
-              <input 
-                type="text" 
-                [(ngModel)]="formData.board_10th" 
-                id="stu_board10"
-                placeholder=" " 
-                class="floating-input" 
-              />
-              <label for="stu_board10" class="floating-label">10th Board Name</label>
-            </div>
-            <div class="floating-field">
-              <input 
-                type="text" 
-                [(ngModel)]="formData.percentage_10th" 
-                id="stu_perc10"
-                placeholder=" " 
-                class="floating-input" 
-              />
-              <label for="stu_perc10" class="floating-label">10th Percentage (%)</label>
-            </div>
-          </div>
-
-          <div class="form-row-2">
-            <div class="floating-field">
-              <input 
-                type="text" 
-                [(ngModel)]="formData.board_12th" 
-                id="stu_board12"
-                placeholder=" " 
-                class="floating-input" 
-              />
-              <label for="stu_board12" class="floating-label">12th Board Name</label>
-            </div>
-            <div class="floating-field">
-              <input 
-                type="text" 
-                [(ngModel)]="formData.percentage_12th" 
-                id="stu_perc12"
-                placeholder=" " 
-                class="floating-input" 
-              />
-              <label for="stu_perc12" class="floating-label">12th Percentage (%)</label>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 3: PARENTS DETAILS (MATCHING DB USERS SCHEMA) -->
-        <div *ngIf="activeFormTab === 'parent'" class="form-step-section">
-          <div class="form-row-2">
-            <div class="floating-field">
-              <input 
-                type="text" 
-                [(ngModel)]="formData.father_name" 
-                id="stu_father"
-                placeholder=" " 
-                class="floating-input" 
-              />
-              <label for="stu_father" class="floating-label">Father's Name</label>
-            </div>
-            <div class="floating-field">
-              <input 
-                type="text" 
-                [(ngModel)]="formData.mother_name" 
-                id="stu_mother"
-                placeholder=" " 
-                class="floating-input" 
-              />
-              <label for="stu_mother" class="floating-label">Mother's Name</label>
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <!-- STEPPER FOOTER -->
+      <!-- MODAL FOOTER ACTIONS -->
       <div class="modal-footer-actions">
-        <button class="btn-modal-secondary" (click)="closeAddEditModal()">Cancel</button>
+        <!-- CANCEL BUTTON (ALWAYS AVAILABLE) -->
+        <button type="button" class="btn-modal-secondary btn-cancel" (click)="closeAddEditModal()">Cancel</button>
 
-        <button *ngIf="newUserRole === 'Student' && activeFormTab !== 'basic'" class="btn-modal-secondary" (click)="goToPreviousStep()">
-          ⬅ Previous Step
-        </button>
+        <!-- STEP NAVIGATION AND SUBMIT BUTTONS -->
+        <div class="footer-step-buttons">
+          <button type="button" class="btn-modal-secondary" *ngIf="activeFormTab !== 'basic'" (click)="goToPreviousStep()">
+            ⬅ Back
+          </button>
 
-        <!-- NEXT STEP BUTTON (SHOWN ON STEPS 1 & 2 FOR STUDENT) -->
-        <button *ngIf="newUserRole === 'Student' && activeFormTab !== 'parent'" class="btn-modal-primary btn-amber" (click)="goToNextStep()">
-          Next Step ➔
-        </button>
+          <button type="button" class="btn-modal-primary" *ngIf="activeFormTab === 'basic' || (activeFormTab === 'academic' && newUserRole === 'Student')" (click)="goToNextStep()">
+            Next Step ➔
+          </button>
 
-        <!-- REGISTER USER / SAVE CHANGES BUTTON -->
-        <button class="btn-modal-primary" (click)="saveUser()" [disabled]="isSaving">
-          <span *ngIf="isSaving">⏳ Saving...</span>
-          <span *ngIf="!isSaving">
-            {{ modalMode === 'edit' ? 'Save Changes' : ('➕ Register ' + newUserRole) }}
-          </span>
-        </button>
+          <button type="button" class="btn-modal-primary btn-submit-step" *ngIf="activeFormTab === 'parent'" (click)="saveUser()" [disabled]="isSaving">
+            <span *ngIf="isSaving">⏳ Saving...</span>
+            <span *ngIf="!isSaving">
+              {{ modalMode === 'edit' ? 'Save Changes' : ('➕ Register ' + newUserRole) }}
+            </span>
+          </button>
+        </div>
       </div>
 
     </div>
