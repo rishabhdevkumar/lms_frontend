@@ -7,6 +7,23 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (authService.isLoggedInValue) {
+    const user = authService.currentUserValue;
+    const userStatus = String(user?.status || '').trim().toLowerCase();
+    const isActive = user?.is_active;
+
+    if (
+      isActive === 0 ||
+      isActive === false ||
+      Number(isActive) === 0 ||
+      userStatus.includes('deact') ||
+      userStatus.includes('inact') ||
+      userStatus.includes('lock') ||
+      (userStatus !== '' && userStatus !== 'active')
+    ) {
+      authService.logout();
+      router.navigate(['/login'], { queryParams: { deactivated: 'true' } });
+      return false;
+    }
     return true;
   }
 
@@ -21,6 +38,24 @@ export const roleGuard = (requiredRoles: UserRole[]): CanActivateFn => {
 
     if (!authService.isLoggedInValue) {
       router.navigate(['/home']);
+      return false;
+    }
+
+    const user = authService.currentUserValue;
+    const userStatus = String(user?.status || '').trim().toLowerCase();
+    const isActive = user?.is_active;
+
+    if (
+      isActive === 0 ||
+      isActive === false ||
+      Number(isActive) === 0 ||
+      userStatus.includes('deact') ||
+      userStatus.includes('inact') ||
+      userStatus.includes('lock') ||
+      (userStatus !== '' && userStatus !== 'active')
+    ) {
+      authService.logout();
+      router.navigate(['/login'], { queryParams: { deactivated: 'true' } });
       return false;
     }
 

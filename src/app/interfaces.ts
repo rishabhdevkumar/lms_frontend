@@ -179,4 +179,23 @@ export interface UpdateBatchPayload {
   end_time?: string | null;
   room?: string | null;
   status: string;
-}
+}
+
+export interface SyllabusPayload {
+  id?: number | string;
+  course_id: number;
+  semester_id: number;
+  syllabus_name: string;
+  syllabus: string;
+  syllabus_pdf?: string | null;
+  is_active?: number;
+  [key: string]: any;
+}
+
+export interface SyllabusResponse {
+  ok: boolean;
+  msg: string;
+  data?: any;
+  error?: string;
+}
+

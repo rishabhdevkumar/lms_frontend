@@ -1308,8 +1308,14 @@
   border-top: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 0.65rem;
+
+  .footer-step-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
 }
 
 .btn-modal-secondary {
@@ -1434,36 +1440,52 @@
   }
 }
 
-/* PASSWORD FIELD WRAPPER */
-.password-field-wrap {
+/* PASSWORD FIELD WITH TOGGLE EYE BUTTON */
+.floating-field.has-password-toggle {
   position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
 
   .floating-input {
-    padding-right: 2.75rem !important;
+    padding-right: 2.85rem !important;
   }
 
   .btn-toggle-eye {
     position: absolute;
-    right: 0.75rem;
-    top: 50%;
+    right: 0.85rem;
+    top: 24px;
     transform: translateY(-50%);
     background: transparent;
     border: none;
-    font-size: 1.1rem;
     cursor: pointer;
-    color: #64748b;
-    padding: 0.25rem;
+    padding: 0.3rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.15s ease;
+    z-index: 4;
+    outline: none;
 
-    &:hover {
-      transform: translateY(-50%) scale(1.15);
+    ion-icon {
+      font-size: 1.35rem;
+      color: #64748b;
+      display: block;
+      pointer-events: none;
+      transition: color 0.15s ease, transform 0.15s ease;
     }
+
+    &:hover ion-icon {
+      color: #1e293b;
+      transform: scale(1.1);
+    }
+  }
+
+  &:focus-within .floating-label,
+  .floating-input:focus ~ .floating-label,
+  .floating-input:not(:placeholder-shown) ~ .floating-label {
+    top: 0;
+    transform: translateY(-50%) scale(0.85);
+    transform-origin: left top;
+    color: #2563eb !important;
+    font-weight: 700;
+    background-color: #ffffff;
   }
 }
 
@@ -1517,5 +1539,199 @@
     font-weight: 800;
     cursor: pointer;
     padding: 0.2rem;
+  }
+}
+
+/* READONLY AUTO-GENERATED ROLL NO STYLING */
+.readonly-input {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+  cursor: not-allowed !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em;
+  border-color: #cbd5e1 !important;
+  box-shadow: none !important;
+  user-select: none;
+}
+
+/* SECTION HEADERS FOR UNIFIED FORM */
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 1.25rem 0 0.65rem 0;
+  padding-bottom: 0.45rem;
+  border-bottom: 1.5px dashed #e2e8f0;
+
+  .section-badge {
+    font-size: 1.05rem;
+  }
+}
+
+/* CIRCLE STEPPER BAR */
+.circle-stepper-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.15rem 1.5rem 0.85rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+
+  .stepper-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    min-width: 85px;
+    user-select: none;
+
+    .step-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #f8fafc;
+      border: 2px solid #cbd5e1;
+      color: #64748b;
+      font-size: 0.88rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+      .check-icon {
+        font-size: 1rem;
+        font-weight: 900;
+        color: #ffffff;
+      }
+    }
+
+    .step-label {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #64748b;
+      margin-top: 0.45rem;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+
+    &:hover .step-circle {
+      border-color: #94a3b8;
+      transform: scale(1.05);
+    }
+
+    /* ACTIVE STEP */
+    &.active {
+      .step-circle {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: #ffffff;
+        font-weight: 900;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2), 0 2px 6px rgba(37, 99, 235, 0.28);
+      }
+
+      .step-label {
+        color: #1e40af;
+        font-weight: 800;
+      }
+    }
+
+    /* COMPLETED STEP WITH GREEN BACKGROUND AND CHECK */
+    &.completed {
+      .step-circle {
+        background-color: #10b981 !important;
+        border-color: #10b981 !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 2px 6px rgba(16, 185, 129, 0.25);
+      }
+
+      .step-label {
+        color: #059669;
+        font-weight: 800;
+      }
+    }
+
+    /* DISABLED / INCOMPLETE STEP */
+    &.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+
+      &:hover .step-circle {
+        border-color: #cbd5e1;
+        transform: none;
+      }
+
+      .step-label {
+        color: #94a3b8;
+      }
+    }
+  }
+
+  .stepper-line {
+    flex: 1;
+    height: 3px;
+    background-color: #e2e8f0;
+    margin: 0 0.5rem 1.35rem;
+    border-radius: 9999px;
+    transition: background-color 0.3s ease;
+
+    &.filled {
+      background-color: #10b981;
+    }
+  }
+}
+
+/* FLOATING FIELD SILVER BORDER & BLUE ACTIVE TYPING FOCUS */
+.floating-field {
+  .floating-input,
+  .floating-select {
+    border: 1.5px solid #cbd5e1 !important; /* Silver by default */
+    background-color: #ffffff;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover:not(:disabled):not(.readonly-input) {
+      border-color: #94a3b8 !important;
+    }
+
+    &:focus {
+      border-color: #2563eb !important; /* Blue when actively focused / typing */
+      border-width: 2px !important;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14) !important;
+      background-color: #ffffff;
+    }
+
+    &.readonly-input {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+      cursor: not-allowed;
+    }
+  }
+
+  .floating-label {
+    color: #64748b;
+  }
+
+  .floating-input:focus ~ .floating-label,
+  .floating-select:focus ~ .floating-label {
+    color: #2563eb !important;
+  }
+
+  &.has-error {
+    .floating-input,
+    .floating-select {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12) !important;
+    }
+    .floating-label {
+      color: #ef4444 !important;
+    }
   }
 }

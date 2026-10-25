@@ -42,7 +42,7 @@ export interface AttendanceRecordBackend {
   providedIn: 'root'
 })
 export class AttendanceService {
-  private baseUrl = environment.api_url || 'http://localhost:3000';
+  private baseUrl = environment.api_url || 'http://localhost:3001';
 
   constructor(private http: HttpClient) {}
 

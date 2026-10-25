@@ -11,7 +11,6 @@ import {
 } from '../api/model/models';
 import { AuthService, User } from './auth.service';
 import { environment } from '../../environments/environment';
-import { Configuration } from '../api/configuration';
 import { toast } from 'ngx-sonner';
 
 export interface CheckoutCourseParams {
@@ -45,21 +44,13 @@ export interface PaymentTransactionItem {
 })
 export class PaymentService {
   private razorpayScriptLoaded = false;
+  private readonly baseUrl = environment.api_url;
 
   constructor(
     private apiPaymentsService: ApiPaymentsService,
     private httpClient: HttpClient,
-    private authService: AuthService,
-    private apiConfig: Configuration
+    private authService: AuthService
   ) {}
-
-  private getBasePath(): string {
-    return (
-      environment.api_url ||
-      this.apiConfig.basePath ||
-      'http://localhost:3000'
-    );
-  }
 
   /**
    * Dynamically loads the Razorpay checkout script if not already present
@@ -94,7 +85,7 @@ export class PaymentService {
    * Fetch public Razorpay Key ID from backend
    */
   public getPublicKey(): Observable<string> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     return this.httpClient.get<any>(`${basePath}/payments/key`).pipe(
       map((res: any) => {
         if (typeof res === 'string') return res;
@@ -111,7 +102,7 @@ export class PaymentService {
    * Create payment order on backend
    */
   public createPaymentOrder(dto: CreatePaymentOrderDto): Observable<any> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     return this.httpClient.post<any>(`${basePath}/payments/create-order`, dto).pipe(
       catchError((err) => {
         return throwError(() => err?.error || err);
@@ -123,7 +114,7 @@ export class PaymentService {
    * Verify Razorpay payment signature on backend
    */
   public verifyPayment(dto: VerifyPaymentDto): Observable<any> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     return this.httpClient.post<any>(`${basePath}/payments/verify`, dto).pipe(
       catchError((err) => {
         return throwError(() => err?.error || err);
@@ -135,7 +126,7 @@ export class PaymentService {
    * Get payment orders by user ID
    */
   public getUserOrders(userId: number | string): Observable<any[]> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     return this.httpClient.post<any>(`${basePath}/payments/orders/user/${userId}`, {}).pipe(
       map((res) => {
         if (Array.isArray(res)) return res;
@@ -154,7 +145,7 @@ export class PaymentService {
    * Get all course enrollments (for Admin payments page)
    */
   public getAllEnrollments(): Observable<any[]> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     return this.httpClient.post<any>(`${basePath}/payments/enrollments/getall`, {}).pipe(
       map((res) => {
         if (Array.isArray(res)) return res;
@@ -173,7 +164,7 @@ export class PaymentService {
    * Get course enrollments for a specific student
    */
   public getUserEnrollments(userId: number | string): Observable<any[]> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     return this.httpClient.post<any>(`${basePath}/payments/enrollments/user/${userId}`, {}).pipe(
       map((res) => {
         if (Array.isArray(res)) return res;
@@ -192,7 +183,7 @@ export class PaymentService {
    * Check if user is enrolled and has access to a course
    */
   public checkEnrollment(userId: number | string, courseId: number | string): Observable<boolean> {
-    const basePath = this.getBasePath();
+    const basePath = this.baseUrl;
     return this.httpClient.post<any>(`${basePath}/payments/enrollments/check`, {
       users_id: Number(userId),
       course_id: Number(courseId),
